@@ -15,7 +15,7 @@ import {
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { apps } from "../../db/schema";
-import { getDyadAppPath } from "../../paths/paths";
+import { getKapableAppPath } from "../../paths/paths";
 import { createTypedHandler } from "./base";
 import {
   E2E_TEST_DIR,
@@ -52,7 +52,7 @@ import { spawnStreaming } from "../utils/spawn_streaming";
 import {
   configSetsTimeout,
   ensurePlaywrightBootstrap,
-  DYAD_CONFIG_FILENAME,
+  KAPABLE_CONFIG_FILENAME,
   PREVIEW_CDP_ENDPOINT_ENV,
   PREVIEW_CDP_TOKEN_ENV,
   SLOW_MO_DELAY_MS,
@@ -83,7 +83,7 @@ import { readTestScreenshotDataUrl } from "../utils/test_screenshot";
 import { isRecordingActive } from "../services/recording_registry";
 import { readSettings } from "@/main/settings";
 import { resolveNodeModulePackageJsonPathSync } from "../../../shared/node_module_resolution";
-import { DyadError, DyadErrorKind, isDyadError } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
 
 const logger = log.scope("tests_handlers");
 
@@ -203,9 +203,9 @@ async function getApp(appId: number) {
     where: eq(apps.id, appId),
   });
   if (!app) {
-    throw new DyadError(
+    throw new KapableError(
       `App with id ${appId} not found`,
-      DyadErrorKind.NotFound,
+      KapableErrorKind.NotFound,
     );
   }
   return app;
@@ -421,7 +421,7 @@ async function runPreviewTestBatch({
   const resultsRoot = path.join(appPath, "test-results");
   fs.mkdirSync(resultsRoot, { recursive: true });
   for (const entry of fs.readdirSync(resultsRoot, { withFileTypes: true })) {
-    if (entry.isDirectory() && entry.name.startsWith("dyad-preview-")) {
+    if (entry.isDirectory() && entry.name.startsWith("kapable-preview-")) {
       try {
         fs.rmSync(path.join(resultsRoot, entry.name), {
           recursive: true,
@@ -432,7 +432,7 @@ async function runPreviewTestBatch({
       }
     }
   }
-  const batchDir = path.join(resultsRoot, `dyad-preview-${randomUUID()}`);
+  const batchDir = path.join(resultsRoot, `kapable-preview-${randomUUID()}`);
   fs.mkdirSync(batchDir, { recursive: true });
 
   const remainingTimeout = (): number | undefined => {
@@ -455,7 +455,7 @@ async function runPreviewTestBatch({
   let result: RunAppTestsResult = { appId, results: [] };
   try {
     const discoveryReportPath = path.join(batchDir, "discovery.json");
-    const discoveryArgs = ["test", "--config", DYAD_CONFIG_FILENAME];
+    const discoveryArgs = ["test", "--config", KAPABLE_CONFIG_FILENAME];
     appendRequestedTestTarget(discoveryArgs, normalizedTestFile, testLine);
     if (grep) discoveryArgs.push("-g", grep);
     discoveryArgs.push("--list", "--reporter=json", "--trace=off");
@@ -574,7 +574,7 @@ async function runPreviewTestBatch({
       const artifactsPath = path.join(invocationDir, "artifacts");
       fs.mkdirSync(invocationDir, { recursive: true });
 
-      const args = ["test", "--config", DYAD_CONFIG_FILENAME];
+      const args = ["test", "--config", KAPABLE_CONFIG_FILENAME];
       args.push(
         `${escapeRegExpForSelector(target.file)}:${target.line}`,
         "-g",
@@ -733,7 +733,7 @@ export async function runAppTestsCore({
   rotatePreviewView,
 }: RunAppTestsCoreOptions): Promise<RunAppTestsResult> {
   const app = await getApp(appId);
-  const appPath = getDyadAppPath(app.path);
+  const appPath = getKapableAppPath(app.path);
   const emit = (chunk: string, phase: "setup" | "running") =>
     onOutput?.(chunk, phase);
   const normalizedTestFile =
@@ -835,12 +835,12 @@ export async function runAppTestsCore({
   // interpreted as a shell command. A line suffix (`file:line`) targets a
   // single test; the line is validated to be a positive integer at the IPC
   // boundary, so it can't smuggle a flag.
-  // Always select Dyad's config by name. Playwright auto-resolves
+  // Always select KapAble's config by name. Playwright auto-resolves
   // `playwright.config.ts` — the app's own file, which may not exist, may
   // hardcode a baseURL, or may point at a different testDir. Ours is the only
-  // one that honors DYAD_TEST_BASE_URL, so it's passed explicitly rather than
-  // Dyad taking over the canonical config name.
-  const args = ["test", "--config", DYAD_CONFIG_FILENAME];
+  // one that honors KAPABLE_TEST_BASE_URL, so it's passed explicitly rather than
+  // KapAble taking over the canonical config name.
+  const args = ["test", "--config", KAPABLE_CONFIG_FILENAME];
   appendRequestedTestTarget(args, normalizedTestFile ?? undefined, testLine);
   // `-g <regex>` narrows the run to the tests whose title matches (same as the
   // Playwright CLI). Passed as a separate array arg, never a shell string, so
@@ -849,7 +849,7 @@ export async function runAppTestsCore({
     args.push("-g", grep);
   }
   args.push("--reporter=list,json");
-  // baseURL is passed via the DYAD_TEST_BASE_URL env var, not a CLI flag —
+  // baseURL is passed via the KAPABLE_TEST_BASE_URL env var, not a CLI flag —
   // `playwright test` has no `--base-url` option.
   // `--headed` opens a visible browser window so the user can watch the run.
   // It overrides the headless default (and the CI=true env set below).
@@ -1279,7 +1279,7 @@ export async function runAppTestsWithIsolation({
   ): RunAppTestsResult => {
     if (!envRestoreFailed) return result;
     const restoreMessage =
-      "Dyad couldn't restore your app's real database settings after the test run. Restore .env.local before running the app again.";
+      "KapAble couldn't restore your app's real database settings after the test run. Restore .env.local before running the app again.";
     return {
       ...result,
       // Appended rather than substituted: an isolation-setup failure explains
@@ -1656,9 +1656,9 @@ export async function runAppTestsWithIsolation({
     // Anything reaching here is a test-infrastructure failure (isolation setup,
     // teardown, spawn), not a product exception — classify it so telemetry
     // routes it by kind instead of counting it as unclassified.
-    throw isDyadError(error)
+    throw isKapableError(error)
       ? error
-      : new DyadError(finalResult.infraError!.message, DyadErrorKind.Internal, {
+      : new KapableError(finalResult.infraError!.message, KapableErrorKind.Internal, {
           cause: error,
         });
   } finally {
@@ -1722,7 +1722,7 @@ async function moveFileWithFallback(src: string, dst: string): Promise<void> {
 export function registerTestsHandlers() {
   createTypedHandler(testsContracts.listAppTests, async (_event, params) => {
     const app = await getApp(params.appId);
-    const appPath = getDyadAppPath(app.path);
+    const appPath = getKapableAppPath(app.path);
     const matches = await listSpecFiles(appPath);
     const specs = await Promise.all(
       matches.map(async (file) => ({
@@ -1742,7 +1742,7 @@ export function registerTestsHandlers() {
     testsContracts.getTestScreenshot,
     async (_event, params) => {
       const app = await getApp(params.appId);
-      const appPath = getDyadAppPath(app.path);
+      const appPath = getKapableAppPath(app.path);
       return {
         dataUrl: await readTestScreenshotDataUrl(appPath, params.path),
       };
@@ -1758,15 +1758,15 @@ export function registerTestsHandlers() {
 
   createTypedHandler(testsContracts.deleteAppTest, async (_event, params) => {
     const app = await getApp(params.appId);
-    const appPath = getDyadAppPath(app.path);
+    const appPath = getKapableAppPath(app.path);
     // Only ever delete something that looks like one of the spec paths
     // `listAppTests` produces — the same guard the runner uses, so a
     // compromised renderer can't turn this into an arbitrary file delete.
     const testFile = normalizeRunTestFile(params.testFile);
     if (!testFile) {
-      throw new DyadError(
+      throw new KapableError(
         `Invalid test file: ${params.testFile}`,
-        DyadErrorKind.Validation,
+        KapableErrorKind.Validation,
       );
     }
 
@@ -1799,9 +1799,9 @@ export function registerTestsHandlers() {
           await fs.promises.lstat(fullPath);
         } catch (error: any) {
           if (error?.code === "ENOENT") {
-            throw new DyadError(
+            throw new KapableError(
               `Test file not found: ${testFile}`,
-              DyadErrorKind.NotFound,
+              KapableErrorKind.NotFound,
             );
           }
           throw error;
@@ -1849,7 +1849,7 @@ export function registerTestsHandlers() {
     testsContracts.detectLegacyTests,
     async (_event, params) => {
       const app = await getApp(params.appId);
-      const appPath = getDyadAppPath(app.path);
+      const appPath = getKapableAppPath(app.path);
       const specs = await detectLegacyPlaywrightSpecs(appPath);
       const files = specs.map((file) => ({
         file,
@@ -1863,7 +1863,7 @@ export function registerTestsHandlers() {
     testsContracts.migrateLegacyTests,
     async (_event, params) => {
       const app = await getApp(params.appId);
-      const appPath = getDyadAppPath(app.path);
+      const appPath = getKapableAppPath(app.path);
       // Serialize against test runs (same numeric appId lock) so a move can't
       // interleave with a run's env swap / dev-server restart.
       //

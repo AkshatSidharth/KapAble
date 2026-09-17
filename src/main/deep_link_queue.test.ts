@@ -6,15 +6,15 @@ describe("createDeepLinkQueue", () => {
     const handler = vi.fn();
     const queue = createDeepLinkQueue(handler);
 
-    queue.handle("dyad://one");
-    queue.handle("dyad://two");
+    queue.handle("kapable://one");
+    queue.handle("kapable://two");
 
     expect(handler).not.toHaveBeenCalled();
 
     queue.markReady();
 
-    expect(handler).toHaveBeenNthCalledWith(1, "dyad://one");
-    expect(handler).toHaveBeenNthCalledWith(2, "dyad://two");
+    expect(handler).toHaveBeenNthCalledWith(1, "kapable://one");
+    expect(handler).toHaveBeenNthCalledWith(2, "kapable://two");
   });
 
   it("handles deep links immediately after the app is marked ready", () => {
@@ -22,11 +22,11 @@ describe("createDeepLinkQueue", () => {
     const queue = createDeepLinkQueue(handler);
 
     queue.markReady();
-    queue.handle("dyad://ready");
+    queue.handle("kapable://ready");
     queue.markReady();
 
     expect(handler).toHaveBeenCalledOnce();
-    expect(handler).toHaveBeenCalledWith("dyad://ready");
+    expect(handler).toHaveBeenCalledWith("kapable://ready");
   });
 
   it("queues again while a newly targeted window is loading", () => {
@@ -35,10 +35,10 @@ describe("createDeepLinkQueue", () => {
     queue.markReady();
     queue.markNotReady();
 
-    queue.handle("dyad://new-window");
+    queue.handle("kapable://new-window");
     expect(handler).not.toHaveBeenCalled();
 
     queue.markReady();
-    expect(handler).toHaveBeenCalledWith("dyad://new-window");
+    expect(handler).toHaveBeenCalledWith("kapable://new-window");
   });
 });

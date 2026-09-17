@@ -13,7 +13,7 @@ import {
 } from "@/ipc/utils/stream_text_utils";
 import { getMaxTokens, getTemperature } from "@/ipc/utils/token_utils";
 import type { UserSettings } from "@/lib/schemas";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { searchChatsTool } from "./search_chats";
 import { readChatTool } from "./read_chat";
 import type { AgentContext, ToolDefinition } from "./types";
@@ -135,9 +135,9 @@ export async function runExploreChatHistorySubagent({
         builtinProviderId: modelInfo.modelClient.builtinProviderId,
       }),
       providerOptions: getProviderOptions({
-        dyadAppId: ctx.appId,
-        dyadRequestId: ctx.dyadRequestId,
-        dyadDisableFiles: true,
+        kapableAppId: ctx.appId,
+        kapableRequestId: ctx.kapableRequestId,
+        kapableDisableFiles: true,
         files: [],
         mentionedAppsCodebases: [],
         builtinProviderId: modelInfo.modelClient.builtinProviderId,
@@ -206,16 +206,16 @@ function assertHistoryExplorerAvailable(
   ctx: AgentContext,
 ): void {
   // Toolset exclusion is not an execution-time security boundary — re-check.
-  if (!ctx.isDyadPro || !settings.enableDyadPro) {
-    throw new DyadError(
-      "explore_chat_history requires Dyad Pro",
-      DyadErrorKind.Precondition,
+  if (!ctx.isKapablePro || !settings.enableKapablePro) {
+    throw new KapableError(
+      "explore_chat_history requires KapAble Pro",
+      KapableErrorKind.Precondition,
     );
   }
   if (!settings.providerSettings?.auto?.apiKey) {
-    throw new DyadError(
-      "explore_chat_history requires a Dyad Pro auto provider API key",
-      DyadErrorKind.Precondition,
+    throw new KapableError(
+      "explore_chat_history requires a KapAble Pro auto provider API key",
+      KapableErrorKind.Precondition,
     );
   }
 }

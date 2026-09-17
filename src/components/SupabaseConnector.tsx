@@ -244,7 +244,7 @@ export function SupabaseConnector({ appId }: { appId: number }) {
     }
   }, [flowState, t]);
 
-  // A dyad://supabase-oauth-return processed with no active flow (cold
+  // A kapable://supabase-oauth-return processed with no active flow (cold
   // start, app restarted mid-flow, or a return that arrived after the flow
   // timed out): tokens are already stored, just refresh what we show.
   useUnsolicitedConnectionReturn("supabase", () => {
@@ -359,7 +359,7 @@ export function SupabaseConnector({ appId }: { appId: number }) {
           });
         } else {
           await ipc.system.openExternalUrl(
-            "https://supabase-oauth.dyad.sh/api/connect-supabase/login",
+            "https://supabase-oauth.kapable.sh/api/connect-supabase/login",
           );
         }
       } catch (error) {
@@ -379,7 +379,7 @@ export function SupabaseConnector({ appId }: { appId: number }) {
       } else if (outcome === "already-current") {
         toast.success(t("integrations.supabase.apiKeyAlreadyCurrent"));
       } else {
-        // The key is still legacy and Dyad couldn't act on it. Reporting
+        // The key is still legacy and KapAble couldn't act on it. Reporting
         // success here would leave the user believing a broken app was fixed.
         toast.info(t("integrations.supabase.apiKeyNotUpdated"));
       }

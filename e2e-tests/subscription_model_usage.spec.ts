@@ -2,7 +2,7 @@ import { expect } from "@playwright/test";
 import { test } from "./helpers/test_helper";
 
 test("subscription model usage UX", async ({ po, electronApp }, testInfo) => {
-  await po.setUpDyadPro();
+  await po.setUpKapablePro();
   await electronApp.evaluate(({ ipcMain, BrowserWindow }) => {
     ipcMain.removeHandler("codex-subscription:status");
     ipcMain.handle("codex-subscription:status", () => ({
@@ -145,11 +145,11 @@ test("subscription model usage UX", async ({ po, electronApp }, testInfo) => {
     });
   });
   await expect(
-    po.page.getByRole("dialog", { name: "Enjoy your extra Dyad usage!" }),
+    po.page.getByRole("dialog", { name: "Enjoy your extra KapAble usage!" }),
   ).toBeVisible();
   await expect(
     po.page.getByText(
-      "Uses up to 1.5 Dyad Pro credits / 1 million tokens processed.",
+      "Uses up to 1.5 KapAble Pro credits / 1 million tokens processed.",
       { exact: true },
     ),
   ).toBeVisible();

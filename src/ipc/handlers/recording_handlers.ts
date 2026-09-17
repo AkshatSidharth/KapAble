@@ -38,7 +38,7 @@ import {
 } from "../services/recorded_test_drafts";
 import { isTestRunActive } from "./tests_handlers";
 import { readSettings } from "@/main/settings";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   isTestBranchCleanupOnly,
   restoreAppFromTestBranch,
@@ -67,9 +67,9 @@ function deferred<T>() {
 async function getApp(appId: number) {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
   if (!app) {
-    throw new DyadError(
+    throw new KapableError(
       `App with id ${appId} not found`,
-      DyadErrorKind.NotFound,
+      KapableErrorKind.NotFound,
     );
   }
   return app;
@@ -89,7 +89,7 @@ function toRecordingAuth(setup: IsolationAuthSetup | undefined): RecordingAuth {
  * identity into storage the preview keeps — a Supabase session under
  * `sb-<ref>-auth-token`, a Better Auth cookie — and deleting the test user is a
  * server-side change an already-issued JWT does not see. Left behind, the
- * preview goes on acting as a user Dyad has disowned, against the real project.
+ * preview goes on acting as a user KapAble has disowned, against the real project.
  *
  * The `origin` filter is honest for localStorage/IndexedDB/service workers,
  * which are genuinely origin-keyed, but NOT for cookies: cookies have never been
@@ -138,7 +138,7 @@ export function registerRecordingHandlers() {
         return infraResult(
           appId,
           blockedBy
-            ? `Wait for Dyad to ${blockedBy} before starting a recording.`
+            ? `Wait for KapAble to ${blockedBy} before starting a recording.`
             : "A recording session is already in progress for this app.",
         );
       }
@@ -197,7 +197,7 @@ export function registerRecordingHandlers() {
           if (!restored) {
             return infraResult(
               appId,
-              "Dyad couldn't restore this app's real database settings from the previous session. Retry after checking the Neon connection.",
+              "KapAble couldn't restore this app's real database settings from the previous session. Retry after checking the Neon connection.",
             );
           }
           // Recovery may clear the marker or leave a cleanup-only marker. Give
@@ -341,7 +341,7 @@ export function registerRecordingHandlers() {
                   ready.resolve(
                     infraResult(
                       appId,
-                      "Dyad couldn't restore this app's real database settings from the previous operation. Retry after checking the Neon connection.",
+                      "KapAble couldn't restore this app's real database settings from the previous operation. Retry after checking the Neon connection.",
                     ),
                   );
                   return;
@@ -485,7 +485,7 @@ export function registerRecordingHandlers() {
                   // this reaches the user as an error toast.
                   endReason = "error";
                   endMessage =
-                    "Dyad couldn't restore your app's real database settings after recording. Restore .env.local before running the app again.";
+                    "KapAble couldn't restore your app's real database settings after recording. Restore .env.local before running the app again.";
                 }
                 clearRegistration();
                 // A setup failure normally has no live recorder to notify. The

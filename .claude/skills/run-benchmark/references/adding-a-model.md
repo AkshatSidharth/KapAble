@@ -6,7 +6,7 @@ wrong number (see traps.md).
 1. **Find it in the live catalog** and pin the catalog.
 
    ```bash
-   curl -sf https://api.dyad.sh/v1/language-model-catalog -o catalog/catalog-$(date +%F).json
+   curl -sf https://api.kapable.sh/v1/language-model-catalog -o catalog/catalog-$(date +%F).json
    node -e "const c=require('./catalog/catalog-$(date +%F).json');for(const [p,ms] of Object.entries(c.modelsByProvider))for(const m of ms)if(/<name>/i.test(m.apiName+m.displayName))console.log(p,JSON.stringify(m))"
    ```
 

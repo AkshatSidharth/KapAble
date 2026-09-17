@@ -2,16 +2,16 @@ import type { ClientChannel, ConnectConfig } from "ssh2";
 import type { SshFailure } from "@/shared/ssh_failure";
 import { createHash } from "crypto";
 import log from "electron-log";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 const logger = log.scope("ssh_client");
 
 /**
- * Dyad's SSH client, for setting a server up before Coolify exists on it.
+ * KapAble's SSH client, for setting a server up before Coolify exists on it.
  *
- * Deploying needs no SSH at all — Coolify clones from GitHub with a key Dyad
+ * Deploying needs no SSH at all — Coolify clones from GitHub with a key KapAble
  * hands it. This is the other half: reaching a bare machine to install Coolify
- * in the first place, which nothing else in Dyad does.
+ * in the first place, which nothing else in KapAble does.
  */
 
 /** Long enough for a slow link, short enough that a wrong address gives up. */
@@ -35,11 +35,11 @@ export interface SshTarget {
  */
 export type { SshFailure };
 
-export class SshError extends DyadError {
+export class SshError extends KapableError {
   constructor(
     readonly failure: SshFailure,
     message: string,
-    kind: DyadErrorKind,
+    kind: KapableErrorKind,
     /**
      * What the operating system called it, where it said anything.
      *
@@ -77,7 +77,7 @@ export function hostKeyFingerprint(key: Buffer): string {
  *
  * A parameter rather than a policy baked in here, because the answer differs by
  * how we arrived. A server the user typed the address of has nothing to check
- * against, so the honest answer is to show them the fingerprint. One Dyad has
+ * against, so the honest answer is to show them the fingerprint. One KapAble has
  * already looked at can be checked exactly.
  *
  * Synchronous: ssh2 decides during the handshake, with nothing to await into,
@@ -108,9 +108,9 @@ function classify(
   if (level === "client-authentication") {
     return new SshError(
       "auth-rejected",
-      "The server refused this key. Add Dyad's public key to the server's " +
+      "The server refused this key. Add KapAble's public key to the server's " +
         "authorized_keys and try again.",
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   }
   if (level === "handshake") {
@@ -122,13 +122,13 @@ function classify(
       "handshake-failed",
       // The library's own words, with its "Handshake failed:" preamble taken
       // off — this sentence has already said that much.
-      `Dyad and this server could not agree on how to connect${
+      `KapAble and this server could not agree on how to connect${
         err.message
           ? `: ${err.message.replace(/^handshake failed:\s*/i, "")}`
           : ""
       }. That usually means the server's SSH is older or more restricted ` +
-        `than Dyad's defaults.`,
-      DyadErrorKind.External,
+        `than KapAble's defaults.`,
+      KapableErrorKind.External,
     );
   }
   if (level === "client-timeout") {
@@ -139,7 +139,7 @@ function classify(
             "frozen; check it and try again."
         : "The server did not answer in time. Check the address and that " +
             "port 22 is reachable.",
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
   if (
@@ -151,7 +151,7 @@ function classify(
       "unreachable",
       `Could not reach the server (${err.code}). Check the address and that ` +
         `port 22 is open.`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
       err.code,
     );
   }
@@ -160,7 +160,7 @@ function classify(
     connected
       ? `The connection to the server failed: ${err.message}`
       : `Could not connect over SSH: ${err.message}`,
-    DyadErrorKind.External,
+    KapableErrorKind.External,
     err.code,
   );
 }
@@ -253,12 +253,12 @@ export async function connectSsh(
     // that whole stretch — the panel said "Stopping…" and kept going.
     if (signal?.aborted) {
       conn.end();
-      reject(new DyadError("Cancelled.", DyadErrorKind.UserCancelled));
+      reject(new KapableError("Cancelled.", KapableErrorKind.UserCancelled));
       return;
     }
     const onAbort = () => {
       conn.end();
-      reject(new DyadError("Cancelled.", DyadErrorKind.UserCancelled));
+      reject(new KapableError("Cancelled.", KapableErrorKind.UserCancelled));
     };
     signal?.addEventListener("abort", onAbort, { once: true });
     const settled = (fn: () => void) => () => {
@@ -283,7 +283,7 @@ export async function connectSsh(
           new SshError(
             "host-key-rejected",
             "The server's identity was not accepted, so nothing was sent to it.",
-            DyadErrorKind.UserCancelled,
+            KapableErrorKind.UserCancelled,
           ),
         );
         return;
@@ -315,7 +315,7 @@ export async function connectSsh(
     run(command, { input, onOutput, signal, timeoutMs } = {}) {
       return new Promise<SshResult>((resolve, reject) => {
         if (signal?.aborted) {
-          reject(new DyadError("Cancelled.", DyadErrorKind.UserCancelled));
+          reject(new KapableError("Cancelled.", KapableErrorKind.UserCancelled));
           return;
         }
         let timer: ReturnType<typeof setTimeout> | undefined;
@@ -330,7 +330,7 @@ export async function connectSsh(
           cancelled = true;
           stopListening();
           openStream?.close();
-          reject(new DyadError("Cancelled.", DyadErrorKind.UserCancelled));
+          reject(new KapableError("Cancelled.", KapableErrorKind.UserCancelled));
         };
         signal?.addEventListener("abort", onAbort, { once: true });
         const stopListening = () => {
@@ -351,7 +351,7 @@ export async function connectSsh(
               new SshError(
                 "command-timeout",
                 "The server did not answer in time.",
-                DyadErrorKind.External,
+                KapableErrorKind.External,
               ),
             );
           }, timeoutMs);

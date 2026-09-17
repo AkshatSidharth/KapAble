@@ -1,6 +1,6 @@
 import type { ExternalModelAdmission } from "../services/external_model_admission";
 import {
-  AUTO_DYAD_PRO_MODEL_ALIASES,
+  AUTO_KAPABLE_PRO_MODEL_ALIASES,
   AUTO_BALANCED_ALIAS,
   resolveAutoModelCandidate,
   type AutoModelCandidates,
@@ -32,17 +32,17 @@ import { getLanguageModelProviders } from "../shared/language_model_helpers";
 import { resolveBuiltinModelAlias } from "../shared/remote_language_model_catalog";
 import { LanguageModelProvider } from "@/ipc/types";
 import {
-  createDyadEngine,
-  type DyadEngineProvider,
+  createKapableEngine,
+  type KapableEngineProvider,
 } from "./llm_engine_provider";
 
 import { getLmStudioBaseUrl } from "./lm_studio_utils";
 import { createOllamaProvider } from "./ollama_provider";
 import { getOllamaApiUrl } from "../handlers/local_model_ollama_handler";
 import { createFallback } from "./fallback_ai_model";
-import { getDyadEngineBaseUrl } from "./dyad_engine_url";
+import { getKapableEngineBaseUrl } from "./kapable_engine_url";
 import { getTestFetchOption } from "./test_fetch_override";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   findInvalidProviderApiKeyCharacter,
   formatInvalidProviderApiKeyMessage,
@@ -68,8 +68,8 @@ function getModelClientFetchOption(): { fetch?: FetchFunction } {
 }
 
 const AUTO_MODEL_ALIASES = [
-  ...AUTO_DYAD_PRO_MODEL_ALIASES,
-  "dyad/auto/openrouter",
+  ...AUTO_KAPABLE_PRO_MODEL_ALIASES,
+  "kapable/auto/openrouter",
 ] as const;
 
 const OPENROUTER_FREE_MODEL_NAME = "openrouter/free";
@@ -98,7 +98,7 @@ async function createResolvedAliasClient({
   settings,
   context,
 }: {
-  provider: DyadEngineProvider;
+  provider: KapableEngineProvider;
   resolvedModel: ResolvedAliasModel;
   modelId: string;
   selection: ModelSelection;
@@ -115,7 +115,7 @@ async function createResolvedAliasClient({
             context,
             settings.chatgptFastMode,
           )
-        : createDyadEngineAliasModel({ provider, resolvedModel, modelId }),
+        : createKapableEngineAliasModel({ provider, resolvedModel, modelId }),
   };
 }
 
@@ -126,12 +126,12 @@ export interface ModelClientResult {
   isSmartContextEnabled?: boolean;
 }
 
-function createDyadEngineAliasModel({
+function createKapableEngineAliasModel({
   provider,
   resolvedModel,
   modelId,
 }: {
-  provider: DyadEngineProvider;
+  provider: KapableEngineProvider;
   resolvedModel: ResolvedAliasModel;
   modelId: string;
 }): LanguageModel {
@@ -183,10 +183,10 @@ export async function getModelClient(
         settings.modelEffortPreferences?.[getModelPreferenceKey(selectedModel)],
     }));
   const model = getAutoSidekickRuntimeModel(selectedModel);
-  if (selectedModelSelection.connection === "pro" && !settings.enableDyadPro)
-    throw new DyadError(
-      "Enable Dyad Pro before using Pro credits.",
-      DyadErrorKind.Auth,
+  if (selectedModelSelection.connection === "pro" && !settings.enableKapablePro)
+    throw new KapableError(
+      "Enable KapAble Pro before using Pro credits.",
+      KapableErrorKind.Auth,
     );
   // A supplied connection is the source already accepted for this turn.
   // Auxiliary callers without one resolve their own concrete model here.
@@ -198,9 +198,9 @@ export async function getModelClient(
   const connection = modelSelection.connection;
   if (connection === "subscription") {
     if (modelSelection.provider !== "openai")
-      throw new DyadError(
+      throw new KapableError(
         "Subscription supports OpenAI models only. Choose a ChatGPT model.",
-        DyadErrorKind.Validation,
+        KapableErrorKind.Validation,
       );
     return {
       modelClient: {
@@ -219,30 +219,30 @@ export async function getModelClient(
   }
   const allProviders = await getLanguageModelProviders();
 
-  const dyadApiKey = settings.enableDyadPro
+  const kapableApiKey = settings.enableKapablePro
     ? getProviderApiKeyForRequest(
         settings.providerSettings?.auto?.apiKey?.value,
-        "Dyad",
+        "KapAble",
       )
     : undefined;
   const isLocalProvider = ["ollama", "lmstudio"].includes(model.provider);
-  const isDyadProEnabledForRequest = Boolean(
-    dyadApiKey && settings.enableDyadPro,
+  const isKapableProEnabledForRequest = Boolean(
+    kapableApiKey && settings.enableKapablePro,
   );
-  if (connection === "pro" && !isDyadProEnabledForRequest)
-    throw new DyadError(
-      "Enable Dyad Pro before using Pro credits.",
-      DyadErrorKind.Auth,
+  if (connection === "pro" && !isKapableProEnabledForRequest)
+    throw new KapableError(
+      "Enable KapAble Pro before using Pro credits.",
+      KapableErrorKind.Auth,
     );
 
   if (
     model.provider === "auto" &&
     model.name === AUTO_BALANCED_MODEL_NAME &&
-    !isDyadProEnabledForRequest
+    !isKapableProEnabledForRequest
   ) {
-    throw new DyadError(
-      "Auto (balanced) requires Dyad Pro. Switch to another model or enable Dyad Pro.",
-      DyadErrorKind.Auth,
+    throw new KapableError(
+      "Auto (balanced) requires KapAble Pro. Switch to another model or enable KapAble Pro.",
+      KapableErrorKind.Auth,
     );
   }
 
@@ -250,22 +250,22 @@ export async function getModelClient(
   const providerConfig = allProviders.find((p) => p.id === model.provider);
 
   if (!providerConfig) {
-    throw new DyadError(
+    throw new KapableError(
       `Configuration not found for provider: ${model.provider}`,
-      DyadErrorKind.NotFound,
+      KapableErrorKind.NotFound,
     );
   }
 
-  if (isFreeProModel(model) && (!settings.enableDyadPro || !dyadApiKey)) {
-    throw new DyadError(
-      "Dyad Free requires an active Dyad Pro API key. Switch to another model or enable Dyad Pro.",
-      DyadErrorKind.Auth,
+  if (isFreeProModel(model) && (!settings.enableKapablePro || !kapableApiKey)) {
+    throw new KapableError(
+      "KapAble Free requires an active KapAble Pro API key. Switch to another model or enable KapAble Pro.",
+      KapableErrorKind.Auth,
     );
   }
 
   // Direct providers retain their transport while Engine bills reported usage.
   if (
-    isDyadProEnabledForRequest &&
+    isKapableProEnabledForRequest &&
     (isLocalProvider || providerConfig.type === "custom")
   ) {
     const regular = getRegularModelClient(
@@ -284,7 +284,7 @@ export async function getModelClient(
             connection: isLocalProvider ? "local" : "byok",
             modelProvider: model.provider,
           },
-          dyadApiKey!,
+          kapableApiKey!,
           context?.externalModelAdmission,
         ),
       },
@@ -293,23 +293,23 @@ export async function getModelClient(
     };
   }
 
-  // Handle Dyad Pro override
-  if (isDyadProEnabledForRequest && !isLocalProvider) {
-    const dyadEngineUrl = process.env.DYAD_ENGINE_URL;
-    // Check if the selected provider supports Dyad Pro (has a gateway prefix) OR
+  // Handle KapAble Pro override
+  if (isKapableProEnabledForRequest && !isLocalProvider) {
+    const kapableEngineUrl = process.env.KAPABLE_ENGINE_URL;
+    // Check if the selected provider supports KapAble Pro (has a gateway prefix) OR
     // we're using local engine.
     // IMPORTANT: some providers like OpenAI have an empty string gateway prefix,
     // so we do a nullish and not a truthy check here.
-    if (providerConfig.gatewayPrefix != null || dyadEngineUrl) {
+    if (providerConfig.gatewayPrefix != null || kapableEngineUrl) {
       // Native tool-backed modes select and edit files themselves. Retired
       // engine-side Build options remain in stored settings only for backwards
       // compatibility and must not affect requests.
       const enableSmartFilesContext = false;
-      const provider = createDyadEngine({
-        apiKey: dyadApiKey,
-        baseURL: getDyadEngineBaseUrl(),
+      const provider = createKapableEngine({
+        apiKey: kapableApiKey,
+        baseURL: getKapableEngineBaseUrl(),
         ...getModelClientFetchOption(),
-        dyadOptions: {
+        kapableOptions: {
           enableLazyEdits: false,
           enableSmartFilesContext,
           enableWebSearch: false,
@@ -319,11 +319,11 @@ export async function getModelClient(
       });
 
       logger.debug(
-        `\x1b[1;97;44m Using Dyad Pro API key for model: ${model.name} \x1b[0m`,
+        `\x1b[1;97;44m Using KapAble Pro API key for model: ${model.name} \x1b[0m`,
       );
 
       logger.debug(
-        `\x1b[1;30;42m Using Dyad Pro engine: ${dyadEngineUrl ?? "<prod>"} \x1b[0m`,
+        `\x1b[1;30;42m Using KapAble Pro engine: ${kapableEngineUrl ?? "<prod>"} \x1b[0m`,
       );
 
       // Do not use free variant (for openrouter).
@@ -345,9 +345,9 @@ export async function getModelClient(
         isSmartContextEnabled: enableSmartFilesContext,
       };
     } else {
-      throw new DyadError(
-        "This provider is not available through Pro credits. Turn off Dyad Pro to use your own API key.",
-        DyadErrorKind.Validation,
+      throw new KapableError(
+        "This provider is not available through Pro credits. Turn off KapAble Pro to use your own API key.",
+        KapableErrorKind.Validation,
       );
     }
   }
@@ -358,9 +358,9 @@ export async function getModelClient(
         (p) => p.id === "openrouter",
       );
       if (!openRouterProvider) {
-        throw new DyadError(
+        throw new KapableError(
           "OpenRouter provider not found",
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
       return {
@@ -404,7 +404,7 @@ export async function getModelClient(
         );
         if (
           resolvedModel.providerId === "openrouter" &&
-          !isDyadProEnabledForRequest &&
+          !isKapableProEnabledForRequest &&
           providerInfo
         ) {
           return {
@@ -481,7 +481,7 @@ async function getProModelClient({
 }: {
   model: LargeLanguageModel;
   settings: UserSettings;
-  provider: DyadEngineProvider;
+  provider: KapableEngineProvider;
   modelId: string;
   context?: { chatId: number; externalModelAdmission?: ExternalModelAdmission };
   autoModelCandidates?: AutoModelCandidates;
@@ -502,9 +502,9 @@ async function getProModelClient({
       autoModelCandidates,
     );
     if (!candidate) {
-      throw new DyadError(
+      throw new KapableError(
         "Auto (balanced) could not be resolved from the model catalog",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
     const { resolvedModel, selection } = candidate;
@@ -514,16 +514,16 @@ async function getProModelClient({
       (providerInfo) => providerInfo.id === resolvedModel.providerId,
     );
     if (!resolvedProvider) {
-      throw new DyadError(
+      throw new KapableError(
         `Configuration not found for provider: ${resolvedModel.providerId}`,
-        DyadErrorKind.NotFound,
+        KapableErrorKind.NotFound,
       );
     }
 
     if (resolvedModel.apiProtocol !== "responses") {
-      throw new DyadError(
+      throw new KapableError(
         "Auto (balanced) must use the Responses API according to the model catalog",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
@@ -547,7 +547,7 @@ async function getProModelClient({
   if (model.provider === "auto" && model.name === "auto") {
     const providers = await getLanguageModelProviders();
     const fallbackEntries = await Promise.all(
-      AUTO_DYAD_PRO_MODEL_ALIASES.map(async (aliasId) => {
+      AUTO_KAPABLE_PRO_MODEL_ALIASES.map(async (aliasId) => {
         const candidate = await resolveAutoModelCandidate(
           aliasId,
           settings,
@@ -577,10 +577,10 @@ async function getProModelClient({
         // The stream's call options are computed for the PRIMARY selection, so
         // give each chain entry the options it would have received had IT been
         // selected: its own temperature and output cap from the catalog.
-        // Provider-family thinking options are already injected by the Dyad
+        // Provider-family thinking options are already injected by the KapAble
         // Engine fetch wrapper from this entry's providerId; adding e.g.
         // providerOptions.google here would be ignored because these AI SDK
-        // model instances read the dyad-engine provider-options key.
+        // model instances read the kapable-engine provider-options key.
         const chainModelSelection = {
           provider: resolvedModel.providerId,
           name: resolvedModel.apiName,
@@ -602,9 +602,9 @@ async function getProModelClient({
 
     const validEntries = fallbackEntries.filter((entry) => entry !== null);
     if (validEntries.length === 0) {
-      throw new DyadError(
+      throw new KapableError(
         "No auto-mode models could be resolved from the catalog",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
@@ -943,9 +943,9 @@ function getRegularModelClient(
         };
       }
       // If it's not a known ID and not type 'custom', it's unsupported
-      throw new DyadError(
+      throw new KapableError(
         `Unsupported model provider: ${model.provider}`,
-        DyadErrorKind.Validation,
+        KapableErrorKind.Validation,
       );
     }
   }
@@ -961,9 +961,9 @@ function getProviderApiKeyForRequest(
   }
   const invalidCharacter = findInvalidProviderApiKeyCharacter(normalizedValue);
   if (invalidCharacter) {
-    throw new DyadError(
+    throw new KapableError(
       formatInvalidProviderApiKeyMessage(providerDisplayName, invalidCharacter),
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
   return normalizedValue;

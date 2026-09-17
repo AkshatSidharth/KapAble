@@ -24,7 +24,7 @@ import {
   buildAddDependencyCommand,
   buildUpdateDependencyCommand,
   detectPreferredPackageManager,
-  DYAD_ALLOW_BUILDS_CACHE_TTL_MS,
+  KAPABLE_ALLOW_BUILDS_CACHE_TTL_MS,
   ensurePnpmAllowBuildsConfigured,
   ensureSocketFirewallInstalled,
   getBestEffortPnpmRebuildCommand,
@@ -200,9 +200,9 @@ describe("detectPreferredPackageManager", () => {
 
 describe("updatePnpmAllowBuildsConfigContent", () => {
   const allowBuildsText = [
-    "# dyad-default-allow-builds-schema=v1",
-    "# dyad-default-allow-builds-data-version=2026-05-21.1",
-    "# dyad-default-allow-builds-channel=local",
+    "# kapable-default-allow-builds-schema=v1",
+    "# kapable-default-allow-builds-data-version=2026-05-21.1",
+    "# kapable-default-allow-builds-channel=local",
     "sharp",
     "@swc/core",
     "sharp",
@@ -213,13 +213,13 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
     expect(updatePnpmAllowBuildsConfigContent("", allowBuildsText)).toBe(
       [
         "allowBuilds:",
-        "  # dyad-default-allow-builds begin",
-        "  # dyad-default-allow-builds-schema=v1",
-        "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-        "  # dyad-default-allow-builds-channel=local",
+        "  # kapable-default-allow-builds begin",
+        "  # kapable-default-allow-builds-schema=v1",
+        "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+        "  # kapable-default-allow-builds-channel=local",
         '  "@swc/core": true',
         "  sharp: true",
-        "  # dyad-default-allow-builds end",
+        "  # kapable-default-allow-builds end",
         "",
         "packages:",
         "  - .",
@@ -241,12 +241,12 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       [
         "storeDir: /tmp/pnpm-store",
         "allowBuilds:",
-        "  # dyad-default-allow-builds begin",
-        "  # dyad-default-allow-builds-schema=v1",
-        "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-        "  # dyad-default-allow-builds-channel=local",
+        "  # kapable-default-allow-builds begin",
+        "  # kapable-default-allow-builds-schema=v1",
+        "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+        "  # kapable-default-allow-builds-channel=local",
         '  "@swc/core": true',
-        "  # dyad-default-allow-builds end",
+        "  # kapable-default-allow-builds end",
         "  sharp: false",
         "",
         "packages:",
@@ -267,12 +267,12 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       [
         "minimumReleaseAge: 60",
         "allowBuilds:",
-        "  # dyad-default-allow-builds begin",
-        "  # dyad-default-allow-builds-schema=v1",
-        "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-        "  # dyad-default-allow-builds-channel=local",
+        "  # kapable-default-allow-builds begin",
+        "  # kapable-default-allow-builds-schema=v1",
+        "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+        "  # kapable-default-allow-builds-channel=local",
         '  "@swc/core": true',
-        "  # dyad-default-allow-builds end",
+        "  # kapable-default-allow-builds end",
         "  sharp: false",
         "",
         "packages:",
@@ -287,25 +287,25 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       updatePnpmAllowBuildsConfigContent(
         [
           "allowBuilds:",
-          "  # dyad-default-allow-builds begin",
-          "  # dyad-default-allow-builds-schema=v1",
-          "  # dyad-default-allow-builds-data-version=2026-05-20.1",
-          "  # dyad-default-allow-builds-channel=local",
+          "  # kapable-default-allow-builds begin",
+          "  # kapable-default-allow-builds-schema=v1",
+          "  # kapable-default-allow-builds-data-version=2026-05-20.1",
+          "  # kapable-default-allow-builds-channel=local",
           "  old-package: true",
-          "  # dyad-default-allow-builds end",
+          "  # kapable-default-allow-builds end",
         ].join("\n"),
         allowBuildsText,
       ),
     ).toBe(
       [
         "allowBuilds:",
-        "  # dyad-default-allow-builds begin",
-        "  # dyad-default-allow-builds-schema=v1",
-        "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-        "  # dyad-default-allow-builds-channel=local",
+        "  # kapable-default-allow-builds begin",
+        "  # kapable-default-allow-builds-schema=v1",
+        "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+        "  # kapable-default-allow-builds-channel=local",
         '  "@swc/core": true',
         "  sharp: true",
-        "  # dyad-default-allow-builds end",
+        "  # kapable-default-allow-builds end",
         "",
         "packages:",
         "  - .",
@@ -320,22 +320,22 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       updatePnpmAllowBuildsConfigContent(
         [
           "allowBuilds:",
-          "  # dyad-default-allow-builds=v1 begin",
+          "  # kapable-default-allow-builds=v1 begin",
           "  old-package: true",
-          "  # dyad-default-allow-builds=v1 end",
+          "  # kapable-default-allow-builds=v1 end",
         ].join("\n"),
         allowBuildsText,
       ),
     ).toBe(
       [
         "allowBuilds:",
-        "  # dyad-default-allow-builds begin",
-        "  # dyad-default-allow-builds-schema=v1",
-        "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-        "  # dyad-default-allow-builds-channel=local",
+        "  # kapable-default-allow-builds begin",
+        "  # kapable-default-allow-builds-schema=v1",
+        "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+        "  # kapable-default-allow-builds-channel=local",
         '  "@swc/core": true',
         "  sharp: true",
-        "  # dyad-default-allow-builds end",
+        "  # kapable-default-allow-builds end",
         "",
         "packages:",
         "  - .",
@@ -363,13 +363,13 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
         "  - apps/*",
         "",
         "allowBuilds:",
-        "  # dyad-default-allow-builds begin",
-        "  # dyad-default-allow-builds-schema=v1",
-        "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-        "  # dyad-default-allow-builds-channel=local",
+        "  # kapable-default-allow-builds begin",
+        "  # kapable-default-allow-builds-schema=v1",
+        "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+        "  # kapable-default-allow-builds-channel=local",
         '  "@swc/core": true',
         "  sharp: true",
-        "  # dyad-default-allow-builds end",
+        "  # kapable-default-allow-builds end",
         "minimumReleaseAge: 1440",
         "",
       ].join("\n"),
@@ -394,12 +394,12 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
         "---",
         "# existing config",
         "allowBuilds:",
-        "  # dyad-default-allow-builds begin",
-        "  # dyad-default-allow-builds-schema=v1",
-        "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-        "  # dyad-default-allow-builds-channel=local",
+        "  # kapable-default-allow-builds begin",
+        "  # kapable-default-allow-builds-schema=v1",
+        "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+        "  # kapable-default-allow-builds-channel=local",
         '  "@swc/core": true',
-        "  # dyad-default-allow-builds end",
+        "  # kapable-default-allow-builds end",
         "  sharp: false",
         "",
         "packages:",
@@ -411,7 +411,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
   });
 
   it("writes project pnpm-workspace.yaml atomically", async () => {
-    const tempDir = await mkdtemp(path.join(os.tmpdir(), "dyad-pnpm-config-"));
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "kapable-pnpm-config-"));
     try {
       await expect(
         ensurePnpmAllowBuildsConfigured({
@@ -425,13 +425,13 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       ).resolves.toBe(
         [
           "allowBuilds:",
-          "  # dyad-default-allow-builds begin",
-          "  # dyad-default-allow-builds-schema=v1",
-          "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-          "  # dyad-default-allow-builds-channel=local",
+          "  # kapable-default-allow-builds begin",
+          "  # kapable-default-allow-builds-schema=v1",
+          "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+          "  # kapable-default-allow-builds-channel=local",
           '  "@swc/core": true',
           "  sharp: true",
-          "  # dyad-default-allow-builds end",
+          "  # kapable-default-allow-builds end",
           "",
           "packages:",
           "  - .",
@@ -445,11 +445,11 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
   });
 
   it("writes a valid fetched remote list", async () => {
-    const tempDir = await mkdtemp(path.join(os.tmpdir(), "dyad-pnpm-remote-"));
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "kapable-pnpm-remote-"));
     const remoteAllowBuildsText = [
-      "# dyad-default-allow-builds-schema=v1",
-      "# dyad-default-allow-builds-data-version=2026-05-21.2",
-      "# dyad-default-allow-builds-channel=remote",
+      "# kapable-default-allow-builds-schema=v1",
+      "# kapable-default-allow-builds-data-version=2026-05-21.2",
+      "# kapable-default-allow-builds-channel=remote",
       "esbuild",
       "@swc/core",
       "",
@@ -467,7 +467,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
 
       await expect(
         readFile(path.join(tempDir, "pnpm-workspace.yaml"), "utf8"),
-      ).resolves.toContain("  # dyad-default-allow-builds-channel=remote");
+      ).resolves.toContain("  # kapable-default-allow-builds-channel=remote");
     } finally {
       await rm(tempDir, { recursive: true, force: true });
     }
@@ -475,15 +475,15 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
 
   it("reuses a fetched remote list for one hour", async () => {
     const firstTempDir = await mkdtemp(
-      path.join(os.tmpdir(), "dyad-pnpm-remote-cache-"),
+      path.join(os.tmpdir(), "kapable-pnpm-remote-cache-"),
     );
     const secondTempDir = await mkdtemp(
-      path.join(os.tmpdir(), "dyad-pnpm-remote-cache-"),
+      path.join(os.tmpdir(), "kapable-pnpm-remote-cache-"),
     );
     const remoteAllowBuildsText = [
-      "# dyad-default-allow-builds-schema=v1",
-      "# dyad-default-allow-builds-data-version=2026-05-21.2",
-      "# dyad-default-allow-builds-channel=remote",
+      "# kapable-default-allow-builds-schema=v1",
+      "# kapable-default-allow-builds-data-version=2026-05-21.2",
+      "# kapable-default-allow-builds-channel=remote",
       "esbuild",
       "",
     ].join("\n");
@@ -518,22 +518,22 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
 
   it("refetches the remote list after the one-hour cache TTL", async () => {
     const firstTempDir = await mkdtemp(
-      path.join(os.tmpdir(), "dyad-pnpm-remote-cache-expiry-"),
+      path.join(os.tmpdir(), "kapable-pnpm-remote-cache-expiry-"),
     );
     const secondTempDir = await mkdtemp(
-      path.join(os.tmpdir(), "dyad-pnpm-remote-cache-expiry-"),
+      path.join(os.tmpdir(), "kapable-pnpm-remote-cache-expiry-"),
     );
     const firstRemoteAllowBuildsText = [
-      "# dyad-default-allow-builds-schema=v1",
-      "# dyad-default-allow-builds-data-version=2026-05-21.2",
-      "# dyad-default-allow-builds-channel=remote",
+      "# kapable-default-allow-builds-schema=v1",
+      "# kapable-default-allow-builds-data-version=2026-05-21.2",
+      "# kapable-default-allow-builds-channel=remote",
       "esbuild",
       "",
     ].join("\n");
     const secondRemoteAllowBuildsText = [
-      "# dyad-default-allow-builds-schema=v1",
-      "# dyad-default-allow-builds-data-version=2026-05-21.3",
-      "# dyad-default-allow-builds-channel=remote",
+      "# kapable-default-allow-builds-schema=v1",
+      "# kapable-default-allow-builds-data-version=2026-05-21.3",
+      "# kapable-default-allow-builds-channel=remote",
       "sharp",
       "",
     ].join("\n");
@@ -558,7 +558,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
         }),
       ).resolves.toEqual({ changed: true, promotedPackages: [] });
 
-      dateNowSpy.mockReturnValue(startMs + DYAD_ALLOW_BUILDS_CACHE_TTL_MS + 1);
+      dateNowSpy.mockReturnValue(startMs + KAPABLE_ALLOW_BUILDS_CACHE_TTL_MS + 1);
 
       await expect(
         ensurePnpmAllowBuildsConfigured({
@@ -571,7 +571,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       await expect(
         readFile(path.join(secondTempDir, "pnpm-workspace.yaml"), "utf8"),
       ).resolves.toContain(
-        "  # dyad-default-allow-builds-data-version=2026-05-21.3",
+        "  # kapable-default-allow-builds-data-version=2026-05-21.3",
       );
     } finally {
       dateNowSpy.mockRestore();
@@ -582,7 +582,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
 
   it("keeps an existing remote block when the remote list is unavailable", async () => {
     const tempDir = await mkdtemp(
-      path.join(os.tmpdir(), "dyad-pnpm-existing-remote-"),
+      path.join(os.tmpdir(), "kapable-pnpm-existing-remote-"),
     );
     const configPath = path.join(tempDir, "pnpm-workspace.yaml");
     const existingConfig = [
@@ -590,12 +590,12 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       "  - .",
       "",
       "allowBuilds:",
-      "  # dyad-default-allow-builds begin",
-      "  # dyad-default-allow-builds-schema=v1",
-      "  # dyad-default-allow-builds-data-version=2026-05-21.2",
-      "  # dyad-default-allow-builds-channel=remote",
+      "  # kapable-default-allow-builds begin",
+      "  # kapable-default-allow-builds-schema=v1",
+      "  # kapable-default-allow-builds-data-version=2026-05-21.2",
+      "  # kapable-default-allow-builds-channel=remote",
       "  esbuild: true",
-      "  # dyad-default-allow-builds end",
+      "  # kapable-default-allow-builds end",
       "minimumReleaseAge: 1440",
       "",
     ].join("\n");
@@ -619,7 +619,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
   });
 
   it("falls back to the bundled local list when no remote block exists", async () => {
-    const tempDir = await mkdtemp(path.join(os.tmpdir(), "dyad-pnpm-local-"));
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "kapable-pnpm-local-"));
     try {
       await expect(
         ensurePnpmAllowBuildsConfigured({
@@ -633,14 +633,14 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
 
       await expect(
         readFile(path.join(tempDir, "pnpm-workspace.yaml"), "utf8"),
-      ).resolves.toContain("  # dyad-default-allow-builds-channel=local");
+      ).resolves.toContain("  # kapable-default-allow-builds-channel=local");
     } finally {
       await rm(tempDir, { recursive: true, force: true });
     }
   });
 
   it("records ignored builds as tagged denials outside the managed block", async () => {
-    const tempDir = await mkdtemp(path.join(os.tmpdir(), "dyad-pnpm-deny-"));
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "kapable-pnpm-deny-"));
     try {
       await expect(
         recordDeniedPnpmBuilds({
@@ -667,15 +667,15 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       ).resolves.toBe(
         [
           "allowBuilds:",
-          '  "@scope/native": false # dyad-auto-denied',
-          "  core-js: false # dyad-auto-denied",
-          "  # dyad-default-allow-builds begin",
-          "  # dyad-default-allow-builds-schema=v1",
-          "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-          "  # dyad-default-allow-builds-channel=local",
+          '  "@scope/native": false # kapable-auto-denied',
+          "  core-js: false # kapable-auto-denied",
+          "  # kapable-default-allow-builds begin",
+          "  # kapable-default-allow-builds-schema=v1",
+          "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+          "  # kapable-default-allow-builds-channel=local",
           '  "@swc/core": true',
           "  sharp: true",
-          "  # dyad-default-allow-builds end",
+          "  # kapable-default-allow-builds end",
           "",
           "packages:",
           "  - .",
@@ -689,12 +689,12 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
   });
 
   it("promotes tagged denials when the allow-list later includes the package", async () => {
-    const tempDir = await mkdtemp(path.join(os.tmpdir(), "dyad-pnpm-promote-"));
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "kapable-pnpm-promote-"));
     const configPath = path.join(tempDir, "pnpm-workspace.yaml");
     const promotedAllowBuildsText = [
-      "# dyad-default-allow-builds-schema=v1",
-      "# dyad-default-allow-builds-data-version=2026-05-22.1",
-      "# dyad-default-allow-builds-channel=local",
+      "# kapable-default-allow-builds-schema=v1",
+      "# kapable-default-allow-builds-data-version=2026-05-22.1",
+      "# kapable-default-allow-builds-channel=local",
       "core-js",
       "sharp",
       "",
@@ -705,14 +705,14 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
         configPath,
         [
           "allowBuilds:",
-          "  core-js: false # dyad-auto-denied",
+          "  core-js: false # kapable-auto-denied",
           "  user-denied: false",
-          "  # dyad-default-allow-builds begin",
-          "  # dyad-default-allow-builds-schema=v1",
-          "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-          "  # dyad-default-allow-builds-channel=local",
+          "  # kapable-default-allow-builds begin",
+          "  # kapable-default-allow-builds-schema=v1",
+          "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+          "  # kapable-default-allow-builds-channel=local",
           "  sharp: true",
-          "  # dyad-default-allow-builds end",
+          "  # kapable-default-allow-builds end",
           "minimumReleaseAge: 1440",
           "",
         ].join("\n"),
@@ -729,13 +729,13 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
         [
           "allowBuilds:",
           "  user-denied: false",
-          "  # dyad-default-allow-builds begin",
-          "  # dyad-default-allow-builds-schema=v1",
-          "  # dyad-default-allow-builds-data-version=2026-05-22.1",
-          "  # dyad-default-allow-builds-channel=local",
+          "  # kapable-default-allow-builds begin",
+          "  # kapable-default-allow-builds-schema=v1",
+          "  # kapable-default-allow-builds-data-version=2026-05-22.1",
+          "  # kapable-default-allow-builds-channel=local",
           "  core-js: true",
           "  sharp: true",
-          "  # dyad-default-allow-builds end",
+          "  # kapable-default-allow-builds end",
           "minimumReleaseAge: 1440",
           "",
           "packages:",
@@ -750,7 +750,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
 
   it("converts pnpm placeholder entries into tagged denials", async () => {
     const tempDir = await mkdtemp(
-      path.join(os.tmpdir(), "dyad-pnpm-placeholder-"),
+      path.join(os.tmpdir(), "kapable-pnpm-placeholder-"),
     );
     const configPath = path.join(tempDir, "pnpm-workspace.yaml");
     try {
@@ -762,12 +762,12 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
         [
           "allowBuilds:",
           "  core-js: set this to true or false",
-          "  # dyad-default-allow-builds begin",
-          "  # dyad-default-allow-builds-schema=v1",
-          "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-          "  # dyad-default-allow-builds-channel=local",
+          "  # kapable-default-allow-builds begin",
+          "  # kapable-default-allow-builds-schema=v1",
+          "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+          "  # kapable-default-allow-builds-channel=local",
           "  sharp: true",
-          "  # dyad-default-allow-builds end",
+          "  # kapable-default-allow-builds end",
           "packages:",
           "  - .",
           "minimumReleaseAge: 1440",
@@ -790,7 +790,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       });
 
       const nextConfig = await readFile(configPath, "utf8");
-      expect(nextConfig).toContain("core-js: false # dyad-auto-denied");
+      expect(nextConfig).toContain("core-js: false # kapable-auto-denied");
       expect(nextConfig).not.toContain("set this to true or false");
     } finally {
       await rm(tempDir, { recursive: true, force: true });
@@ -799,7 +799,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
 
   it("resolves placeholder entries even without an ignored-builds list", async () => {
     const tempDir = await mkdtemp(
-      path.join(os.tmpdir(), "dyad-pnpm-placeholder-ensure-"),
+      path.join(os.tmpdir(), "kapable-pnpm-placeholder-ensure-"),
     );
     const configPath = path.join(tempDir, "pnpm-workspace.yaml");
     try {
@@ -809,12 +809,12 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
           "allowBuilds:",
           "  core-js: set this to true or false",
           "  sharp: set this to true or false",
-          "  # dyad-default-allow-builds begin",
-          "  # dyad-default-allow-builds-schema=v1",
-          "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-          "  # dyad-default-allow-builds-channel=local",
+          "  # kapable-default-allow-builds begin",
+          "  # kapable-default-allow-builds-schema=v1",
+          "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+          "  # kapable-default-allow-builds-channel=local",
           '  "@swc/core": true',
-          "  # dyad-default-allow-builds end",
+          "  # kapable-default-allow-builds end",
           "packages:",
           "  - .",
           "minimumReleaseAge: 1440",
@@ -832,7 +832,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       ).resolves.toEqual({ changed: true, promotedPackages: [] });
 
       const nextConfig = await readFile(configPath, "utf8");
-      expect(nextConfig).toContain("core-js: false # dyad-auto-denied");
+      expect(nextConfig).toContain("core-js: false # kapable-auto-denied");
       expect(nextConfig).toContain("sharp: true");
       expect(nextConfig).not.toContain("set this to true or false");
     } finally {
@@ -842,7 +842,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
 
   it("creates the allowBuilds key when recording offline denials into a config without one", async () => {
     const tempDir = await mkdtemp(
-      path.join(os.tmpdir(), "dyad-pnpm-deny-no-key-"),
+      path.join(os.tmpdir(), "kapable-pnpm-deny-no-key-"),
     );
     const configPath = path.join(tempDir, "pnpm-workspace.yaml");
     try {
@@ -852,11 +852,11 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       await writeFile(
         configPath,
         [
-          "# dyad-default-allow-builds begin",
-          "# dyad-default-allow-builds-schema=v1",
-          "# dyad-default-allow-builds-data-version=2026-05-21.1",
-          "# dyad-default-allow-builds-channel=remote",
-          "# dyad-default-allow-builds end",
+          "# kapable-default-allow-builds begin",
+          "# kapable-default-allow-builds-schema=v1",
+          "# kapable-default-allow-builds-data-version=2026-05-21.1",
+          "# kapable-default-allow-builds-channel=remote",
+          "# kapable-default-allow-builds end",
           "packages:",
           "  - .",
           "",
@@ -884,7 +884,7 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
 
       const nextConfig = await readFile(configPath, "utf8");
       expect(nextConfig).toContain("allowBuilds:");
-      expect(nextConfig).toContain("core-js: false # dyad-auto-denied");
+      expect(nextConfig).toContain("core-js: false # kapable-auto-denied");
     } finally {
       await rm(tempDir, { recursive: true, force: true });
     }
@@ -892,18 +892,18 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
 
   it("records denials against existing config when the remote allow-list is unavailable", async () => {
     const tempDir = await mkdtemp(
-      path.join(os.tmpdir(), "dyad-pnpm-deny-offline-"),
+      path.join(os.tmpdir(), "kapable-pnpm-deny-offline-"),
     );
     const configPath = path.join(tempDir, "pnpm-workspace.yaml");
     try {
       const existingConfig = [
         "allowBuilds:",
-        "  # dyad-default-allow-builds begin",
-        "  # dyad-default-allow-builds-schema=v1",
-        "  # dyad-default-allow-builds-data-version=2026-05-21.1",
-        "  # dyad-default-allow-builds-channel=remote",
+        "  # kapable-default-allow-builds begin",
+        "  # kapable-default-allow-builds-schema=v1",
+        "  # kapable-default-allow-builds-data-version=2026-05-21.1",
+        "  # kapable-default-allow-builds-channel=remote",
         "  sharp: true",
-        "  # dyad-default-allow-builds end",
+        "  # kapable-default-allow-builds end",
         "packages:",
         "  - .",
         "minimumReleaseAge: 1440",
@@ -932,10 +932,10 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
       });
 
       const nextConfig = await readFile(configPath, "utf8");
-      expect(nextConfig).toContain("core-js: false # dyad-auto-denied");
+      expect(nextConfig).toContain("core-js: false # kapable-auto-denied");
       // The remote-managed block must be preserved untouched.
       expect(nextConfig).toContain(
-        "# dyad-default-allow-builds-channel=remote",
+        "# kapable-default-allow-builds-channel=remote",
       );
       expect(nextConfig).toContain("sharp: true");
       expect(nextConfig).not.toContain("sharp: false");
@@ -998,7 +998,7 @@ describe("readPnpmIgnoredBuilds", () => {
 
   it("reads ignored builds from the app path", async () => {
     const tempDir = await mkdtemp(
-      path.join(os.tmpdir(), "dyad-pnpm-ignored-builds-"),
+      path.join(os.tmpdir(), "kapable-pnpm-ignored-builds-"),
     );
     const modulesYamlContent = `${JSON.stringify(
       { ignoredBuilds: ["core-js@3.49.0"], layoutVersion: 5 },

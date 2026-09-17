@@ -279,11 +279,11 @@ async function runSpec(
 ): Promise<RunAppTestsResult> {
   const label = grep ? `${testFile} › /${grep}/` : testFile;
   ctx.onXmlStream(
-    `<dyad-status title="${escapeXmlAttr(`Running ${label}`)}"></dyad-status>`,
+    `<kapable-status title="${escapeXmlAttr(`Running ${label}`)}"></kapable-status>`,
   );
   // Honor the modes the user picked in the Tests panel — including slow motion,
   // so a user watching the agent's runs gets the same pace as their own. With
-  // the preview experiment enabled, headed mode drives Dyad's native preview
+  // the preview experiment enabled, headed mode drives KapAble's native preview
   // view. A preview or narrowed run must stay serial.
   const settings = readSettings();
   const preview =

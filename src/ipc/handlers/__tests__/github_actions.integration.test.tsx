@@ -27,7 +27,7 @@ import {
   type HybridChatHarness,
 } from "@/testing/hybrid_chat_harness";
 import { h } from "@/testing/hybrid.setup";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { githubOpsService } from "@/ipc/services/github_ops_service";
 
 type TestApp = {
@@ -202,7 +202,7 @@ describe("GitHub connector actions (integration)", () => {
     ].join("\n");
     const runSpy = vi
       .spyOn(githubOpsService, "run")
-      .mockRejectedValueOnce(new DyadError(pushError, DyadErrorKind.Conflict));
+      .mockRejectedValueOnce(new KapableError(pushError, KapableErrorKind.Conflict));
 
     fireEvent.click(
       within(connectedRepo).getByRole("button", { name: "Sync to GitHub" }),
@@ -221,13 +221,13 @@ describe("GitHub connector actions (integration)", () => {
       within(connectedRepo)
         .getByRole("link", { name: "See troubleshooting guide" })
         .getAttribute("href"),
-    ).toBe("https://www.dyad.sh/docs/integrations/github#troubleshooting");
+    ).toBe("https://www.kapable.sh/docs/integrations/github#troubleshooting");
     expect(
       within(connectedRepo).getByRole("button", { name: "Copy" }),
     ).toBeTruthy();
 
     runSpy.mockRejectedValueOnce(
-      new DyadError("Not authenticated with GitHub.", DyadErrorKind.Auth),
+      new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth),
     );
     fireEvent.click(
       within(connectedRepo).getByRole("button", { name: "Sync to GitHub" }),

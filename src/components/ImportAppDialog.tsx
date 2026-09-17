@@ -55,12 +55,12 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
   const [isCheckingName, setIsCheckingName] = useState<boolean>(false);
   const [installCommand, setInstallCommand] = useState("");
   const [startCommand, setStartCommand] = useState("");
-  const [copyToDyadApps, setCopyToDyadApps] = useState(true);
+  const [copyToKapableApps, setCopyToKapableApps] = useState(true);
   const { streamMessage } = useStreamChat({ hasChatId: false });
   const { selectChat } = useSelectChat();
   const { refreshApps } = useLoadApps();
   const setSelectedAppId = useSetAtom(selectedAppIdAtom);
-  const [optimizeForDyad, setOptimizeForDyad] = useState(true);
+  const [optimizeForKapable, setOptimizeForKapable] = useState(true);
   // GitHub import state
   const [url, setUrl] = useState("");
   const [importing, setImporting] = useState(false);
@@ -78,16 +78,16 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
       setGithubAppName("");
       setGithubNameExists(false);
       // Reset optimize flag when dialog opens so tabs don't carry over state
-      setOptimizeForDyad(true);
+      setOptimizeForKapable(true);
     }
   }, [isOpen]);
 
-  // Re-check app name when copyToDyadApps changes
+  // Re-check app name when copyToKapableApps changes
   useEffect(() => {
     if (customAppName.trim() && selectedPath) {
-      checkAppName({ name: customAppName, skipCopy: !copyToDyadApps });
+      checkAppName({ name: customAppName, skipCopy: !copyToKapableApps });
     }
-  }, [copyToDyadApps]);
+  }, [copyToKapableApps]);
 
   const handleUrlBlur = async () => {
     if (!url.trim()) return;
@@ -164,7 +164,7 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
         installCommand: installCommand.trim() || undefined,
         startCommand: startCommand.trim() || undefined,
         appName,
-        optimizeForDyad,
+        optimizeForKapable,
       });
       if (!(await processCloneResult(result))) {
         setImporting(false);
@@ -191,7 +191,7 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
         installCommand: installCommand.trim() || undefined,
         startCommand: startCommand.trim() || undefined,
         appName,
-        optimizeForDyad,
+        optimizeForKapable,
       });
       if (!(await processCloneResult(result))) {
         setImporting(false);
@@ -270,7 +270,7 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
       // Use the folder name from the IPC response
       setCustomAppName(result.name);
       // Check if the app name already exists
-      await checkAppName({ name: result.name, skipCopy: !copyToDyadApps });
+      await checkAppName({ name: result.name, skipCopy: !copyToKapableApps });
       return result;
     },
     onError: (error: Error) => {
@@ -286,7 +286,7 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
         appName: customAppName,
         installCommand: installCommand || undefined,
         startCommand: startCommand || undefined,
-        skipCopy: !copyToDyadApps,
+        skipCopy: !copyToKapableApps,
       });
     },
     onSuccess: async (result) => {
@@ -326,7 +326,7 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
     setNameExists(false);
     setInstallCommand("");
     setStartCommand("");
-    setCopyToDyadApps(true);
+    setCopyToKapableApps(true);
   };
 
   const handleAppNameChange = async (
@@ -335,7 +335,7 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
     const newName = e.target.value;
     setCustomAppName(newName);
     if (newName.trim()) {
-      await checkAppName({ name: newName, skipCopy: !copyToDyadApps });
+      await checkAppName({ name: newName, skipCopy: !copyToKapableApps });
     }
   };
 
@@ -429,19 +429,19 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
 
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="copy-to-dyad-apps"
-                        aria-label="Copy to the dyad-apps folder"
-                        checked={copyToDyadApps}
+                        id="copy-to-kapable-apps"
+                        aria-label="Copy to the kapable-apps folder"
+                        checked={copyToKapableApps}
                         onCheckedChange={(checked) =>
-                          setCopyToDyadApps(checked === true)
+                          setCopyToKapableApps(checked === true)
                         }
                         disabled={importAppMutation.isPending}
                       />
                       <label
-                        htmlFor="copy-to-dyad-apps"
+                        htmlFor="copy-to-kapable-apps"
                         className="text-xs sm:text-sm cursor-pointer"
                       >
-                        {t("home:copyToDyadApps")}
+                        {t("home:copyToKapableApps")}
                       </label>
                     </div>
 
@@ -514,7 +514,7 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
                     {hasAiRules === false && (
                       <Alert className="border-yellow-500/20 text-yellow-500 flex items-start gap-2">
                         <span
-                          title="AI_RULES.md lets Dyad know which tech stack to use for editing the app"
+                          title="AI_RULES.md lets KapAble know which tech stack to use for editing the app"
                           className="flex-shrink-0 mt-1"
                         >
                           <Info className="h-4 w-4" />
@@ -649,15 +649,15 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
                           <AccordionContent className="space-y-4">
                             <div className="flex items-center space-x-2 py-1">
                               <Checkbox
-                                id="optimize-for-dyad-repos"
-                                checked={optimizeForDyad}
+                                id="optimize-for-kapable-repos"
+                                checked={optimizeForKapable}
                                 onCheckedChange={(checked) =>
-                                  setOptimizeForDyad(checked === true)
+                                  setOptimizeForKapable(checked === true)
                                 }
                                 disabled={importing}
                               />
                               <Label
-                                htmlFor="optimize-for-dyad-repos"
+                                htmlFor="optimize-for-kapable-repos"
                                 className="text-xs sm:text-sm cursor-pointer"
                               >
                                 {t("home:autoUpgradeAnnotator")} (
@@ -750,15 +750,15 @@ export function ImportAppDialog({ isOpen, onClose }: ImportAppDialogProps) {
                   <AccordionContent className="space-y-4">
                     <div className="flex items-center space-x-2 py-1">
                       <Checkbox
-                        id="optimize-for-dyad-url"
-                        checked={optimizeForDyad}
+                        id="optimize-for-kapable-url"
+                        checked={optimizeForKapable}
                         onCheckedChange={(checked) =>
-                          setOptimizeForDyad(checked === true)
+                          setOptimizeForKapable(checked === true)
                         }
                         disabled={importing}
                       />
                       <Label
-                        htmlFor="optimize-for-dyad-url"
+                        htmlFor="optimize-for-kapable-url"
                         className="text-xs sm:text-sm cursor-pointer"
                       >
                         {t("home:autoUpgradeAnnotator")} (

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSubscriptionAccount } from "@/hooks/useSubscriptionAccount";
 import { useSettings } from "@/hooks/useSettings";
-import { isDyadProEnabled } from "@/lib/schemas";
+import { isKapableProEnabled } from "@/lib/schemas";
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ChevronRight, Unplug } from "lucide-react";
 import { Badge } from "./ui/badge";
@@ -34,7 +34,7 @@ export function SubscriptionModelMenu({ children }: { children?: ReactNode }) {
     mutationFn: (checked: boolean) =>
       updateSettings({ chatgptFastMode: checked }),
   });
-  const hasPro = settings && isDyadProEnabled(settings);
+  const hasPro = settings && isKapableProEnabled(settings);
   const action = useMutation({
     onMutate: () => fastMode.reset(),
     mutationFn: (kind: "connect" | "disconnect") =>
@@ -117,7 +117,7 @@ export function SubscriptionModelMenu({ children }: { children?: ReactNode }) {
       {(!settings || status.data?.credentialError || hasPro) && (
         <p className="px-2 py-2 text-sm text-muted-foreground">
           {!settings
-            ? "Checking Dyad Pro status…"
+            ? "Checking KapAble Pro status…"
             : status.data?.credentialError
               ? "Your saved ChatGPT connection could not be opened. Disconnect it to clear the saved connection, then reconnect or use your OpenAI API key."
               : connected

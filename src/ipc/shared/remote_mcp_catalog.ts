@@ -13,15 +13,15 @@ const MAX_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const FAILURE_CACHE_TTL_MS = 30 * 1000;
 
 function getRemoteMcpCatalogUrl() {
-  if (process.env.DYAD_MCP_CATALOG_URL) {
-    return process.env.DYAD_MCP_CATALOG_URL;
+  if (process.env.KAPABLE_MCP_CATALOG_URL) {
+    return process.env.KAPABLE_MCP_CATALOG_URL;
   }
 
   if (process.env.E2E_TEST_BUILD === "true" && process.env.FAKE_LLM_PORT) {
     return `http://localhost:${process.env.FAKE_LLM_PORT}/api/mcp-catalog`;
   }
 
-  return "https://api.dyad.sh/v1/mcp-catalog";
+  return "https://api.kapable.sh/v1/mcp-catalog";
 }
 
 // The envelope is parsed strictly but entries are validated one by

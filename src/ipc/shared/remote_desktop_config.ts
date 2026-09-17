@@ -29,11 +29,11 @@ let remoteDesktopConfigFetchPromise: Promise<RemoteDesktopConfig | null> | null 
   null;
 
 function getRemoteDesktopConfigUrl() {
-  if (process.env.DYAD_DESKTOP_CONFIG_URL) {
-    return process.env.DYAD_DESKTOP_CONFIG_URL;
+  if (process.env.KAPABLE_DESKTOP_CONFIG_URL) {
+    return process.env.KAPABLE_DESKTOP_CONFIG_URL;
   }
 
-  return "https://api.dyad.sh/v1/desktop-config";
+  return "https://api.kapable.sh/v1/desktop-config";
 }
 
 async function fetchRemoteDesktopConfig(): Promise<RemoteDesktopConfig | null> {

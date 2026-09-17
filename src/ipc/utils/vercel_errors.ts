@@ -1,27 +1,27 @@
 import { ResponseValidationError } from "@vercel/sdk/models/responsevalidationerror.js";
 import { VercelError } from "@vercel/sdk/models/vercelerror.js";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
-function getVercelErrorKind(status: number): DyadErrorKind {
+function getVercelErrorKind(status: number): KapableErrorKind {
   switch (status) {
     case 400:
     case 422:
-      return DyadErrorKind.Validation;
+      return KapableErrorKind.Validation;
     case 401:
     case 403:
-      return DyadErrorKind.Auth;
+      return KapableErrorKind.Auth;
     case 402:
     case 428:
-      return DyadErrorKind.Precondition;
+      return KapableErrorKind.Precondition;
     case 404:
     case 410:
-      return DyadErrorKind.NotFound;
+      return KapableErrorKind.NotFound;
     case 409:
-      return DyadErrorKind.Conflict;
+      return KapableErrorKind.Conflict;
     case 429:
-      return DyadErrorKind.RateLimited;
+      return KapableErrorKind.RateLimited;
     default:
-      return DyadErrorKind.External;
+      return KapableErrorKind.External;
   }
 }
 
@@ -64,14 +64,14 @@ export function getVercelProjectCreationError(error: unknown): Error {
     }
     const fallback =
       error instanceof ResponseValidationError
-        ? "Dyad couldn't read Vercel's response while setting up your project."
+        ? "KapAble couldn't read Vercel's response while setting up your project."
         : "Vercel rejected the project setup request without an error message.";
     const recovery =
       error.statusCode >= 200 && error.statusCode < 300
         ? ' The project may already have been created. Check your Vercel dashboard; if it exists, choose "Connect to existing project" in the Publish panel before retrying.'
         : "";
 
-    return new DyadError(
+    return new KapableError(
       `Vercel project setup failed (HTTP ${error.statusCode}): ${(detail || fallback).slice(0, 4000)}${recovery}`,
       getVercelErrorKind(error.statusCode),
     );

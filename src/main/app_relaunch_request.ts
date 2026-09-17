@@ -33,7 +33,7 @@ export function createAppRelaunchRequest() {
         if (request) {
           relaunch({
             args: [
-              ...currentArgs.filter((arg) => !arg.startsWith("dyad://")),
+              ...currentArgs.filter((arg) => !arg.startsWith("kapable://")),
               ...(request.deepLinkUrl ? [request.deepLinkUrl] : []),
             ],
           });

@@ -82,7 +82,7 @@ export const apps = sqliteTable("apps", {
   // In-flight ephemeral test-user id for isolated e2e runs against Supabase.
   // Supabase's free tier has no DB branching, so instead of a throwaway branch
   // we create a dedicated throwaway auth user (via the Auth Admin API, stamped
-  // app_metadata.dyad_test=true) and run the tests authenticated as it. Set
+  // app_metadata.kapable_test=true) and run the tests authenticated as it. Set
   // while a test session holds that user, cleared on teardown. Persisted so a
   // crash mid-session can be reconciled (orphan user deleted) on the next
   // launch. See ipc/utils/supabase_test_user.ts.
@@ -419,7 +419,7 @@ export const agentActivities = sqliteTable(
     status: text("status", {
       enum: ["pending", "completed", "error", "aborted"],
     }).notNull(),
-    // Existing Dyad XML used to render the activity.
+    // Existing KapAble XML used to render the activity.
     presentationXml: text("presentation_xml").notNull(),
     // Validated tool arguments retained for grounded report reconstruction.
     inputJson: text("input_json", { mode: "json" }).$type<Record<
@@ -756,7 +756,7 @@ export const mcpServers = sqliteTable(
       .default(sql`0`),
     // OAuth state (tokens, expiry, client info). Encrypted via Electron
     // `safeStorage`, or base64 plaintext where no keyring is available
-    // (see encryptToString). Read/written only by DyadOAuthClientProvider.
+    // (see encryptToString). Read/written only by KapableOAuthClientProvider.
     oauthState: text("oauth_state"),
     // Optional pre-registered OAuth client_id for servers that don't
     // support dynamic client registration (RFC 7591). User-supplied via

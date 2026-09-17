@@ -7,7 +7,7 @@ import {
 } from "./unauthorized-release-alert.mjs";
 
 const baseAlert = {
-  repository: "dyad-sh/dyad",
+  repository: "AkshatSidharth/KapAble",
   releaseId: "123",
   releaseTag: "v9.9.9",
   releaseAuthor: "octocat",

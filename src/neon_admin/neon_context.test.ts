@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getNeonClient } from "./neon_management_client";
 import { getConnectionUri, getNeonTableSchema } from "./neon_context";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   filterSchemaForTable,
   getSchemaFromSnapshot,
@@ -197,10 +197,10 @@ describe("Neon context", () => {
     );
   });
 
-  it("preserves existing DyadError classifications", async () => {
-    const authError = new DyadError(
+  it("preserves existing KapableError classifications", async () => {
+    const authError = new KapableError(
       "Neon authentication failed",
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
     getNeonClientMock.mockRejectedValue(authError);
 

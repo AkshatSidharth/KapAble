@@ -347,11 +347,11 @@ export const createChatCompletionHandler =
 
     // Check for upload image to codebase using lastUserMessage (which already handles both string and array content)
     if (userTextContent.includes("[[UPLOAD_IMAGE_TO_CODEBASE]]")) {
-      // Extract the attachment path from the user message (format: "path: /path/to/app/.dyad/media/...")
+      // Extract the attachment path from the user message (format: "path: /path/to/app/.kapable/media/...")
       const pathMatch = userTextContent.match(/\(path: ([^\s)]+)\)/);
-      const attachmentPath = pathMatch?.[1] ?? ".dyad/media/unknown.png";
+      const attachmentPath = pathMatch?.[1] ?? ".kapable/media/unknown.png";
       messageContent = `Uploading image to codebase
-<dyad-copy from="${attachmentPath}" to="new/image/file.png" description="Uploaded image to codebase"></dyad-copy>
+<kapable-copy from="${attachmentPath}" to="new/image/file.png" description="Uploaded image to codebase"></kapable-copy>
 `;
       messageContent += "\n\n" + generateDump(req);
     }
@@ -404,11 +404,11 @@ export const createChatCompletionHandler =
         }
       }
       messageContent = `Resolved conflicts in ${conflictPath}.
-<dyad-write path="${conflictPath}" description="Resolve merge conflicts.">
+<kapable-write path="${conflictPath}" description="Resolve merge conflicts.">
 Line 1
 Line 2 Modified Feature
 Line 3
-</dyad-write>
+</kapable-write>
 `;
     }
 
@@ -422,14 +422,14 @@ Line 3
     ) {
       // Fix errors in create-ts-errors.md and introduce a new error
       messageContent = `
-<dyad-write path="src/bad-file.ts" description="Fix 2 errors and introduce a new error.">
+<kapable-write path="src/bad-file.ts" description="Fix 2 errors and introduce a new error.">
 // Import doesn't exist
 // import NonExistentClass from 'non-existent-class';
 
 
 const x = new Object();
 x.nonExistentMethod2();
-</dyad-write>
+</kapable-write>
 
       `;
     }
@@ -442,14 +442,14 @@ x.nonExistentMethod2();
     ) {
       // Fix errors in create-ts-errors.md and introduce a new error
       messageContent = `
-<dyad-write path="src/bad-file.ts" description="Fix remaining error.">
+<kapable-write path="src/bad-file.ts" description="Fix remaining error.">
 // Import doesn't exist
 // import NonExistentClass from 'non-existent-class';
 
 
 const x = new Object();
 x.toString(); // replaced with existing method
-</dyad-write>
+</kapable-write>
 
       `;
     }
@@ -468,10 +468,10 @@ x.toString(); // replaced with existing method
     ) {
       messageContent = `
       Fixing the error...
-      <dyad-write path="src/pages/Index.tsx">
+      <kapable-write path="src/pages/Index.tsx">
       
 
-import { MadeWithDyad } from "@/components/made-with-dyad";
+import { MadeWithKapable } from "@/components/made-with-kapable";
 
 const Index = () => {
   return (
@@ -479,37 +479,37 @@ const Index = () => {
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">No more errors!</h1>
       </div>
-      <MadeWithDyad />
+      <MadeWithKapable />
     </div>
   );
 };
 
 export default Index;
 
-      </dyad-write>
+      </kapable-write>
       `;
     }
     if (
       lastMessage &&
       typeof lastMessage.content === "string" &&
       lastMessage.content.startsWith(
-        "There was an issue with the following `dyad-search-replace` tags.",
+        "There was an issue with the following `kapable-search-replace` tags.",
       )
     ) {
-      if (lastMessage.content.includes("Make sure you use `dyad-read`")) {
+      if (lastMessage.content.includes("Make sure you use `kapable-read`")) {
         // Fix errors in create-ts-errors.md and introduce a new error
         messageContent =
           `
-<dyad-read path="src/pages/Index.tsx"></dyad-read>
+<kapable-read path="src/pages/Index.tsx"></kapable-read>
 
-<dyad-search-replace path="src/pages/Index.tsx">
+<kapable-search-replace path="src/pages/Index.tsx">
 <<<<<<< SEARCH
         // STILL Intentionally DO NOT MATCH ANYTHING TO TRIGGER FALLBACK
         <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
 =======
         <h1 className="text-4xl font-bold mb-4">Welcome to the UPDATED App</h1>
 >>>>>>> REPLACE
-</dyad-search-replace>
+</kapable-search-replace>
 ` +
           "\n\n" +
           generateDump(req);
@@ -517,9 +517,9 @@ export default Index;
         // Fix errors in create-ts-errors.md and introduce a new error
         messageContent =
           `
-<dyad-write path="src/pages/Index.tsx" description="Rewrite file.">
+<kapable-write path="src/pages/Index.tsx" description="Rewrite file.">
 // FILE IS REPLACED WITH FALLBACK WRITE.
-</dyad-write>` +
+</kapable-write>` +
           "\n\n" +
           generateDump(req);
       }
@@ -595,7 +595,7 @@ export default Index;
         getTextContent(m).includes("[[STRING_TO_BE_FINISHED]]"),
       )
     ) {
-      messageContent = `[[STRING_IS_FINISHED]]";</dyad-write>\nFinished writing file.`;
+      messageContent = `[[STRING_IS_FINISHED]]";</kapable-write>\nFinished writing file.`;
       messageContent += "\n\n" + generateDump(req);
     }
     // See testAssertionsFixtures.ts: code synthesis for assertions the user
@@ -897,7 +897,7 @@ export function generateDump(req: Request) {
       "utf-8",
     );
     console.log(`* Dumped messages to: ${dumpFilePath}`);
-    return `[[dyad-dump-path=${dumpFilePath}]]`;
+    return `[[kapable-dump-path=${dumpFilePath}]]`;
   } catch (error) {
     console.error(`* Error writing dump file: ${error}`);
     return `Error: Could not write dump file: ${error}`;

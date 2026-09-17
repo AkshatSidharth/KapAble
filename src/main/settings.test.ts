@@ -22,7 +22,7 @@ import {
 } from "@/main/settings";
 import { getUserDataPath } from "@/paths/paths";
 import { forgottenCoolify, UserSettings } from "@/lib/schemas";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { getRemoteDesktopConfig } from "@/ipc/shared/remote_desktop_config";
 import {
   getRecoveryStats,
@@ -540,7 +540,7 @@ describe("readSettings", () => {
     it("should return default settings when file read fails", () => {
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readFileSync.mockImplementation(() => {
-        throw new DyadError("File read error", DyadErrorKind.External);
+        throw new KapableError("File read error", KapableErrorKind.External);
       });
 
       const result = readSettings();
@@ -652,7 +652,7 @@ describe("readSettings", () => {
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readFileSync.mockReturnValue(JSON.stringify(mockFileContent));
       mockSafeStorage.decryptString.mockImplementation(() => {
-        throw new DyadError("Decryption failed", DyadErrorKind.External);
+        throw new KapableError("Decryption failed", KapableErrorKind.External);
       });
 
       const result = readSettings();
@@ -722,7 +722,7 @@ describe("readSettings", () => {
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readFileSync.mockReturnValue(JSON.stringify(mockFileContent));
       mockSafeStorage.decryptString.mockImplementationOnce(() => {
-        throw new DyadError("Decryption failed", DyadErrorKind.External);
+        throw new KapableError("Decryption failed", KapableErrorKind.External);
       });
 
       const result = readSettings();
@@ -815,7 +815,7 @@ describe("writeSettings", () => {
       expect.objectContaining({
         action: {
           label: "Read restore docs",
-          url: "https://www.dyad.sh/docs/guides/migrate-restore#restoring-settings-from-backup",
+          url: "https://www.kapable.sh/docs/guides/migrate-restore#restoring-settings-from-backup",
         },
         message: expect.not.stringContaining("https://"),
       }),
@@ -910,9 +910,9 @@ describe("writeSettings", () => {
       thrown = error;
     }
 
-    expect(thrown).toBeInstanceOf(DyadError);
-    expect((thrown as DyadError).kind).toBe(DyadErrorKind.External);
-    expect((thrown as DyadError).cause).toBeInstanceOf(Error);
+    expect(thrown).toBeInstanceOf(KapableError);
+    expect((thrown as KapableError).kind).toBe(KapableErrorKind.External);
+    expect((thrown as KapableError).cause).toBeInstanceOf(Error);
     expect((thrown as Error).message).toContain(
       "Failed to write settings: disk full",
     );
@@ -931,9 +931,9 @@ describe("writeSettings", () => {
       thrown = error;
     }
 
-    expect(thrown).toBeInstanceOf(DyadError);
-    expect((thrown as DyadError).kind).toBe(DyadErrorKind.Validation);
-    expect((thrown as DyadError).cause).toBeInstanceOf(ZodError);
+    expect(thrown).toBeInstanceOf(KapableError);
+    expect((thrown as KapableError).kind).toBe(KapableErrorKind.Validation);
+    expect((thrown as KapableError).cause).toBeInstanceOf(ZodError);
   });
 
   it("returns false instead of throwing for best-effort settings writes", () => {
@@ -1140,7 +1140,7 @@ describe("preserving undecryptable secrets", () => {
   });
 
   it("puts the Coolify admin password through encryption", () => {
-    // Dyad made this one up and is the only thing holding it, which is a
+    // KapAble made this one up and is the only thing holding it, which is a
     // reason to keep it readable and not a reason to keep it in the clear.
     writeSettings({
       coolify: {

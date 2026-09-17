@@ -3,11 +3,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 
-const userDataDir = mkdtempSync(join(tmpdir(), "dyad-onboarding-"));
-const nodeStatus = process.env.DYAD_DEV_NODEJS_STATUS || "missing";
+const userDataDir = mkdtempSync(join(tmpdir(), "kapable-onboarding-"));
+const nodeStatus = process.env.KAPABLE_DEV_NODEJS_STATUS || "missing";
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 
-console.log("Starting Dyad onboarding preview");
+console.log("Starting KapAble onboarding preview");
 console.log(`  userData: ${userDataDir}`);
 console.log(`  Node.js status: ${nodeStatus}`);
 
@@ -16,8 +16,8 @@ const child = spawn(npmCommand, ["start"], {
   env: {
     ...process.env,
     NODE_ENV: "development",
-    DYAD_DEV_USER_DATA_DIR: userDataDir,
-    DYAD_DEV_NODEJS_STATUS: nodeStatus,
+    KAPABLE_DEV_USER_DATA_DIR: userDataDir,
+    KAPABLE_DEV_NODEJS_STATUS: nodeStatus,
   },
 });
 

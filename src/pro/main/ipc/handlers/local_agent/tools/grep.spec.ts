@@ -113,9 +113,9 @@ function deepHello() {
       isSharedModulesChanged: false,
       sharedServerModulePaths: [],
       pendingFunctionDeploys: [],
-      isDyadPro: false,
+      isKapablePro: false,
       todos: [],
-      dyadRequestId: "test-request",
+      kapableRequestId: "test-request",
       fileEditTracker: {},
       testingEnabled: true,
       testRunAttempts: new Map(),
@@ -238,10 +238,10 @@ function deepHello() {
       await grepTool.execute({ query: "hello" }, mockContext);
 
       expect(mockContext.onXmlComplete).toHaveBeenCalledWith(
-        expect.stringContaining("<dyad-grep"),
+        expect.stringContaining("<kapable-grep"),
       );
       expect(mockContext.onXmlComplete).toHaveBeenCalledWith(
-        expect.stringContaining("</dyad-grep>"),
+        expect.stringContaining("</kapable-grep>"),
       );
     });
   });
@@ -360,10 +360,10 @@ function deepHello() {
     });
 
     it("searches hidden ignored files when include_ignored is true", async () => {
-      const dyadDir = path.join(testDir, ".dyad");
-      await fs.promises.mkdir(dyadDir, { recursive: true });
+      const kapableDir = path.join(testDir, ".kapable");
+      await fs.promises.mkdir(kapableDir, { recursive: true });
       await fs.promises.writeFile(
-        path.join(dyadDir, "backup.txt"),
+        path.join(kapableDir, "backup.txt"),
         "hiddenIgnoredNeedle",
       );
 
@@ -371,12 +371,12 @@ function deepHello() {
         {
           query: "hiddenIgnoredNeedle",
           include_ignored: true,
-          include_pattern: ".dyad/**",
+          include_pattern: ".kapable/**",
         },
         mockContext,
       );
 
-      expect(result).toContain(".dyad/backup.txt");
+      expect(result).toContain(".kapable/backup.txt");
     });
 
     it("excludes dotenv matches when ignored files are included", async () => {
@@ -648,7 +648,7 @@ function deepHello() {
 
     it("builds partial XML during streaming", () => {
       const result = grepTool.buildXml?.({ query: "hello" }, false);
-      expect(result).toContain("<dyad-grep");
+      expect(result).toContain("<kapable-grep");
       expect(result).toContain('query="hello"');
       expect(result).toContain("Searching...");
     });

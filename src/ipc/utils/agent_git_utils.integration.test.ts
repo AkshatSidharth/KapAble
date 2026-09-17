@@ -252,17 +252,17 @@ describe("agent Git utilities", () => {
     expect(result.content).not.toContain("do-not-leak");
   });
 
-  it("includes pnpm workspace patches while omitting Dyad-internal patches", async () => {
-    await fs.promises.mkdir(path.join(repo, ".dyad"));
+  it("includes pnpm workspace patches while omitting KapAble-internal patches", async () => {
+    await fs.promises.mkdir(path.join(repo, ".kapable"));
     await fs.promises.writeFile(
       path.join(repo, "pnpm-workspace.yaml"),
       'packages:\n  - "app"\n',
     );
     await fs.promises.writeFile(
-      path.join(repo, ".dyad", "internal.json"),
+      path.join(repo, ".kapable", "internal.json"),
       '{"version":1}\n',
     );
-    await git(repo, "add", "pnpm-workspace.yaml", ".dyad/internal.json");
+    await git(repo, "add", "pnpm-workspace.yaml", ".kapable/internal.json");
     await git(repo, "commit", "-m", "add workspace metadata");
 
     await fs.promises.writeFile(
@@ -270,7 +270,7 @@ describe("agent Git utilities", () => {
       'packages:\n  - "app"\n  - "packages/*"\n',
     );
     await fs.promises.writeFile(
-      path.join(repo, ".dyad", "internal.json"),
+      path.join(repo, ".kapable", "internal.json"),
       '{"version":2}\n',
     );
 

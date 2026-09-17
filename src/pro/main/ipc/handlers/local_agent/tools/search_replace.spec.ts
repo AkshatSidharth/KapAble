@@ -55,9 +55,9 @@ describe("searchReplaceTool", () => {
     isSharedModulesChanged: false,
     sharedServerModulePaths: [],
     pendingFunctionDeploys: [],
-    isDyadPro: false,
+    isKapablePro: false,
     todos: [],
-    dyadRequestId: "test-request",
+    kapableRequestId: "test-request",
     fileEditTracker: {},
     testingEnabled: true,
     testRunAttempts: new Map(),
@@ -501,7 +501,7 @@ describe("searchReplaceTool", () => {
       expect(result).toContain("=======");
       expect(result).toContain("new content");
       expect(result).toContain(">>>>>>> REPLACE");
-      expect(result).toContain("</dyad-search-replace>");
+      expect(result).toContain("</kapable-search-replace>");
     });
   });
 

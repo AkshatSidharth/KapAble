@@ -1,4 +1,4 @@
 First read
-<dyad-write path="src/pages/Index.tsx" description="replace file">
+<kapable-write path="src/pages/Index.tsx" description="replace file">
 // this file has been replaced
-</dyad-write>
+</kapable-write>

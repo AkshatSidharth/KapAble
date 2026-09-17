@@ -51,7 +51,7 @@ function setBudgetHandler(
 
 function resetNonProSettings() {
   writeSettings({
-    enableDyadPro: false,
+    enableKapablePro: false,
     providerSettings: {},
     isTestMode: false,
   });
@@ -87,7 +87,7 @@ describe("promo message (integration)", () => {
       engine: true,
       autoApprove: true,
       settings: {
-        enableDyadPro: false,
+        enableKapablePro: false,
         isTestMode: false,
         providerSettings: {},
       },
@@ -120,7 +120,7 @@ describe("promo message (integration)", () => {
       {},
       { timeout: 15_000 },
     );
-    expect(promo.textContent).toMatch(/Dyad|GitHub|subreddit|X/);
+    expect(promo.textContent).toMatch(/KapAble|GitHub|subreddit|X/);
     expect(within(promo).getByRole("button")).toBeTruthy();
 
     await harness.waitForStreamEnd(chatId);
@@ -128,12 +128,12 @@ describe("promo message (integration)", () => {
   }, 60_000);
 
   it.each([true, false])(
-    "does not show a promo when the user has a Pro key and enableDyadPro is %s",
-    async (enableDyadPro) => {
+    "does not show a promo when the user has a Pro key and enableKapablePro is %s",
+    async (enableKapablePro) => {
       writeSettings({
-        enableDyadPro,
+        enableKapablePro,
         providerSettings: {
-          auto: { apiKey: { value: "dyad-pro-key" } },
+          auto: { apiKey: { value: "kapable-pro-key" } },
         },
         isTestMode: false,
       });
@@ -209,7 +209,7 @@ describe("promo message (integration)", () => {
         name: message.cta,
       }),
     );
-    expect(await screen.findByText("Unlock Dyad Pro")).toBeTruthy();
+    expect(await screen.findByText("Unlock KapAble Pro")).toBeTruthy();
   }, 60_000);
 
   it("opens an external URL from a community promo CTA", async () => {

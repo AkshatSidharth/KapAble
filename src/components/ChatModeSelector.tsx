@@ -13,7 +13,7 @@ import {
 import { useChatMode } from "@/hooks/useChatMode";
 import { useFreeAgentQuota } from "@/hooks/useFreeAgentQuota";
 import type { ChatMode } from "@/lib/schemas";
-import { isDyadProEnabled } from "@/lib/schemas";
+import { isKapableProEnabled } from "@/lib/schemas";
 import { getChatModeDisplayName } from "@/lib/chatModeToast";
 import { cn } from "@/lib/utils";
 import { detectIsMac } from "@/hooks/useChatModeToggle";
@@ -38,11 +38,11 @@ export function ChatModeSelector() {
   const setHasManuallySelectedChatMode = useSetAtom(
     hasManuallySelectedChatModeAtom,
   );
-  const isProEnabled = settings ? isDyadProEnabled(settings) : false;
+  const isProEnabled = settings ? isKapableProEnabled(settings) : false;
   const { messagesRemaining, messagesLimit, isQuotaExceeded } =
     useFreeAgentQuota();
-  const isDyadFreeSelected = isFreeProModel(selectedModel);
-  const buildUnavailableForDyadFree = isDyadFreeSelected;
+  const isKapableFreeSelected = isFreeProModel(selectedModel);
+  const buildUnavailableForKapableFree = isKapableFreeSelected;
 
   useEffect(() => {
     if (
@@ -62,7 +62,7 @@ export function ChatModeSelector() {
       selectedModel &&
       isFreeProBuildModeCombination(selectedModel, newMode)
     ) {
-      toast.error("Dyad Free is not available in Build mode.");
+      toast.error("KapAble Free is not available in Build mode.");
       return;
     }
     // An explicit pick outside a chat updates settings.selectedChatMode;
@@ -173,15 +173,15 @@ export function ChatModeSelector() {
               </div>
             </SelectItem>
           )}
-          <SelectItem value="build" disabled={buildUnavailableForDyadFree}>
+          <SelectItem value="build" disabled={buildUnavailableForKapableFree}>
             <div className="flex flex-col items-start">
               <div className="flex items-center gap-1.5">
                 <Hammer size={14} className="text-muted-foreground" />
                 <span className="font-medium">Build</span>
               </div>
               <span className="text-xs text-muted-foreground ml-[22px]">
-                {buildUnavailableForDyadFree
-                  ? "Use Agent, Ask, or Plan with Dyad Free"
+                {buildUnavailableForKapableFree
+                  ? "Use Agent, Ask, or Plan with KapAble Free"
                   : "Generate and edit code"}
               </span>
             </div>

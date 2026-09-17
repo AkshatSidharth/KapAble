@@ -44,7 +44,7 @@ describe("ChatErrorBox Basic Agent quota error", () => {
     render(
       <ChatErrorBox
         error='{"type":"FREE_AGENT_QUOTA_EXCEEDED","resetTime":1787295600000}'
-        isDyadProEnabled={false}
+        isKapableProEnabled={false}
         onDismiss={onDismiss}
         onSwitchToBuildMode={onSwitchToBuildMode}
       />,
@@ -55,9 +55,9 @@ describe("ChatErrorBox Basic Agent quota error", () => {
     ).toBeTruthy();
     expect(screen.getByText(/Your quota resets at/)).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Upgrade to Dyad Pro"));
+    fireEvent.click(screen.getByText("Upgrade to KapAble Pro"));
     expect(mocks.openExternalUrl).toHaveBeenCalledWith(
-      "https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=free-agent-quota-exceeded",
+      "https://kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=free-agent-quota-exceeded",
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Switch to Build" }));
@@ -65,17 +65,17 @@ describe("ChatErrorBox Basic Agent quota error", () => {
     expect(onDismiss).not.toHaveBeenCalled();
   });
 
-  it("explains that Dyad Free must be changed before using Build", () => {
+  it("explains that KapAble Free must be changed before using Build", () => {
     render(
       <ChatErrorBox
         error='{"type":"FREE_AGENT_QUOTA_EXCEEDED","resetTime":1787295600000}'
-        isDyadProEnabled={false}
+        isKapableProEnabled={false}
         onDismiss={vi.fn()}
       />,
     );
 
     expect(
-      screen.getByText(/first choose a model other than Dyad Free/),
+      screen.getByText(/first choose a model other than KapAble Free/),
     ).toBeTruthy();
     expect(
       screen.queryByRole("button", { name: "Switch to Build" }),
@@ -88,7 +88,7 @@ describe("ChatErrorBox error presentation", () => {
     render(
       <ChatErrorBox
         error={`Implementer failures:\n${"Detailed failure line\n".repeat(200)}`}
-        isDyadProEnabled
+        isKapableProEnabled
         onDismiss={vi.fn()}
       />,
     );
@@ -107,13 +107,13 @@ describe("ChatErrorBox subscription billing errors", () => {
       "OUT_OF_CREDITS",
       "Add credits to continue using your subscription.",
       "Get more credits",
-      "https://academy.dyad.sh/subscription",
+      "https://academy.kapable.sh/subscription",
     ],
     [
       "KEY_REJECTED",
       "Get your current Pro key.",
       "Open membership portal",
-      "https://academy.dyad.sh",
+      "https://academy.kapable.sh",
     ],
   ] as const)(
     "offers the right recovery for %s",
@@ -122,7 +122,7 @@ describe("ChatErrorBox subscription billing errors", () => {
       render(
         <ChatErrorBox
           error={new SubscriptionBillingError(code).serialize()}
-          isDyadProEnabled
+          isKapableProEnabled
           onDismiss={vi.fn()}
           onStartNewChat={vi.fn()}
         />,
@@ -146,7 +146,7 @@ describe("ChatErrorBox exhausted credit notice", () => {
       render(
         <ChatErrorBox
           error="ExceededBudget: exhausted"
-          isDyadProEnabled
+          isKapableProEnabled
           onDismiss={onDismiss}
           onStartNewChat={vi.fn()}
         />,
@@ -166,7 +166,7 @@ describe("ChatErrorBox exhausted credit notice", () => {
       expect(screen.queryByText("Start new chat")).toBeNull();
       fireEvent.click(screen.getByRole("button", { name: "Get more credits" }));
       expect(mocks.openExternalUrl).toHaveBeenCalledExactlyOnceWith(
-        "https://academy.dyad.sh/subscription",
+        "https://academy.kapable.sh/subscription",
       );
       fireEvent.click(
         screen.getByRole("button", { name: "Dismiss billing notice" }),
@@ -180,27 +180,27 @@ describe("ChatErrorBox exhausted credit notice", () => {
 describe("ChatErrorBox legacy rejected Pro key", () => {
   it.each([false, true])(
     "offers the membership portal (Pro enabled: %s)",
-    (isDyadProEnabled) => {
+    (isKapableProEnabled) => {
       mocks.openExternalUrl.mockReset();
       const onDismiss = vi.fn();
       render(
         <ChatErrorBox
           error="Provider returned error: LiteLLM Virtual Key expected"
-          isDyadProEnabled={isDyadProEnabled}
+          isKapableProEnabled={isKapableProEnabled}
           onDismiss={onDismiss}
           onStartNewChat={vi.fn()}
         />,
       );
-      expect(screen.getByText("Your Dyad Pro key was rejected")).toBeTruthy();
+      expect(screen.getByText("Your KapAble Pro key was rejected")).toBeTruthy();
       expect(screen.getByText("Get your current Pro key.")).toBeTruthy();
-      expect(screen.queryByText("Upgrade to Dyad Pro")).toBeNull();
+      expect(screen.queryByText("Upgrade to KapAble Pro")).toBeNull();
       expect(screen.queryByText("Start new chat")).toBeNull();
       expect(screen.queryByText("Read docs")).toBeNull();
       fireEvent.click(
         screen.getByRole("button", { name: "Open membership portal" }),
       );
       expect(mocks.openExternalUrl).toHaveBeenCalledExactlyOnceWith(
-        "https://academy.dyad.sh",
+        "https://academy.kapable.sh",
       );
       fireEvent.click(
         screen.getByRole("button", { name: "Dismiss billing notice" }),
@@ -216,7 +216,7 @@ it("recognizes a legacy rejected key inside fallback details", () => {
       error={
         'All models failed. Fallbacks=[{"error":"LiteLLM Virtual Key expected"}]'
       }
-      isDyadProEnabled
+      isKapableProEnabled
       onDismiss={vi.fn()}
     />,
   );

@@ -1,5 +1,5 @@
 import log from "electron-log/main";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   BufferedProcessSpawnError,
   DEFAULT_BUFFERED_PROCESS_TIMEOUT_MS,
@@ -22,7 +22,7 @@ export async function simpleSpawn({
   cwd: string;
   successMessage: string;
   errorPrefix: string;
-  // Defaults to getPackageManagerCommandEnv() so Dyad-managed commands see
+  // Defaults to getPackageManagerCommandEnv() so KapAble-managed commands see
   // the managed pnpm and the Corepack project-spec disable without every
   // call site having to remember to pass it.
   env?: NodeJS.ProcessEnv;
@@ -49,9 +49,9 @@ export async function simpleSpawn({
   } catch (error) {
     if (error instanceof BufferedProcessSpawnError) {
       logger.error(`Failed to spawn command: ${command}`, error);
-      throw new DyadError(
+      throw new KapableError(
         `Failed to spawn command: ${error.message}\n\nSTDOUT:\n${error.stdout}\n\nSTDERR:\n${error.stderr}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
         { cause: error },
       );
     }
@@ -75,10 +75,10 @@ export async function simpleSpawn({
   }
 
   logger.error(`${errorPrefix}, ${failureReason}`);
-  throw new DyadError(
+  throw new KapableError(
     `${errorPrefix} (${failureReason})\n\nSTDOUT:\n${result.stdout}\n\nSTDERR:\n${result.stderr}`,
     // An abort comes from the caller's AbortSignal, so it is not an upstream
     // failure worth reporting to telemetry.
-    result.aborted ? DyadErrorKind.UserCancelled : DyadErrorKind.External,
+    result.aborted ? KapableErrorKind.UserCancelled : KapableErrorKind.External,
   );
 }

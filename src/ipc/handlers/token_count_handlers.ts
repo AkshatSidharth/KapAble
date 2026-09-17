@@ -13,7 +13,7 @@ import {
 } from "../../prompts/supabase_prompt";
 import { buildNeonPromptForApp } from "../../neon_admin/neon_prompt_context";
 import { NEON_DISCONNECTED_SYSTEM_PROMPT } from "../../prompts/neon_prompt";
-import { getDyadAppPath } from "../../paths/paths";
+import { getKapableAppPath } from "../../paths/paths";
 import { detectFrameworkType } from "../utils/framework_utils";
 import log from "electron-log";
 import {
@@ -31,13 +31,13 @@ import {
 } from "@/ipc/utils/model_effort";
 import { extractMentionedAppsCodebasesFromPrompt } from "../utils/mention_apps";
 import {
-  isDyadProEnabled,
+  isKapableProEnabled,
   isBasicAgentMode,
   isLocalAgentBackedMode,
   isTurboEditsV2Enabled,
   hasSupabaseCredentialsForOrganization,
 } from "@/lib/schemas";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { resolveChatModeForTurn } from "./chat_mode_resolution";
 import { isImplementerSubagentEnabled } from "@/lib/autoSidekick";
 import { estimateAgentToolTokens } from "@/pro/main/ipc/handlers/local_agent/tool_definitions";
@@ -71,9 +71,9 @@ export function registerTokenCountHandlers() {
       });
 
       if (!chat) {
-        throw new DyadError(
+        throw new KapableError(
           `Chat not found: ${req.chatId}`,
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
 
@@ -103,7 +103,7 @@ export function registerTokenCountHandlers() {
       // Count system prompt tokens
       // Migration on read converts "agent" to "build", so no need to check for it here
       const themePrompt = await getThemePromptById(chat.app?.themeId ?? null);
-      const frameworkType = detectFrameworkType(getDyadAppPath(chat.app.path));
+      const frameworkType = detectFrameworkType(getKapableAppPath(chat.app.path));
       const enableAppBlueprint =
         settings.enableAppBlueprint === true && chat.app.needsAppBlueprint;
       const appBlueprint = getAppBlueprintForChat(chat.id);
@@ -113,7 +113,7 @@ export function registerTokenCountHandlers() {
       const appBlueprintQuestionnaireCompleted =
         hasCompletedAppBlueprintQuestionnaire(chat.messages);
       let systemPrompt = constructSystemPrompt({
-        aiRules: await readAiRules(getDyadAppPath(chat.app.path)),
+        aiRules: await readAiRules(getKapableAppPath(chat.app.path)),
         chatMode: selectedChatMode === "ask" ? "local-agent" : selectedChatMode,
         enableTurboEditsV2: isTurboEditsV2Enabled(settings),
         themePrompt,
@@ -122,7 +122,7 @@ export function registerTokenCountHandlers() {
         hasSupabaseProject: !!chat.app?.supabaseProjectId,
         implementerAvailable:
           selectedChatMode === "local-agent" &&
-          isDyadProEnabled(settings) &&
+          isKapableProEnabled(settings) &&
           isImplementerSubagentEnabled(settings),
         testingEnabled: !!chat.app?.testingEnabled,
         enableAppBlueprint,
@@ -186,7 +186,7 @@ export function registerTokenCountHandlers() {
         systemPrompt += "\n\n" + SUPABASE_NOT_AVAILABLE_SYSTEM_PROMPT;
       }
 
-      const isDyadPro = isDyadProEnabled(settings);
+      const isKapablePro = isKapableProEnabled(settings);
       const mcpToolDefs =
         selectedChatMode === "local-agent" ? getCachedMcpToolDefs() : [];
       const toolDefinitionTokens = await estimateAgentToolTokens({
@@ -196,7 +196,7 @@ export function registerTokenCountHandlers() {
         basicAgentMode:
           selectedChatMode === "local-agent" && isBasicAgentMode(settings),
         enableAppBlueprint,
-        isDyadPro,
+        isKapablePro,
         frameworkType,
         supabaseProjectId: chat.app.supabaseProjectId,
         supabaseProviderToolsAvailable,
@@ -206,16 +206,16 @@ export function registerTokenCountHandlers() {
         testingEnabled: !!chat.app.testingEnabled,
         canUseExplorerSubagent:
           selectedChatMode !== "build" &&
-          isDyadPro &&
+          isKapablePro &&
           settings.enableExplorerSubagent !== false,
         canUseImplementerSubagent:
           selectedChatMode === "local-agent" &&
-          isDyadPro &&
+          isKapablePro &&
           isImplementerSubagentEnabled(settings),
         mcpToolDefs,
         canUseAdvancedSubagentTools:
           selectedChatMode === "local-agent" &&
-          isDyadPro &&
+          isKapablePro &&
           settings.enableAdvancedSubagents === true,
         runTypeScriptForWholeProject:
           settings.runTypeScriptForWholeProject === true,

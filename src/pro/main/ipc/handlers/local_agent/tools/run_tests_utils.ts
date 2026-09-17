@@ -174,12 +174,12 @@ export function truncateError(error: string): string {
  * mode that may claim real data was untouched. A `supabase-test-user` run
  * executes against the app's REAL project — Row-Level Security is the only
  * thing scoping it — so it states what we did (tested with a test user) rather
- * than promising what didn't happen. `reason` (tables without RLS, RLS Dyad
+ * than promising what didn't happen. `reason` (tables without RLS, RLS KapAble
  * couldn't verify, or why isolation was skipped) is appended rather than
  * dropped: it's precisely the case where a blanket safety claim would be false.
  *
  * The `mode` enum must never reach the text: this string is both the tool
- * result AND the body of the <dyad-status> card the user reads in chat, so it
+ * result AND the body of the <kapable-status> card the user reads in chat, so it
  * says what happened in plain words instead of naming an internal identifier.
  */
 export function isolationLine(res: RunAppTestsResult): string {
@@ -200,7 +200,7 @@ export function completeWarning(
   body: string,
 ): void {
   ctx.onXmlComplete(
-    `<dyad-output type="warning" message="${escapeXmlAttr(title)}">\n${escapeXmlContent(body)}\n</dyad-output>`,
+    `<kapable-output type="warning" message="${escapeXmlAttr(title)}">\n${escapeXmlContent(body)}\n</kapable-output>`,
   );
 }
 
@@ -210,6 +210,6 @@ export function completeStatus(
   body: string,
 ): void {
   ctx.onXmlComplete(
-    `<dyad-status title="${escapeXmlAttr(title)}">\n${escapeXmlContent(body)}\n</dyad-status>`,
+    `<kapable-status title="${escapeXmlAttr(title)}">\n${escapeXmlContent(body)}\n</kapable-status>`,
   );
 }

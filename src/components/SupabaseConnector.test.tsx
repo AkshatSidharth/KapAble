@@ -11,7 +11,7 @@ import type { PropsWithChildren } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SupabaseConnector } from "./SupabaseConnector";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { SUPABASE_PROJECT_CREATED_BUT_UNLINKED } from "@/ipc/types";
 
 const {
@@ -586,11 +586,11 @@ function deferredCreate() {
 // The code is the marker; the kind is the catch-all it happens to share with
 // every other unclassified failure.
 function createdButUnlinkedError() {
-  const error = new DyadError(
+  const error = new KapableError(
     "Created Supabase project abc123 but couldn't link it to this app.",
-    DyadErrorKind.Internal,
+    KapableErrorKind.Internal,
   );
-  (error as DyadError & { code: string }).code =
+  (error as KapableError & { code: string }).code =
     SUPABASE_PROJECT_CREATED_BUT_UNLINKED;
   return error;
 }
@@ -742,7 +742,7 @@ describe("SupabaseConnector — app API key", () => {
     );
   });
 
-  // The key is still legacy and Dyad couldn't act on it — the one case where
+  // The key is still legacy and KapAble couldn't act on it — the one case where
   // claiming the key is "already up to date" would be a plain falsehood.
   it("does not claim the key is current when nothing could be switched", async () => {
     switchAppToPublishableKeyMock.mockResolvedValue({
@@ -991,7 +991,7 @@ describe("SupabaseConnector — a create that fails", () => {
   // the user to go clean up something that does not exist.
   it("does not claim a project exists for an unmarked internal failure", async () => {
     await submitFailingCreate(
-      new DyadError("Renderer is not trusted", DyadErrorKind.Internal),
+      new KapableError("Renderer is not trusted", KapableErrorKind.Internal),
     );
 
     expect((await screen.findByRole("alert")).textContent).toContain(

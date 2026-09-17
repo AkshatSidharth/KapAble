@@ -15,7 +15,7 @@ import { eq } from "drizzle-orm";
 import { withChatQueueLock } from "@/chat_stream/queue_lock";
 import { parkChatQueue } from "@/chat_stream/persistence";
 import { cancelActiveStreamsForChat } from "./chat_stream_handlers";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { preflightSubscriptionTurn } from "@/ipc/services/subscription_turn_preflight";
 import {
   setupChatFlowHarness,
@@ -73,13 +73,13 @@ describe("redo turn admission", () => {
   });
 
   it.each([
-    ["Out of credits", DyadErrorKind.Precondition],
-    ["Reconnect your subscription", DyadErrorKind.Auth],
+    ["Out of credits", KapableErrorKind.Precondition],
+    ["Reconnect your subscription", KapableErrorKind.Auth],
   ])(
     "preserves the entire exchange when preflight rejects: %s",
     async (message, kind) => {
       vi.mocked(preflightSubscriptionTurn).mockRejectedValue(
-        new DyadError(message, kind),
+        new KapableError(message, kind),
       );
 
       const result = await harness.streamChat("tc=no-code-response", {

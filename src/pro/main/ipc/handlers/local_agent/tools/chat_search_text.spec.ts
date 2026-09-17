@@ -22,18 +22,18 @@ function user(content: string) {
 
 describe("projectChatMessageForSearch", () => {
   describe("user messages", () => {
-    it("preserves user text as-is, including literal dyad-tag examples", () => {
+    it("preserves user text as-is, including literal kapable-tag examples", () => {
       const result = user(
-        "How do I use <dyad-write> tags? Please fix the login form.",
+        "How do I use <kapable-write> tags? Please fix the login form.",
       );
-      expect(result.text).toContain("<dyad-write>");
+      expect(result.text).toContain("<kapable-write>");
       expect(result.text).toContain("fix the login form");
       expect(result.truncated).toBe(false);
     });
 
     it("does not strip payload-looking content from user messages", () => {
       const result = user(
-        '<dyad-write path="a.ts">const secret = "user pasted this";</dyad-write>',
+        '<kapable-write path="a.ts">const secret = "user pasted this";</kapable-write>',
       );
       expect(result.text).toContain("user pasted this");
     });
@@ -51,7 +51,7 @@ describe("projectChatMessageForSearch", () => {
 
     it("reduces file writes to path metadata without the body", () => {
       const result = assistant(
-        '<dyad-write path="src/Login.tsx" description="Login form">const SECRET_BODY = 1;</dyad-write>',
+        '<kapable-write path="src/Login.tsx" description="Login form">const SECRET_BODY = 1;</kapable-write>',
       );
       expect(result.text).toContain("src/Login.tsx");
       expect(result.text).toContain("Login form");
@@ -60,7 +60,7 @@ describe("projectChatMessageForSearch", () => {
 
     it("omits bulky tool-output bodies while keeping the query", () => {
       const result = assistant(
-        '<dyad-grep query="login">src/a.ts:1: SECRET_MATCH</dyad-grep>',
+        '<kapable-grep query="login">src/a.ts:1: SECRET_MATCH</kapable-grep>',
       );
       expect(result.text).toContain("login");
       expect(result.text).not.toContain("SECRET_MATCH");
@@ -68,7 +68,7 @@ describe("projectChatMessageForSearch", () => {
 
     it("omits SQL bodies but keeps the description", () => {
       const result = assistant(
-        '<dyad-execute-sql description="Add users table">CREATE TABLE users (secret_col TEXT);</dyad-execute-sql>',
+        '<kapable-execute-sql description="Add users table">CREATE TABLE users (secret_col TEXT);</kapable-execute-sql>',
       );
       expect(result.text).toContain("Add users table");
       expect(result.text).not.toContain("secret_col");
@@ -78,7 +78,7 @@ describe("projectChatMessageForSearch", () => {
       const result = projectChatMessageForSearch({
         role: "assistant",
         content:
-          "<dyad-compaction>We decided to use Supabase auth with magic links.</dyad-compaction>",
+          "<kapable-compaction>We decided to use Supabase auth with magic links.</kapable-compaction>",
         isCompactionSummary: true,
       });
       expect(result.text).toContain("Supabase auth with magic links");
@@ -86,9 +86,9 @@ describe("projectChatMessageForSearch", () => {
 
     it("preserves plans, findings, and output summaries", () => {
       const result = assistant(
-        "<dyad-write-plan>1. Add auth 2. Add tests</dyad-write-plan>" +
-          '<dyad-security-finding title="XSS">Unescaped output in Header</dyad-security-finding>' +
-          '<dyad-output type="warning">Deploy skipped: shared module changed</dyad-output>',
+        "<kapable-write-plan>1. Add auth 2. Add tests</kapable-write-plan>" +
+          '<kapable-security-finding title="XSS">Unescaped output in Header</kapable-security-finding>' +
+          '<kapable-output type="warning">Deploy skipped: shared module changed</kapable-output>',
       );
       expect(result.text).toContain("Add auth");
       expect(result.text).toContain("Unescaped output in Header");
@@ -97,16 +97,16 @@ describe("projectChatMessageForSearch", () => {
 
     it("drops chat-search and read-chat bodies to prevent recursive retrieval", () => {
       const result = assistant(
-        '<dyad-search-chats query="auth">RETRIEVED_HISTORY excerpt</dyad-search-chats>' +
-          '<dyad-read-chat chat-id="3">RETRIEVED_MESSAGES text</dyad-read-chat>',
+        '<kapable-search-chats query="auth">RETRIEVED_HISTORY excerpt</kapable-search-chats>' +
+          '<kapable-read-chat chat-id="3">RETRIEVED_MESSAGES text</kapable-read-chat>',
       );
       expect(result.text).not.toContain("RETRIEVED_HISTORY");
       expect(result.text).not.toContain("RETRIEVED_MESSAGES");
     });
 
-    it("fails closed for unrecognized dyad tags", () => {
+    it("fails closed for unrecognized kapable tags", () => {
       const result = assistant(
-        "Before text <dyad-future-tool foo='bar'>HUGE_PAYLOAD</dyad-future-tool> after text",
+        "Before text <kapable-future-tool foo='bar'>HUGE_PAYLOAD</kapable-future-tool> after text",
       );
       expect(result.text).toContain("Before text");
       expect(result.text).toContain("after text");
@@ -115,7 +115,7 @@ describe("projectChatMessageForSearch", () => {
 
     it("fails closed for an unclosed unrecognized tag", () => {
       const result = assistant(
-        "Intro prose <dyad-future-tool>PAYLOAD_WITHOUT_CLOSE and more",
+        "Intro prose <kapable-future-tool>PAYLOAD_WITHOUT_CLOSE and more",
       );
       expect(result.text).toContain("Intro prose");
       expect(result.text).not.toContain("PAYLOAD_WITHOUT_CLOSE");
@@ -123,7 +123,7 @@ describe("projectChatMessageForSearch", () => {
 
     it("does not leak the body of an unclosed recognized payload tag", () => {
       const result = assistant(
-        'Working on it.\n<dyad-write path="src/a.ts">UNFINISHED_BODY',
+        'Working on it.\n<kapable-write path="src/a.ts">UNFINISHED_BODY',
       );
       expect(result.text).toContain("Working on it.");
       expect(result.text).toContain("src/a.ts");
@@ -133,7 +133,7 @@ describe("projectChatMessageForSearch", () => {
     it("keeps only allowlisted, length-capped attributes", () => {
       const longAttr = "x".repeat(1000);
       const result = assistant(
-        `<dyad-grep query="${longAttr}" internal_secret="hidden-attr">body</dyad-grep>`,
+        `<kapable-grep query="${longAttr}" internal_secret="hidden-attr">body</kapable-grep>`,
       );
       expect(result.text).not.toContain("hidden-attr");
       expect(result.text.length).toBeLessThan(500);

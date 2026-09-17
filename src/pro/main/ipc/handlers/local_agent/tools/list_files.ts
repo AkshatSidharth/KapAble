@@ -9,10 +9,10 @@ import {
 } from "./types";
 import { listCodebaseFileMetadata } from "../../../../../../utils/codebase";
 import { resolveDirectoryWithinAppPath } from "./path_safety";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
-  DYAD_INTERNAL_GLOB,
-  filterDyadInternalFiles,
+  KAPABLE_INTERNAL_GLOB,
+  filterKapableInternalFiles,
   resolveTargetAppPath,
 } from "./resolve_app_context";
 
@@ -97,7 +97,7 @@ export const listFilesTool: ToolDefinition<ListFilesArgs> = {
     if (isComplete) {
       return undefined;
     }
-    return `<dyad-list-files${getXmlAttributes(args)}></dyad-list-files>`;
+    return `<kapable-list-files${getXmlAttributes(args)}></kapable-list-files>`;
   },
 
   execute: async (args, ctx: AgentContext) => {
@@ -122,9 +122,9 @@ export const listFilesTool: ToolDefinition<ListFilesArgs> = {
     }
 
     if (args.include_ignored && args.recursive && !sanitizedDirectory) {
-      throw new DyadError(
+      throw new KapableError(
         "include_ignored=true with recursive=true requires a non-root directory to avoid listing too many files.",
-        DyadErrorKind.Validation,
+        KapableErrorKind.Validation,
       );
     }
 
@@ -140,7 +140,7 @@ export const listFilesTool: ToolDefinition<ListFilesArgs> = {
       const normalizedAppPath = targetAppPath.replace(/\\/g, "/");
       const globPattern = `${normalizedAppPath}/${globPath}`;
       const ignoredGlobs = args.app_name
-        ? ["**/.git", "**/.git/**", DYAD_INTERNAL_GLOB]
+        ? ["**/.git", "**/.git/**", KAPABLE_INTERNAL_GLOB]
         : ["**/.git", "**/.git/**"];
       const ignoredPaths = await glob(globPattern, {
         withFileTypes: true,
@@ -167,7 +167,7 @@ export const listFilesTool: ToolDefinition<ListFilesArgs> = {
         },
       });
 
-      const filteredFiles = filterDyadInternalFiles(files, args.app_name);
+      const filteredFiles = filterKapableInternalFiles(files, args.app_name);
 
       // Build the list of file paths
       allPaths = sortListedPaths(
@@ -203,7 +203,7 @@ export const listFilesTool: ToolDefinition<ListFilesArgs> = {
 
     // Write abbreviated list to UI
     ctx.onXmlComplete(
-      `<dyad-list-files${getXmlAttributes(args, cappedPaths.length, totalCount)}>${escapeXmlContent(abbreviatedList + countInfo)}</dyad-list-files>`,
+      `<kapable-list-files${getXmlAttributes(args, cappedPaths.length, totalCount)}>${escapeXmlContent(abbreviatedList + countInfo)}</kapable-list-files>`,
     );
 
     // Return full file list for LLM

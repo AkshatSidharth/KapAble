@@ -62,7 +62,7 @@ describe("my UI feature (hybrid)", () => {
 
   it("renders the streamed message", async () => {
     harness.mount();
-    const { send } = await harness.typeInChat("tc=dyad-write-angle");
+    const { send } = await harness.typeInChat("tc=kapable-write-angle");
     send();
     await waitFor(() => expect(screen.getByText(/AFTER TAG/)).toBeTruthy());
     await harness.waitForStreamEnd(harness.chatId); // BEFORE any main-side assert
@@ -116,8 +116,8 @@ Common option recipes:
   mode selector in the UI.
 - **multiple chats** — `const c2 = await harness.createChat()` then
   `harness.mount({ chatId: c2 })`.
-- **Dyad Pro / engine routes** — pass `engine: true` so
-  `DYAD_ENGINE_URL` / `DYAD_GATEWAY_URL` point at the harness fake server.
+- **KapAble Pro / engine routes** — pass `engine: true` so
+  `KAPABLE_ENGINE_URL` / `KAPABLE_GATEWAY_URL` point at the harness fake server.
 
 ### The harness object
 
@@ -206,7 +206,7 @@ harness.dispose()                     // race-free teardown (see §6)
   (`chatAttachmentsByIdAtom`, or `attachmentsAtom` for the home composer):
   browser `File` objects plus the `chat-context` / `upload-to-codebase` type.
   Submit still runs through the real `ChatInput` path, including `FileReader`
-  conversion to IPC attachments and `.dyad/media` persistence.
+  conversion to IPC attachments and `.kapable/media` persistence.
 - **Seeding selected components**: use `setSelectedComponents(components)` for
   queue edit/restore assertions that only need ChatInput state. Keep Playwright
   coverage for picking a component inside the real preview iframe.
@@ -340,7 +340,7 @@ before the active one fully disposes.
   have nothing to do (`runTypeScriptCheck` is stubbed to `{ problems: [] }` in
   `hybrid.setup.ts` because the app-local TypeScript CLI needs a real app
   node_modules tree, no Pro key, a CORS-blocked
-  `api.dyad.sh/v1/desktop-config`). They are caught and logged, not failures. The act, pnpm-install, and DB-teardown noise **is** handled (§6, §8).
+  `api.kapable.sh/v1/desktop-config`). They are caught and logged, not failures. The act, pnpm-install, and DB-teardown noise **is** handled (§6, §8).
 
 ---
 
@@ -352,12 +352,12 @@ fire during a hybrid run. Both are inert in production/dev/E2E and must stay:
 - **Implicit pnpm install** — the UI's `nodejs-status` query, when pnpm is
   missing, schedules a **real** background `npm install pnpm`.
   `node_handlers.ts`'s `scheduleManagedPnpmInstall` returns early when
-  `process.env.DYAD_SKIP_MANAGED_PNPM_INSTALL === "true"` (the harness sets it).
+  `process.env.KAPABLE_SKIP_MANAGED_PNPM_INSTALL === "true"` (the harness sets it).
   It only skips the _implicit_ convenience install; an explicit `installPnpm`
   handler call is unaffected, and production never sets the flag.
 - **Monaco eager init** — `src/components/chat/monaco.ts` runs `loader.init()` at
   module load to register editor themes. The chat message tree imports it
-  transitively (`DyadWrite` → `FileEditor`), so a hybrid test pulls it in even
+  transitively (`KapableWrite` → `FileEditor`), so a hybrid test pulls it in even
   though it never renders an editor. The async (CDN) load gets **canceled on
   teardown**, surfacing as a `Canceled` **unhandled rejection** that fails the
   whole run (non-zero exit) even when every `it` passed. `monaco.ts` now guards
@@ -368,7 +368,7 @@ fire during a hybrid run. Both are inert in production/dev/E2E and must stay:
 
 ## 9. Pro / engine routing
 
-Pass `engine: true` to route Dyad Engine and Gateway calls to the harness fake
+Pass `engine: true` to route KapAble Engine and Gateway calls to the harness fake
 server. `get_model_client` and LM Studio URL reads happen at call time, so tests
 no longer need a hoisted relay just to know the fake server's ephemeral port.
 
@@ -378,7 +378,7 @@ no longer need a hoisted relay just to know the fake server's ephemeral port.
 
 - **`chatMode` option trap.** The harness `chatMode` option only seeds
   `settings.selectedChatMode`; `ChatInput` submits the chat row's mode /
-  effective default, and with Dyad Pro enabled the effective default is
+  effective default, and with KapAble Pro enabled the effective default is
   `local-agent`. An ask-mode hybrid test silently runs in local-agent mode
   unless it drives the real selector: `await harness.selectChatMode("ask")`
   (see `local_agent_ask.integration.test.ts`).

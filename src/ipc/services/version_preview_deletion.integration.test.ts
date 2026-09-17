@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ActorHost } from "@/distributed_machines/actor_host";
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 import {
   createFakeClock,
   createSequentialIdSource,
@@ -93,7 +93,7 @@ describe("version preview deletion lifecycle", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    appPath = fs.mkdtempSync(path.join(os.tmpdir(), "dyad-version-delete-"));
+    appPath = fs.mkdtempSync(path.join(os.tmpdir(), "kapable-version-delete-"));
     fs.mkdirSync(path.join(appPath, ".git"));
     database.appPath = appPath;
   });
@@ -188,7 +188,7 @@ describe("version preview deletion lifecycle", () => {
           versionPreviewKey(7),
         ),
       ).toThrowError(
-        expect.objectContaining({ kind: DyadErrorKind.Precondition }),
+        expect.objectContaining({ kind: KapableErrorKind.Precondition }),
       );
       expect(host.peek(versionPreviewDefinition.id, versionPreviewKey(7))).toBe(
         undefined,

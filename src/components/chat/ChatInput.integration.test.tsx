@@ -14,7 +14,7 @@ import {
 } from "@/testing/hybrid_chat_harness";
 import { h } from "@/testing/hybrid.setup";
 import { preflightSubscriptionTurn } from "@/ipc/services/subscription_turn_preflight";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 vi.mock("@/ipc/services/subscription_turn_preflight", () => ({
   preflightSubscriptionTurn: vi.fn(),
@@ -28,7 +28,7 @@ describe("chat input during turn admission", () => {
       electronMock: h,
       autoApprove: true,
       settings: {
-        enableDyadPro: false,
+        enableKapablePro: false,
         providerSettings: {},
         isTestMode: true,
       },
@@ -58,7 +58,7 @@ describe("chat input during turn admission", () => {
       vi.mocked(preflightSubscriptionTurn).mockImplementation(async (model) => {
         await pending;
         if (rejected) {
-          throw new DyadError("Out of credits", DyadErrorKind.Precondition);
+          throw new KapableError("Out of credits", KapableErrorKind.Precondition);
         }
         return { model };
       });

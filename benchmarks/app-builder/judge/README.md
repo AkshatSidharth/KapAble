@@ -13,7 +13,7 @@ node judge.mjs --cell <cellId> --milestone <m> [--judges id1,id2]
 node judge.mjs --cell claude-sonnet-5-relay-crm --milestone 1
 ```
 
-Requires `DYAD_PRO_KEY` in the environment, the cell's archived checkout at
+Requires `KAPABLE_PRO_KEY` in the environment, the cell's archived checkout at
 `results/s-cell/checkouts/<cellId>` (with `checkpoint-m<k>` tags), and — when
 available — CUJ results at `results/s-score/<cellId>-ckpt<m>-a1.json` (judged
 "from code alone" otherwise). Output: `results/judge/<cellId>-m<m>.json` with

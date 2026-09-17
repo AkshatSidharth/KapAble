@@ -26,7 +26,7 @@ export interface ScreenshotOutcome {
 /**
  * The report is handed to GitHub as a prefilled URL, so the whole body has to
  * survive percent-encoding inside a query string. Measured against
- * github.com/dyad-sh/dyad/issues/new: requests are served up to ~6,860
+ * github.com/AkshatSidharth/KapAble/issues/new: requests are served up to ~6,860
  * characters, answer 500 from there to ~8,000, and 414 beyond that. The
  * ceiling below leaves ~5% of headroom under the observed cliff.
  *
@@ -230,7 +230,7 @@ export function describesSomething(description: string): boolean {
 // =============================================================================
 
 export const GITHUB_ISSUES_BASE =
-  "https://github.com/dyad-sh/dyad/issues/new" as const;
+  "https://github.com/AkshatSidharth/KapAble/issues/new" as const;
 
 /** Builds the prefilled issue URL. Never truncates -- see ISSUE_URL_CEILING. */
 export function buildIssueUrl({
@@ -267,7 +267,7 @@ const SCREENSHOT_STATUS_PREFIX = "Screenshot status:";
 export function formatScreenshotStatusLine(outcome: ScreenshotOutcome): string {
   switch (outcome.status) {
     case "captured":
-      return `${SCREENSHOT_STATUS_PREFIX} captured (reporter captured a screenshot in Dyad; if no image is attached, ask them to paste it)`;
+      return `${SCREENSHOT_STATUS_PREFIX} captured (reporter captured a screenshot in KapAble; if no image is attached, ask them to paste it)`;
     case "declined":
       return `${SCREENSHOT_STATUS_PREFIX} declined`;
     case "capture-failed":
@@ -304,7 +304,7 @@ function formatSettingsLines(
     `- Selected Model: ${field(`${model.provider}:${model.name}`)}`,
     `- Chat Mode: ${field(settings.selectedChatMode ?? "default")}`,
     `- Auto Approve Changes: ${settings.autoApproveChanges ?? "n/a"}`,
-    `- Dyad Pro Enabled: ${settings.enableDyadPro ?? "n/a"}`,
+    `- KapAble Pro Enabled: ${settings.enableKapablePro ?? "n/a"}`,
     `- Effort Level: ${field(selectedModel?.effortLevel ?? "medium")}`,
     `- Runtime Mode: ${field(settings.runtimeMode2 ?? "n/a")}`,
     `- Release Channel: ${field(settings.releaseChannel ?? "n/a")}`,
@@ -316,7 +316,7 @@ function formatSystemInfoSection(
   userBudget: UserBudgetInfo | undefined,
 ): string {
   return `## System Information
-- Dyad Version: ${field(debugInfo.dyadVersion)}
+- KapAble Version: ${field(debugInfo.kapableVersion)}
 - Platform: ${field(debugInfo.platform)}
 - Architecture: ${field(debugInfo.architecture)}
 - Node Version: ${field(debugInfo.nodeVersion || "n/a")}

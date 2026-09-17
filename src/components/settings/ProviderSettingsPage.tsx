@@ -32,9 +32,9 @@ import {
   UserSettings,
   AzureProviderSetting,
   VertexProviderSetting,
-  hasDyadProKey,
+  hasKapableProKey,
 } from "@/lib/schemas";
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 import {
   findInvalidProviderApiKeyCharacter,
   formatInvalidProviderApiKeyMessage,
@@ -53,7 +53,7 @@ type ApiKeyValidationDialogState = {
   message: string;
   apiKey: string;
   allowKeepInvalidKey: boolean;
-  errorKind?: DyadErrorKind;
+  errorKind?: KapableErrorKind;
 };
 
 const VALIDATED_API_KEY_PROVIDERS = new Set<string>([
@@ -62,21 +62,21 @@ const VALIDATED_API_KEY_PROVIDERS = new Set<string>([
   "auto",
 ]);
 
-function getErrorKind(error: unknown): DyadErrorKind | undefined {
+function getErrorKind(error: unknown): KapableErrorKind | undefined {
   const kind =
     typeof error === "object" && error !== null
       ? (error as { kind?: unknown }).kind
       : undefined;
   return typeof kind === "string" &&
-    Object.values(DyadErrorKind).includes(kind as DyadErrorKind)
-    ? (kind as DyadErrorKind)
+    Object.values(KapableErrorKind).includes(kind as KapableErrorKind)
+    ? (kind as KapableErrorKind)
     : undefined;
 }
 
 function getApiKeyValidationDialogTitle(
   dialog: ApiKeyValidationDialogState | null,
 ) {
-  return dialog?.errorKind === DyadErrorKind.Auth
+  return dialog?.errorKind === KapableErrorKind.Auth
     ? "API key rejected"
     : "Could not verify API key";
 }
@@ -113,7 +113,7 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
   const supportsCustomModels =
     providerData?.type === "custom" || providerData?.type === "cloud";
 
-  const isDyad = provider === "auto";
+  const isKapable = provider === "auto";
 
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -133,13 +133,13 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
   const { hasArmedPayload } = useFirstPromptSaga();
   const resumeFirstPrompt = useFirstPromptProviderResume();
 
-  // Use fetched data (or defaults for Dyad)
-  const providerDisplayName = isDyad
-    ? "Dyad"
+  // Use fetched data (or defaults for KapAble)
+  const providerDisplayName = isKapable
+    ? "KapAble"
     : (providerData?.name ?? "Unknown Provider");
   const providerWebsiteUrl = providerData?.websiteUrl;
-  const hasFreeTier = isDyad ? false : providerData?.hasFreeTier;
-  const envVarName = isDyad ? undefined : providerData?.envVarName;
+  const hasFreeTier = isKapable ? false : providerData?.hasFreeTier;
+  const envVarName = isKapable ? undefined : providerData?.envVarName;
 
   // Use provider ID (which is the 'provider' prop)
   const userApiKey = settings?.providerSettings?.[provider]?.apiKey?.value;
@@ -232,7 +232,7 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
           setApiKeyValidationDialog({
             message:
               error?.message ||
-              `Dyad could not verify this ${providerDisplayName} API key.`,
+              `KapAble could not verify this ${providerDisplayName} API key.`,
             apiKey: normalizedValue,
             allowKeepInvalidKey: true,
             errorKind: getErrorKind(error),
@@ -242,8 +242,8 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
       }
 
       const isFirstProviderSetup = !isAnyProviderSetup();
-      // Check if this is the first time user is setting up Dyad Pro
-      const isNewDyadProSetup = isDyad && settings && !hasDyadProKey(settings);
+      // Check if this is the first time user is setting up KapAble Pro
+      const isNewKapableProSetup = isKapable && settings && !hasKapableProKey(settings);
 
       const settingsUpdate: Partial<UserSettings> = {
         providerSettings: {
@@ -256,10 +256,10 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
           },
         },
       };
-      if (isDyad) {
-        settingsUpdate.enableDyadPro = true;
+      if (isKapable) {
+        settingsUpdate.enableKapablePro = true;
         // Set default chat mode to local-agent when user upgrades to pro
-        if (isNewDyadProSetup) {
+        if (isNewKapableProSetup) {
           settingsUpdate.defaultChatMode = "local-agent";
         }
       }
@@ -274,8 +274,8 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
         setShowStartBuildingBanner(true);
       }
 
-      // Refetch user budget when Dyad Pro key is saved
-      if (isDyad) {
+      // Refetch user budget when KapAble Pro key is saved
+      if (isKapable) {
         queryClient.invalidateQueries({ queryKey: queryKeys.userBudget.info });
       }
     } catch (error: any) {
@@ -309,7 +309,7 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
       setApiKeyValidationDialog({
         message:
           error?.message ||
-          `Dyad could not verify this ${providerDisplayName} API key.`,
+          `KapAble could not verify this ${providerDisplayName} API key.`,
         apiKey: normalizedValue,
         allowKeepInvalidKey: false,
         errorKind: getErrorKind(error),
@@ -342,15 +342,15 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
     }
   };
 
-  // --- Toggle Dyad Pro Handler ---
-  const handleToggleDyadPro = async (enabled: boolean) => {
+  // --- Toggle KapAble Pro Handler ---
+  const handleToggleKapablePro = async (enabled: boolean) => {
     setIsSaving(true);
     try {
       await updateSettings({
-        enableDyadPro: enabled,
+        enableKapablePro: enabled,
       });
     } catch (error: any) {
-      showError(`Error toggling Dyad Pro: ${error}`);
+      showError(`Error toggling KapAble Pro: ${error}`);
     } finally {
       setIsSaving(false);
     }
@@ -421,7 +421,7 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
   }
 
   // Handle case where provider is not found (e.g., invalid ID in URL)
-  if (!providerData && !isDyad) {
+  if (!providerData && !isKapable) {
     return (
       <div className="min-h-screen px-8 py-4">
         <div className="max-w-4xl mx-auto">
@@ -500,7 +500,7 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
                   AI access is ready
                 </h2>
                 <p className="mt-1 text-sm text-green-800/80 dark:text-green-200/80">
-                  You can now start building with Dyad.
+                  You can now start building with KapAble.
                 </p>
               </div>
             </div>
@@ -519,7 +519,7 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
             isLoading={settingsLoading}
             hasFreeTier={hasFreeTier}
             providerWebsiteUrl={providerWebsiteUrl}
-            isDyad={isDyad}
+            isKapable={isKapable}
             onOpenProviderWebsite={() => {
               if (!isConfigured) {
                 setAwaitingKeyFromWebsite(true);
@@ -557,25 +557,25 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
               onSaveKey={handleSaveKey}
               onTestKey={shouldValidateApiKey ? handleTestKey : undefined}
               onDeleteKey={handleDeleteKey}
-              isDyad={isDyad}
+              isKapable={isKapable}
               updateSettings={updateSettings}
               highlightPasteButton={highlightPasteButton}
               onDismissPasteHighlight={() => setHighlightPasteButton(false)}
             />
           )}
 
-          {isDyad && !settingsLoading && (
+          {isKapable && !settingsLoading && (
             <div className="mt-6 flex items-center justify-between p-4 bg-(--background-lightest) rounded-lg border">
               <div>
-                <h3 className="font-medium">Enable Dyad Pro</h3>
+                <h3 className="font-medium">Enable KapAble Pro</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Toggle to enable Dyad Pro
+                  Toggle to enable KapAble Pro
                 </p>
               </div>
               <Switch
-                aria-label="Enable Dyad Pro"
-                checked={settings?.enableDyadPro}
-                onCheckedChange={handleToggleDyadPro}
+                aria-label="Enable KapAble Pro"
+                checked={settings?.enableKapablePro}
+                onCheckedChange={handleToggleKapablePro}
                 disabled={isSaving}
               />
             </div>

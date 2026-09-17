@@ -23,7 +23,7 @@ const debugInfo: SystemDebugInfo = {
   telemetryId: "telemetry-id",
   telemetryConsent: "opted_in",
   telemetryUrl: "https://example.test",
-  dyadVersion: "1.2.3",
+  kapableVersion: "1.2.3",
   platform: "linux",
   architecture: "x64",
   logs: "some logs",
@@ -250,7 +250,7 @@ describe("buildIssueBody", () => {
       diagnostics,
       sessionId: null,
     });
-    expect(shared).toContain("- Dyad Version: 1.2.3");
+    expect(shared).toContain("- KapAble Version: 1.2.3");
     expect(shared).toContain("## Logs");
 
     const withheld = buildIssueBody({
@@ -262,7 +262,7 @@ describe("buildIssueBody", () => {
     expect(withheld).toContain(
       "## System Information\nNot included by the reporter.",
     );
-    expect(withheld).not.toContain("- Dyad Version");
+    expect(withheld).not.toContain("- KapAble Version");
     expect(withheld).not.toContain("## Logs");
   });
 
@@ -377,7 +377,7 @@ describe("updater log section", () => {
   it("keeps the error section when it is appended after the Squirrel tail", () => {
     const section = updaterSectionOf(
       "Last updater error (this session):\n" +
-        "ERR_CONNECTION_REFUSED at https://update.dyad.sh\n" +
+        "ERR_CONNECTION_REFUSED at https://update.kapable.sh\n" +
         "\n\nSquirrelSetup.log (tail):\n" +
         squirrelTail(40),
     );
@@ -441,7 +441,7 @@ describe("diagnostics field caps", () => {
             },
             selectedChatMode: "build",
             autoApproveChanges: true,
-            enableDyadPro: true,
+            enableKapablePro: true,
             runtimeMode2: "local-node",
             releaseChannel: "stable",
           } as unknown as UserSettings,
@@ -471,7 +471,7 @@ describe("issue URL budget", () => {
   const worstCaseDebugInfo: SystemDebugInfo = {
     ...debugInfo,
     nodePath:
-      "C:\\Users\\\u0410\u043b\u0435\u043a\u0441\u0430\u043d\u0434\u0440\\AppData\\Local\\dyad\\resources\\node\\node.exe",
+      "C:\\Users\\\u0410\u043b\u0435\u043a\u0441\u0430\u043d\u0434\u0440\\AppData\\Local\\kapable\\resources\\node\\node.exe",
     selectedLanguageModel:
       "openrouter:anthropic/claude-sonnet-4-5-20250929-extended-thinking",
     logs: "[2026-08-29 14:22:07.318] [info] (chat_stream) chunk len=512\n".repeat(
@@ -492,7 +492,7 @@ describe("issue URL budget", () => {
       },
       selectedChatMode: "local-agent-with-extended-tools",
       autoApproveChanges: true,
-      enableDyadPro: true,
+      enableKapablePro: true,
       runtimeMode2: "local-node-with-sandbox",
       releaseChannel: "beta",
     } as unknown as UserSettings,
@@ -559,7 +559,7 @@ describe("issue URL budget", () => {
   // once is not a state any machine can be in.
   const absurd = "\u754c".repeat(400);
   it.each([
-    ["dyadVersion", { dyadVersion: absurd }],
+    ["kapableVersion", { kapableVersion: absurd }],
     ["platform", { platform: absurd }],
     ["architecture", { architecture: absurd }],
     ["nodeVersion", { nodeVersion: absurd }],

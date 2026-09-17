@@ -5,7 +5,7 @@ import {
   useStreamFinished,
 } from "@/chat_stream/ChatStreamProvider";
 import { ipc } from "@/ipc/types";
-import { isDyadProEnabled } from "@/lib/schemas";
+import { isKapableProEnabled } from "@/lib/schemas";
 import { showError } from "@/lib/toast";
 
 import {
@@ -185,7 +185,7 @@ export function useBackgroundAutoReview(): void {
         enableAutoReview:
           currentSettings !== undefined &&
           currentSettings !== null &&
-          isDyadProEnabled(currentSettings) &&
+          isKapableProEnabled(currentSettings) &&
           currentSettings.enableAutoReview === true,
         hasQueuedMessages:
           snapshot.queuePaused ||

@@ -23,11 +23,11 @@ import { useScrollAndNavigateTo } from "@/hooks/useScrollAndNavigateTo";
 import logo from "../../assets/logo.svg";
 // @ts-ignore
 import openrouterLogo from "../../assets/ai-logos/openrouter-logo.png";
-import { SetupDyadProButton } from "./ProBanner";
+import { SetupKapableProButton } from "./ProBanner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSubscriptionAccount } from "@/hooks/useSubscriptionAccount";
 import { useSettings } from "@/hooks/useSettings";
-import { isDyadProEnabled } from "@/lib/schemas";
+import { isKapableProEnabled } from "@/lib/schemas";
 import { queryKeys } from "@/lib/queryKeys";
 import { ProviderIcon } from "./ProviderIcon";
 
@@ -44,7 +44,7 @@ export function SetupBanner({
   const client = useQueryClient();
   const subscription = useSubscriptionAccount();
   const { settings } = useSettings();
-  const hasPro = settings && isDyadProEnabled(settings);
+  const hasPro = settings && isKapableProEnabled(settings);
   const connection = useMutation({
     mutationFn: (cancel: boolean) =>
       cancel
@@ -78,10 +78,10 @@ export function SetupBanner({
       params: { provider: "openrouter" },
     });
   };
-  const handleDyadProSetupClick = () => {
-    posthog.capture("setup-flow:ai-provider-setup:dyad:click");
+  const handleKapableProSetupClick = () => {
+    posthog.capture("setup-flow:ai-provider-setup:kapable:click");
     ipc.system.openExternalUrl(
-      "https://academy.dyad.sh/redirect-to-checkout?trialCode=7PRO30&utm_source=dyad-app&utm_medium=app&utm_campaign=setup-dialog-v2",
+      "https://academy.kapable.sh/redirect-to-checkout?trialCode=7PRO30&utm_source=kapable-app&utm_medium=app&utm_campaign=setup-dialog-v2",
     );
   };
 
@@ -136,24 +136,24 @@ export function SetupBanner({
           ) : (
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {hasProviderSetup
-                ? "Change how Dyad accesses AI."
-                : "Dyad uses AI to build your app."}
+                ? "Change how KapAble accesses AI."
+                : "KapAble uses AI to build your app."}
             </p>
           )}
         </div>
 
         <button
           type="button"
-          onClick={handleDyadProSetupClick}
+          onClick={handleKapableProSetupClick}
           className="mt-5 flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-primary/45 bg-primary/8 p-4 text-left transition-colors hover:bg-primary/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 dark:bg-primary/15 dark:hover:bg-primary/20"
         >
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <img src={logo} alt="Dyad Logo" className="size-6" />
+              <img src={logo} alt="KapAble Logo" className="size-6" />
             </div>
             <div className="min-w-0">
               <h3 className="text-lg font-semibold text-primary">
-                Start free Dyad Pro trial
+                Start free KapAble Pro trial
               </h3>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 No API keys. Access leading models instantly.
@@ -209,7 +209,7 @@ export function SetupBanner({
           </div>
           {!settings && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Checking Dyad Pro status…
+              Checking KapAble Pro status…
             </p>
           )}
           {subscription.data?.pending && (
@@ -245,7 +245,7 @@ export function SetupBanner({
         </div>
 
         <div className="mt-4 flex w-full flex-col items-center justify-around gap-2 text-xs sm:flex-row">
-          <SetupDyadProButton />
+          <SetupKapableProButton />
           <button
             type="button"
             onClick={() => {

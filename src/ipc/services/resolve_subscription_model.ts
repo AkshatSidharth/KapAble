@@ -1,6 +1,6 @@
 import { getLanguageModelProviders } from "../shared/language_model_helpers";
 import {
-  isDyadProEnabled,
+  isKapableProEnabled,
   type ModelSelection,
   type UserSettings,
 } from "@/lib/schemas";
@@ -11,7 +11,7 @@ import {
 } from "@/lib/subscriptionModels";
 import { getSubscriptionAccount } from "./codex_subscription_account";
 import { resolveModelSelection } from "../utils/model_effort";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 /** Choose the source for a concrete model, shared by chat and auxiliary calls. */
 export async function resolveSubscriptionModel(
@@ -19,7 +19,7 @@ export async function resolveSubscriptionModel(
   settings: UserSettings,
 ): Promise<ModelSelection> {
   const { connection: _legacyConnection, ...identity } = model;
-  const proEnabled = isDyadProEnabled(settings);
+  const proEnabled = isKapableProEnabled(settings);
   const fallback = proEnabled
     ? { ...identity, connection: "pro" as const }
     : identity;
@@ -42,37 +42,37 @@ export async function resolveSubscriptionModel(
     return fallback;
   const account = await getSubscriptionAccount({ includeUsage: false });
   if (account.credentialError)
-    throw new DyadError(
+    throw new KapableError(
       proEnabled
         ? "Saved ChatGPT credentials could not be opened. Reconnect your ChatGPT subscription or select Pro credits in the Pro menu."
         : "Saved ChatGPT credentials could not be opened. Reconnect ChatGPT, or disconnect it in the model picker to use your OpenAI API key.",
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   // An abandoned sign-in can leave a status error without a connection. It
   // belongs in the account UI and must not block ordinary Pro-credit turns.
   if (!account.connected) return fallback;
   if (account.error && !account.models.length)
-    throw new DyadError(account.error, DyadErrorKind.Auth);
+    throw new KapableError(account.error, KapableErrorKind.Auth);
   // With no catalog, eligibility is unknown. Do not silently change the
   // billing source of a potentially subscription-eligible model on an outage.
   if (account.modelsError && !account.models.length)
-    throw new DyadError(
+    throw new KapableError(
       proEnabled
         ? "Subscription model availability is unavailable. Try again or select Pro credits in the Pro menu."
         : "Subscription model availability is unavailable. Try again or choose another available model.",
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   if (subscriptionAuto) {
-    if (account.error) throw new DyadError(account.error, DyadErrorKind.Auth);
+    if (account.error) throw new KapableError(account.error, KapableErrorKind.Auth);
     const name = getSubscriptionDefaultModel(
       account.models,
       "planType" in account ? account.planType : undefined,
       settings.selectedModel ?? identity,
     );
     if (!name)
-      throw new DyadError(
+      throw new KapableError(
         "Subscription model availability is unavailable. Try again or disconnect ChatGPT to use your API keys.",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     return {
       ...(await resolveModelSelection({
@@ -83,6 +83,6 @@ export async function resolveSubscriptionModel(
     };
   }
   if (!usesChatGPTSubscription(model, settings, account)) return fallback;
-  if (account.error) throw new DyadError(account.error, DyadErrorKind.Auth);
+  if (account.error) throw new KapableError(account.error, KapableErrorKind.Auth);
   return { ...identity, connection: "subscription" };
 }

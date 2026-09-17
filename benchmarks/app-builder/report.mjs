@@ -32,8 +32,8 @@ const MODELS = [
   { name: "glm-5.3-flash", slug: "z-ai_glm-5.3-flash", vendor: "Z-AI" },
   { name: "gemini-3.8-flash", slug: "gemini-3.8-flash", vendor: "Google" },
   { name: "muse-spark-1.3", slug: "meta_muse-spark-1.3", vendor: "Meta" },
-  // Dyad auto routing (primary gpt-5.6-sol) + implementer subagent.
-  { name: "auto-sidekick", slug: "auto-sidekick", vendor: "Dyad" },
+  // KapAble auto routing (primary gpt-5.6-sol) + implementer subagent.
+  { name: "auto-sidekick", slug: "auto-sidekick", vendor: "KapAble" },
 ];
 
 // Per-app checkpoint composition + probe-id classifier (suite conventions
@@ -79,7 +79,7 @@ const VENDOR_COLOR = {
     OpenAI: "#2a78d6",
     Anthropic: "#eb6834",
     xAI: "#1baf7a",
-    Dyad: "#8b5cf6",
+    KapAble: "#8b5cf6",
     "Z-AI": "#c2366b",
     Google: "#946200",
     Meta: "#0e7c86",
@@ -88,7 +88,7 @@ const VENDOR_COLOR = {
     OpenAI: "#3987e5",
     Anthropic: "#d95926",
     xAI: "#199e70",
-    Dyad: "#9678f0",
+    KapAble: "#9678f0",
     "Z-AI": "#e0568f",
     Google: "#e3a72f",
     Meta: "#2cc4d9",
@@ -323,7 +323,7 @@ const EFFORT_MODELS = [
   // medium row is the unsuffixed cell that also feeds the headline table.
   { slug: "x-ai_grok-4.6", label: "grok-4.6", tiers: ["medium", "high"] },
   // Gemini via the engine takes a thinking BUDGET: medium=4000 tokens (product
-  // default), high=-1 (dynamic, Dyad's thinkingBudget=high). Forced at the
+  // default), high=-1 (dynamic, KapAble's thinkingBudget=high). Forced at the
   // proxy with the same mapping the product uses (thinking_utils).
   { slug: "gemini-3.8-flash", tiers: ["medium", "high"] },
   // Ran 2026-09-04 while medium was the product default (unsuffixed cells);
@@ -379,12 +379,12 @@ const effortSection = effortRows.length
   ? `## Reasoning-effort sweep (luna + terra)
 
 The main table runs every model at the product default (medium for every
-model except gpt-6-astra, whose default became \`low\` in Dyad's catalog on
+model except gpt-6-astra, whose default became \`low\` in KapAble's catalog on
 2026-09-04; its headline row is the low cells and its medium run is the
 non-default tier below). This sweep
 re-runs the two cheapest models at \`high\` and \`xhigh\` — same harness, same
 controls. Effort is applied at the recording proxy (\`reasoning_effort\` /
-\`reasoning.effort\`) because Dyad's \`thinkingBudget\` setting exposes only
+\`reasoning.effort\`) because KapAble's \`thinkingBudget\` setting exposes only
 low/medium/high, so these rows do **not** use a product-reachable configuration
 and are reported separately from the headline matrix.
 
@@ -410,7 +410,7 @@ fs.writeFileSync(
   `# App-Builder Benchmark — Results
 
 Run: 2026-07-29 · 7 models × up to 3 apps (Relay CRM, Deskhero, Portalis) ×
-3 milestones each, N=1, Dyad local-agent mode at product-default reasoning
+3 milestones each, N=1, KapAble local-agent mode at product-default reasoning
 effort (medium, recorded per request). Per checkpoint: fixed Playwright CUJ
 suites + adversarial security probes against pinned UI contracts, plus an LLM
 judge (gpt-5.6-sol, single judge, input-capped). Composite per app =

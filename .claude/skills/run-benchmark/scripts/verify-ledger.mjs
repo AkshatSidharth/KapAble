@@ -48,7 +48,7 @@ for (const cell of cells) {
     maxPrompt = Math.max(maxPrompt, r.usage?.promptTokens || 0);
     reasoning += r.usage?.reasoningTokens || 0;
     out += r.usage?.completionTokens || 0;
-    if (/gpt-5\.6-luna/.test(r.model || "") && !/luna/.test(cell)) side++; // Dyad side tasks (titles etc.)
+    if (/gpt-5\.6-luna/.test(r.model || "") && !/luna/.test(cell)) side++; // KapAble side tasks (titles etc.)
   }
   console.log(
     `\n${cell}: ${rows.length} requests, $${usd.toFixed(2)}, max prompt ${maxPrompt}, output ${out} (reasoning ${reasoning})${side ? `, ${side} luna side-task rows` : ""}`,

@@ -1,6 +1,6 @@
 import log from "electron-log";
 import { isIP } from "node:net";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { sleep } from "./sleep";
 import type { SshSession } from "@/ipc/utils/ssh_client";
 import { answerLine, runTinker } from "./tinker";
@@ -16,7 +16,7 @@ import {
 /**
  * Getting the new instance onto HTTPS, if it can be had.
  *
- * A stock Coolify serves plain HTTP, so Dyad's API token — which carries root
+ * A stock Coolify serves plain HTTP, so KapAble's API token — which carries root
  * abilities and can read database connection strings — would cross the network
  * in the clear on every deploy, not just once at setup.
  *
@@ -121,7 +121,7 @@ export function urlHost(host: string): string {
  * environment under a test build so parallel workers do not have to share it.
  */
 function dashboardPort(): number {
-  const override = IS_TEST_BUILD ? process.env.DYAD_E2E_DASHBOARD_PORT : null;
+  const override = IS_TEST_BUILD ? process.env.KAPABLE_E2E_DASHBOARD_PORT : null;
   return override ? Number(override) : 8000;
 }
 
@@ -156,9 +156,9 @@ export async function applyInstanceDomain(
   }: { signal?: AbortSignal; timeoutMs?: number } = {},
 ): Promise<void> {
   if (domain !== null && !isPlausibleInstanceDomain(domain)) {
-    throw new DyadError(
+    throw new KapableError(
       `Refusing to set an unsafe instance domain: ${domain}`,
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
   const answer = await runTinker(
@@ -172,14 +172,14 @@ export async function applyInstanceDomain(
     `echo (function () { $s = \\App\\Models\\InstanceSettings::get(); ` +
       (domain === null
         ? `$s->fqdn = null; `
-        : `$s->fqdn = 'https://' . getenv('DYAD_INSTANCE_DOMAIN'); `) +
+        : `$s->fqdn = 'https://' . getenv('KAPABLE_INSTANCE_DOMAIN'); `) +
       // Eloquent answers false rather than throwing when something vetoes
       // the write, so the throw-safety above is not enough on its own.
       `if (!$s->save()) { return 'not-saved'; } ` +
       `\\App\\Models\\Server::find(0)->setupDynamicProxyConfiguration(); ` +
       `return 'applied'; })();`,
     {
-      env: domain === null ? {} : { DYAD_INSTANCE_DOMAIN: domain },
+      env: domain === null ? {} : { KAPABLE_INSTANCE_DOMAIN: domain },
       signal,
       // Bounded: the proxy rebuild is the slow part, and a server that never
       // answers leaves "Setting up HTTPS" on screen with nothing behind it.
@@ -192,9 +192,9 @@ export async function applyInstanceDomain(
   // notice beside it, and tight enough that the echoed script line — which
   // carries the word — cannot pass for the answer.
   if (!answerLine(answer, (line) => line === "applied")) {
-    throw new DyadError(
+    throw new KapableError(
       `Coolify would not take the domain: ${answer.trim()}`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 }
@@ -259,7 +259,7 @@ export async function domainPointsAtServer(
   const resolved = await resolve(domain);
   // A resolver that could not be reached is not a name with no records. Both
   // arrive with nothing to compare, but only the second is the domain saying
-  // where it points — the first is Dyad not having asked successfully, which
+  // where it points — the first is KapAble not having asked successfully, which
   // the caller has to be able to tell apart from an answer.
   if (resolved.failed) return "no-answer";
   const verdict = domainCheckVerdict({
@@ -292,7 +292,7 @@ export async function domainPointsAtServer(
 const logger = log.scope("coolify_https_setup");
 
 export interface HttpsOutcome {
-  /** What Dyad should store and talk to. */
+  /** What KapAble should store and talk to. */
   instanceUrl: string;
   secure: boolean;
   /** Present when HTTPS was attempted and did not arrive. */
@@ -404,7 +404,7 @@ export async function tryEnableHttps(
         instanceUrl: plainUrlFor(host),
         secure: false,
         reason:
-          `Dyad could not look up where ${domain} points, so it cannot tell ` +
+          `KapAble could not look up where ${domain} points, so it cannot tell ` +
           `whether a certificate for it would describe this machine. Check ` +
           `the domain resolves to ${host} and try again.`,
       };
@@ -418,7 +418,7 @@ export async function tryEnableHttps(
         instanceUrl: plainUrlFor(host),
         secure: false,
         reason:
-          `Dyad could not look up an address for ${host}, so it cannot tell ` +
+          `KapAble could not look up an address for ${host}, so it cannot tell ` +
           `whether ${domain} points at this server. Reach the server by an ` +
           `address or a name DNS can answer for, or set the domain in ` +
           `Coolify yourself.`,
@@ -434,7 +434,7 @@ export async function tryEnableHttps(
         instanceUrl: plainUrlFor(host),
         secure: false,
         reason:
-          `Dyad could not compare where ${domain} points with ${host}: the ` +
+          `KapAble could not compare where ${domain} points with ${host}: the ` +
           `addresses it has for them are in different families, so neither ` +
           `says anything about the other. Give the server's address in the ` +
           `same family as the domain's records, or set the domain in ` +
@@ -461,7 +461,7 @@ export async function tryEnableHttps(
     const deadline = now() + timeoutMs;
     while (now() < deadline) {
       if (signal?.aborted) {
-        throw new DyadError("Cancelled.", DyadErrorKind.UserCancelled);
+        throw new KapableError("Cancelled.", KapableErrorKind.UserCancelled);
       }
       if (await check(url)) {
         keepDomain = true;

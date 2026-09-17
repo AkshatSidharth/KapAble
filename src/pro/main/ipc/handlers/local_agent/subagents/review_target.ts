@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { execAgentGit } from "@/ipc/utils/git_utils";
 
 // gpt-5.6-sol has a 372k-token context window. Keep the raw diff well below
@@ -31,9 +31,9 @@ export async function buildReviewTarget(params: {
   try {
     await git(params.appPath, ["rev-parse", "--git-dir"]);
   } catch (error) {
-    throw new DyadError(
+    throw new KapableError(
       "This app has no Git history, so changes cannot be reviewed.",
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
       { cause: error },
     );
   }
@@ -277,10 +277,10 @@ async function git(cwd: string, args: string[]): Promise<string> {
   return result.stdout;
 }
 
-function reviewGitError(detail: string): DyadError {
-  return new DyadError(
+function reviewGitError(detail: string): KapableError {
+  return new KapableError(
     `Git could not resolve the requested review range: ${detail.trim()}`,
-    DyadErrorKind.Precondition,
+    KapableErrorKind.Precondition,
   );
 }
 

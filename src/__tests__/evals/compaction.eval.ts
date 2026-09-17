@@ -5,7 +5,7 @@
  * transcripts using the production compaction prompt + transcript format.
  *
  * Run:
- *   DYAD_PRO_API_KEY=... EVAL_SUITE/EVAL_MODEL not used — this suite is
+ *   KAPABLE_PRO_API_KEY=... EVAL_SUITE/EVAL_MODEL not used — this suite is
  *   gated by its own env vars:
  *   CMP_RUN=1 npm run eval -- compaction              (full grid)
  *   CMP_RUN=1 CMP_SMOKE=1 npm run eval -- compaction  (1 fixture x models x 1 rep)
@@ -26,11 +26,11 @@ import {
 } from "node:fs";
 import { resolve } from "node:path";
 
-if (!process.env.DYAD_PRO_API_KEY && process.env.DYAD_PRO_KEY) {
-  process.env.DYAD_PRO_API_KEY = process.env.DYAD_PRO_KEY;
+if (!process.env.KAPABLE_PRO_API_KEY && process.env.KAPABLE_PRO_KEY) {
+  process.env.KAPABLE_PRO_API_KEY = process.env.KAPABLE_PRO_KEY;
 }
 
-import { GPT_5_4, getEvalModel, hasDyadProKey } from "./helpers/get_eval_model";
+import { GPT_5_4, getEvalModel, hasKapableProKey } from "./helpers/get_eval_model";
 import {
   loadFixtures,
   loadSpecs,
@@ -173,7 +173,7 @@ describe("compaction fixtures validate", () => {
 
 // ── Benchmark ──────────────────────────────────────────────────
 
-const canRun = hasDyadProKey() && fixtures.length > 0 && optedIn;
+const canRun = hasKapableProKey() && fixtures.length > 0 && optedIn;
 
 (canRun ? describe : describe.skip)("compaction quality benchmark", () => {
   beforeAll(() => {

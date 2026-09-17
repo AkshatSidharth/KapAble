@@ -1,4 +1,4 @@
-import { isDyadProEnabled, type LargeLanguageModel } from "@/lib/schemas";
+import { isKapableProEnabled, type LargeLanguageModel } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -90,8 +90,8 @@ const PRO_PILL_CLASS = cn(
   "bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 bg-[length:200%_100%] animate-[shimmer_5s_ease-in-out_infinite] text-white",
 );
 
-const DYAD_PRO_UPGRADE_BASE_URL =
-  "https://www.dyad.sh/pro?utm_source=dyad-app&utm_medium=app";
+const KAPABLE_PRO_UPGRADE_BASE_URL =
+  "https://www.kapable.sh/pro?utm_source=kapable-app&utm_medium=app";
 
 const NAVIGATION_SUBMENU_HOVER_PROPS = {
   openOnHover: true,
@@ -269,7 +269,7 @@ export function ModelPicker() {
     setOpen(nextOpen);
     if (nextOpen) {
       posthog.capture("model-picker:open", {
-        isDyadPro: settings ? isDyadProEnabled(settings) : false,
+        isKapablePro: settings ? isKapableProEnabled(settings) : false,
       });
     }
   };
@@ -289,7 +289,7 @@ export function ModelPicker() {
   } = useLanguageModelProviders();
 
   const loading = modelsByProvidersLoading || providersLoading;
-  const dyadProEnabled = settings ? isDyadProEnabled(settings) : false;
+  const kapableProEnabled = settings ? isKapableProEnabled(settings) : false;
   // Ollama Models Hook
   const {
     models: ollamaModels,
@@ -386,15 +386,15 @@ export function ModelPicker() {
     !loading && modelsByProviders && modelsByProviders["auto"]
       ? modelsByProviders["auto"].filter((model) => {
           if (model.apiName === FREE_PRO_MODEL_NAME) {
-            return dyadProEnabled && !isTrial && !isLoadingTrialStatus;
+            return kapableProEnabled && !isTrial && !isLoadingTrialStatus;
           }
-          if (settings && !dyadProEnabled && model.apiName === "value") {
+          if (settings && !kapableProEnabled && model.apiName === "value") {
             return false;
           }
-          if (settings && !dyadProEnabled && model.apiName === "balanced") {
+          if (settings && !kapableProEnabled && model.apiName === "balanced") {
             return false;
           }
-          if (settings && dyadProEnabled && model.apiName === "free") {
+          if (settings && kapableProEnabled && model.apiName === "free") {
             return false;
           }
           return true;
@@ -405,7 +405,7 @@ export function ModelPicker() {
   );
   const autoModels = regularAutoModel
     ? catalogAutoModels.flatMap((model) =>
-        model.apiName === "auto" && dyadProEnabled
+        model.apiName === "auto" && kapableProEnabled
           ? [
               model,
               {
@@ -469,7 +469,7 @@ export function ModelPicker() {
       : [];
   const isVisibleCatalogModel = (providerId: string, model: LanguageModel) =>
     !(
-      dyadProEnabled &&
+      kapableProEnabled &&
       providerId === "openrouter" &&
       isFreeOpenRouterModelName(model.apiName)
     );
@@ -643,7 +643,7 @@ export function ModelPicker() {
   };
 
   // Non-Pro users can still use any cloud model with their own API key, so a
-  // model is only locked when neither Dyad Pro nor a provider key can run it.
+  // model is only locked when neither KapAble Pro nor a provider key can run it.
   // Custom and local providers are never locked: Pro doesn't unlock those.
   // While settings/env vars are still loading we can't tell whether a key
   // exists, so fail open rather than flash a lock at env-var-configured users.
@@ -659,7 +659,7 @@ export function ModelPicker() {
       return false;
     if (
       settingsLoading ||
-      dyadProEnabled ||
+      kapableProEnabled ||
       providerId === "auto" ||
       (providerId === "openai" && subscription.isLoading)
     ) {
@@ -683,7 +683,7 @@ export function ModelPicker() {
       source: "unlock-all-footer",
     });
     ipc.system.openExternalUrl(
-      `${DYAD_PRO_UPGRADE_BASE_URL}&utm_campaign=model-picker-unlock-all`,
+      `${KAPABLE_PRO_UPGRADE_BASE_URL}&utm_campaign=model-picker-unlock-all`,
     );
     setOpen(false);
   };
@@ -698,7 +698,7 @@ export function ModelPicker() {
       model: unlockTarget.model.apiName,
     });
     ipc.system.openExternalUrl(
-      `${DYAD_PRO_UPGRADE_BASE_URL}&utm_campaign=model-picker-locked-model`,
+      `${KAPABLE_PRO_UPGRADE_BASE_URL}&utm_campaign=model-picker-locked-model`,
     );
     setUnlockTarget(null);
   };
@@ -784,7 +784,7 @@ export function ModelPicker() {
       isAutoOpenRouterFreeRow ||
       (isAutoProviderRow &&
         model.apiName === "auto" &&
-        !dyadProEnabled &&
+        !kapableProEnabled &&
         isProviderSetup("openrouter"));
     const freeProResetTimeLabel = freeModelQuota.resetTime
       ? new Intl.DateTimeFormat(undefined, {
@@ -972,7 +972,7 @@ export function ModelPicker() {
         aria-label={
           isFreeProviderRow
             ? `${model.displayName} — requires an API key from ${getProviderDisplayName(providerId)}`
-            : `${model.displayName} — requires Dyad Pro or an API key from ${getProviderDisplayName(providerId)}`
+            : `${model.displayName} — requires KapAble Pro or an API key from ${getProviderDisplayName(providerId)}`
         }
         onClick={() => handleLockedModelClick(providerId, model)}
       >
@@ -1058,7 +1058,7 @@ export function ModelPicker() {
     const providerState =
       provider?.type === "custom"
         ? "Custom provider"
-        : provider?.type === "cloud" && !provider.secondary && dyadProEnabled
+        : provider?.type === "cloud" && !provider.secondary && kapableProEnabled
           ? "Pro"
           : null;
 
@@ -1082,7 +1082,7 @@ export function ModelPicker() {
               <span>{providerDisplayName}</span>
               {provider?.type === "cloud" &&
                 !provider?.secondary &&
-                dyadProEnabled && <span className={PRO_PILL_CLASS}>Pro</span>}
+                kapableProEnabled && <span className={PRO_PILL_CLASS}>Pro</span>}
               {provider?.type === "custom" && (
                 <span className={cn(PILL_CLASS, "bg-amber-500 text-white")}>
                   Custom
@@ -1348,7 +1348,7 @@ export function ModelPicker() {
               <>
                 <div className="px-2 py-3 bg-gradient-to-r from-indigo-50 to-sky-50 dark:from-indigo-950/50 dark:to-sky-950/50">
                   <p className="text-sm text-indigo-700 dark:text-indigo-300 mb-2">
-                    Upgrade from Dyad Pro trial to unlock more models.
+                    Upgrade from KapAble Pro trial to unlock more models.
                   </p>
                   <Button
                     variant="outline"
@@ -1356,12 +1356,12 @@ export function ModelPicker() {
                     className="cursor-pointer w-full bg-indigo-600 hover:bg-indigo-700 text-white hover:text-white border-indigo-600"
                     onClick={() => {
                       ipc.system.openExternalUrl(
-                        "https://academy.dyad.sh/subscription",
+                        "https://academy.kapable.sh/subscription",
                       );
                       setOpen(false);
                     }}
                   >
-                    Upgrade to Dyad Pro
+                    Upgrade to KapAble Pro
                   </Button>
                 </div>
                 <DropdownMenuSeparator />
@@ -1633,7 +1633,7 @@ export function ModelPicker() {
             )}
 
             {/* Upgrade footer for non-Pro users */}
-            {!isTrial && !dyadProEnabled && (
+            {!isTrial && !kapableProEnabled && (
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -1644,7 +1644,7 @@ export function ModelPicker() {
                   <div className="flex items-center gap-2 w-full">
                     <SparklesIcon className="size-3.5 text-indigo-600 dark:text-indigo-300 shrink-0" />
                     <span className="text-[13px] font-medium text-indigo-700 dark:text-indigo-300">
-                      Unlock all models with Dyad Pro
+                      Unlock all models with KapAble Pro
                     </span>
                   </div>
                 </DropdownMenuItem>
@@ -1693,10 +1693,10 @@ export function ModelPicker() {
             <>
               <DialogHeader>
                 <DialogTitle>
-                  Unlock {unlockTarget?.model.displayName} with Dyad Pro
+                  Unlock {unlockTarget?.model.displayName} with KapAble Pro
                 </DialogTitle>
                 <DialogDescription>
-                  Dyad Pro gives you {unlockTarget?.model.displayName} and every
+                  KapAble Pro gives you {unlockTarget?.model.displayName} and every
                   other leading AI model with one subscription — no API keys
                   needed.
                 </DialogDescription>
@@ -1706,7 +1706,7 @@ export function ModelPicker() {
                   className="cursor-pointer w-full"
                   onClick={handleUnlockDialogUpgradeClick}
                 >
-                  Get Dyad Pro
+                  Get KapAble Pro
                 </Button>
                 <button
                   type="button"

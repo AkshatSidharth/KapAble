@@ -1,4 +1,4 @@
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 export { slugify } from "@/shared/slugify";
 
 export function buildFrontmatter(meta: Record<string, string>): string {
@@ -11,7 +11,7 @@ export function buildFrontmatter(meta: Record<string, string>): string {
 
 export function validatePlanId(planId: string): void {
   if (!/^[a-z0-9-]+$/.test(planId)) {
-    throw new DyadError("Invalid plan ID", DyadErrorKind.Validation);
+    throw new KapableError("Invalid plan ID", KapableErrorKind.Validation);
   }
 }
 

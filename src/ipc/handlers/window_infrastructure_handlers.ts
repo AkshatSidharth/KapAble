@@ -15,7 +15,7 @@ import {
 } from "../utils/renderer_chat_message";
 import type { ChatResponseChunk } from "../types/chat";
 import { getWindowProductController } from "../../window_infrastructure/main/window_product_controller";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { ChatTabTransferCoordinator } from "@/window_infrastructure/main/chat_tab_transfer_coordinator";
 import { readSettings } from "@/main/settings";
 import {
@@ -91,9 +91,9 @@ export function registerWindowInfrastructureHandlers(): void {
     async (_event, entity) => {
       const controller = getWindowProductController();
       if (!controller) {
-        throw new DyadError(
+        throw new KapableError(
           "Window product controller is not ready",
-          DyadErrorKind.Precondition,
+          KapableErrorKind.Precondition,
         );
       }
       const exists =
@@ -101,9 +101,9 @@ export function registerWindowInfrastructureHandlers(): void {
           ? await db.query.apps.findFirst({ where: eq(apps.id, entity.id) })
           : await db.query.chats.findFirst({ where: eq(chats.id, entity.id) });
       if (!exists) {
-        throw new DyadError(
+        throw new KapableError(
           entity.kind === "app" ? "App not found" : "Chat not found",
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
       return {
@@ -122,7 +122,7 @@ export function registerWindowInfrastructureHandlers(): void {
         where: eq(chats.id, payload.chatId),
       });
       if (!chat || chat.appId !== payload.appId) {
-        throw new DyadError("Chat not found", DyadErrorKind.NotFound);
+        throw new KapableError("Chat not found", KapableErrorKind.NotFound);
       }
       if (
         !windowRegistry.refreshChatTabOwnershipForTransfer(
@@ -132,9 +132,9 @@ export function registerWindowInfrastructureHandlers(): void {
           payload.tabInstanceId,
         )
       ) {
-        throw new DyadError(
+        throw new KapableError(
           "The source window does not own this chat tab",
-          DyadErrorKind.Precondition,
+          KapableErrorKind.Precondition,
         );
       }
       return {
@@ -182,7 +182,7 @@ export function registerWindowInfrastructureHandlers(): void {
         where: eq(chats.id, chatId),
       });
       if (!chat) {
-        throw new DyadError("Chat not found", DyadErrorKind.NotFound);
+        throw new KapableError("Chat not found", KapableErrorKind.NotFound);
       }
       const entity = { kind: "chat" as const, id: chatId };
       const targetSession = chatNotificationTarget(
@@ -201,9 +201,9 @@ export function registerWindowInfrastructureHandlers(): void {
       }
       const controller = getWindowProductController();
       if (!controller) {
-        throw new DyadError(
+        throw new KapableError(
           "Window product controller is not ready",
-          DyadErrorKind.Precondition,
+          KapableErrorKind.Precondition,
         );
       }
       return {

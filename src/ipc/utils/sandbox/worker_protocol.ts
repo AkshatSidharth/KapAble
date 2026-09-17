@@ -1,4 +1,4 @@
-import { DyadError, DyadErrorKind, isDyadError } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
 import type { SandboxHostCallName } from "./capabilities";
 import type { SandboxRunResult } from "./execution";
 
@@ -17,7 +17,7 @@ export interface SandboxWorkerHostCall {
 export interface SerializedSandboxWorkerError {
   name?: string;
   message: string;
-  kind?: DyadErrorKind;
+  kind?: KapableErrorKind;
   stack?: string;
 }
 
@@ -32,7 +32,7 @@ export type SandboxWorkerMessage =
 export function serializeSandboxWorkerError(
   error: unknown,
 ): SerializedSandboxWorkerError {
-  if (isDyadError(error)) {
+  if (isKapableError(error)) {
     return {
       name: error.name,
       message: error.message,
@@ -52,20 +52,20 @@ export function serializeSandboxWorkerError(
   };
 }
 
-function isDyadErrorKind(value: unknown): value is DyadErrorKind {
+function isKapableErrorKind(value: unknown): value is KapableErrorKind {
   return (
     typeof value === "string" &&
-    Object.values(DyadErrorKind).includes(value as DyadErrorKind)
+    Object.values(KapableErrorKind).includes(value as KapableErrorKind)
   );
 }
 
 export function deserializeSandboxWorkerError(
   error: SerializedSandboxWorkerError,
 ): Error {
-  if (isDyadErrorKind(error.kind)) {
-    const dyadError = new DyadError(error.message, error.kind);
-    dyadError.stack = error.stack;
-    return dyadError;
+  if (isKapableErrorKind(error.kind)) {
+    const kapableError = new KapableError(error.message, error.kind);
+    kapableError.stack = error.stack;
+    return kapableError;
   }
 
   const genericError = new Error(error.message);

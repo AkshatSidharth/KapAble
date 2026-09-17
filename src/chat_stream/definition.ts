@@ -5,7 +5,7 @@ import { db } from "@/db";
 import { chats } from "@/db/schema";
 import type { DistributedMachineDefinition } from "@/distributed_machines/definition";
 import { REMOTE_MACHINE_PROTOCOL_VERSION } from "@/distributed_machines/remote_protocol";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   cancelActiveStreamsForChat,
   clearPendingActorStreamCancellation,
@@ -65,7 +65,7 @@ async function requireExistingChat(chatId: number): Promise<number> {
     .where(eq(chats.id, chatId))
     .get();
   if (!chat) {
-    throw new DyadError(`Chat not found: ${chatId}`, DyadErrorKind.Auth);
+    throw new KapableError(`Chat not found: ${chatId}`, KapableErrorKind.Auth);
   }
   return chat.appId;
 }
@@ -233,9 +233,9 @@ function createCommandRunner(
           }
           const invocationRef = command.intent.invocationRef;
           if (!invocationRef) {
-            throw new DyadError(
+            throw new KapableError(
               "Chat submission is missing an invocation identity",
-              DyadErrorKind.Validation,
+              KapableErrorKind.Validation,
             );
           }
           const endpoint = chatExecutionEndpoint(
@@ -739,40 +739,40 @@ export const chatStreamDefinition = {
         ? "allow-stale"
         : "reject-stale",
     authorizeSubscribe: async ({ key }) => {
-      assertChatActorAdmissionOpen(key.chatId, DyadErrorKind.Auth);
+      assertChatActorAdmissionOpen(key.chatId, KapableErrorKind.Auth);
       await requireExistingChat(key.chatId);
-      assertChatActorAdmissionOpen(key.chatId, DyadErrorKind.Auth);
+      assertChatActorAdmissionOpen(key.chatId, KapableErrorKind.Auth);
     },
     authorizeDispatch: async ({ sender, key, event, currentState }) => {
-      assertChatActorAdmissionOpen(key.chatId, DyadErrorKind.Auth);
+      assertChatActorAdmissionOpen(key.chatId, KapableErrorKind.Auth);
       const appId = await requireExistingChat(key.chatId);
-      assertChatActorAdmissionOpen(key.chatId, DyadErrorKind.Auth);
+      assertChatActorAdmissionOpen(key.chatId, KapableErrorKind.Auth);
       if (event.type === "SUBMIT") {
         if (event.intent.chatId !== key.chatId) {
-          throw new DyadError(
+          throw new KapableError(
             "Chat intent does not belong to the routed chat",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         }
         if (event.intent.appId !== undefined && event.intent.appId !== appId) {
-          throw new DyadError(
+          throw new KapableError(
             "Chat intent app does not own the routed chat",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         }
         if (
           event.intent.originWindowSessionId &&
           event.intent.originWindowSessionId !== sender.windowSessionId
         ) {
-          throw new DyadError(
+          throw new KapableError(
             "Chat intent origin does not match the sender",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         }
         if (event.intent.owner || event.intent.userInputRequestId) {
-          throw new DyadError(
+          throw new KapableError(
             "Main-owned follow-up identity cannot be submitted by a renderer",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         }
         if (
@@ -780,18 +780,18 @@ export const chatStreamDefinition = {
           currentState &&
           event.observedStopPolicyVersion > currentState.stopPolicyVersion
         ) {
-          throw new DyadError(
+          throw new KapableError(
             "Chat submission observed an unknown Stop policy version",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         }
         event.intent.originWindowSessionId = sender.windowSessionId;
       }
       if (event.type === "CANCEL") {
         if (event.invocationRef.entityKey !== key.chatId) {
-          throw new DyadError(
+          throw new KapableError(
             "Cancellation does not belong to the routed chat",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         }
         if (
@@ -799,9 +799,9 @@ export const chatStreamDefinition = {
           currentState &&
           event.observedStopPolicyVersion > currentState.stopPolicyVersion
         ) {
-          throw new DyadError(
+          throw new KapableError(
             "Chat cancellation observed an unknown Stop policy version",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         }
         if (
@@ -810,9 +810,9 @@ export const chatStreamDefinition = {
             currentState.active.invocationRef.operationId !==
               event.invocationRef.operationId)
         ) {
-          throw new DyadError(
+          throw new KapableError(
             "Cancellation does not target the active chat stream",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         }
       }

@@ -7,7 +7,7 @@ import {
   escapeXmlContent,
 } from "./types";
 import { engineFetch } from "./engine_fetch";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 const logger = log.scope("web_search");
 
@@ -72,9 +72,9 @@ function parseSSEEvents(
       if (json.error) {
         const errorMessage =
           json.error.message || json.error.type || "Unknown SSE error";
-        throw new DyadError(
+        throw new KapableError(
           `Web search SSE error: ${errorMessage}`,
-          DyadErrorKind.External,
+          KapableErrorKind.External,
         );
       }
 
@@ -103,7 +103,7 @@ async function callWebSearchSSE(
   query: string,
   ctx: AgentContext,
 ): Promise<string> {
-  ctx.onXmlStream(`<dyad-web-search query="${escapeXmlAttr(query)}">`);
+  ctx.onXmlStream(`<kapable-web-search query="${escapeXmlAttr(query)}">`);
 
   const response = await engineFetch(ctx, "/tools/web-search", {
     method: "POST",
@@ -121,9 +121,9 @@ async function callWebSearchSSE(
   }
 
   if (!response.body) {
-    throw new DyadError(
+    throw new KapableError(
       "Web search response has no body",
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 
@@ -146,9 +146,9 @@ async function callWebSearchSSE(
       // Parse SSE events and accumulate content
       buffer = parseSSEEvents(buffer, (content) => {
         accumulated += content;
-        // Stream intermediate results to UI with dyad-web-search prefix
+        // Stream intermediate results to UI with kapable-web-search prefix
         ctx.onXmlStream(
-          `<dyad-web-search query="${escapeXmlAttr(query)}">${escapeXmlContent(accumulated)}`,
+          `<kapable-web-search query="${escapeXmlAttr(query)}">${escapeXmlContent(accumulated)}`,
         );
       });
     }
@@ -178,8 +178,8 @@ export const webSearchTool: ToolDefinition<z.infer<typeof webSearchSchema>> = {
   defaultConsent: "ask",
   usesEngineEndpoint: true,
 
-  // Requires Dyad Pro engine API
-  isEnabled: (ctx) => ctx.isDyadPro,
+  // Requires KapAble Pro engine API
+  isEnabled: (ctx) => ctx.isKapablePro,
 
   getConsentPreview: (args) => `Search the web: "${args.query}"`,
 
@@ -189,15 +189,15 @@ export const webSearchTool: ToolDefinition<z.infer<typeof webSearchSchema>> = {
     const result = await callWebSearchSSE(args.query, ctx);
 
     if (!result) {
-      throw new DyadError(
+      throw new KapableError(
         "Web search returned no results",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
-    // Write final result to UI and DB with dyad-web-search wrapper
+    // Write final result to UI and DB with kapable-web-search wrapper
     ctx.onXmlComplete(
-      `<dyad-web-search query="${escapeXmlAttr(args.query)}">${escapeXmlContent(result)}</dyad-web-search>`,
+      `<kapable-web-search query="${escapeXmlAttr(args.query)}">${escapeXmlContent(result)}</kapable-web-search>`,
     );
 
     logger.log(`Web search completed for query: ${args.query}`);

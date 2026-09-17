@@ -8,10 +8,10 @@ import {
 } from "@ai-sdk/provider-utils";
 
 import log from "electron-log";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { getExtraProviderOptionsForEngine } from "./thinking_utils";
 import { getTestFetchOption } from "./test_fetch_override";
-import { DYAD_INTERNAL_REQUEST_ID_HEADER } from "./provider_options";
+import { KAPABLE_INTERNAL_REQUEST_ID_HEADER } from "./provider_options";
 import type { ModelSelection, UserSettings } from "../../lib/schemas";
 import type { LanguageModel } from "ai";
 import {
@@ -27,7 +27,7 @@ export interface ChatParams {
   providerId: string;
 }
 
-type DyadEngineProviderOptions = Record<string, any>;
+type KapableEngineProviderOptions = Record<string, any>;
 
 export interface ExampleProviderSettings {
   /**
@@ -52,7 +52,7 @@ or to provide a custom fetch implementation for e.g. testing.
 */
   fetch?: FetchFunction;
 
-  dyadOptions: {
+  kapableOptions: {
     enableLazyEdits?: boolean;
     enableSmartFilesContext?: boolean;
     enableWebSearch?: boolean;
@@ -61,7 +61,7 @@ or to provide a custom fetch implementation for e.g. testing.
   modelSelection?: ModelSelection;
 }
 
-export interface DyadEngineProvider {
+export interface KapableEngineProvider {
   /**
 Creates a model for text generation.
 */
@@ -82,9 +82,9 @@ Creates a chat model for text generation.
   anthropic(modelId: ExampleChatModelId, chatParams: ChatParams): LanguageModel;
 }
 
-export function createDyadEngine(
+export function createKapableEngine(
   options: ExampleProviderSettings,
-): DyadEngineProvider {
+): KapableEngineProvider {
   const modelSelection =
     options.modelSelection ??
     ({
@@ -92,13 +92,13 @@ export function createDyadEngine(
       effortLevel: "medium",
     } satisfies ModelSelection);
   const baseURL = withoutTrailingSlash(options.baseURL);
-  logger.debug("creating dyad engine with baseURL", baseURL);
+  logger.debug("creating kapable engine with baseURL", baseURL);
 
   // Track request ID attempts
   const requestIdAttempts = new Map<string, number>();
 
   const getHeaders = () => ({
-    Authorization: `Bearer ${getDyadEngineApiKey(options.apiKey)}`,
+    Authorization: `Bearer ${getKapableEngineApiKey(options.apiKey)}`,
     ...options.headers,
   });
 
@@ -110,7 +110,7 @@ export function createDyadEngine(
   }
 
   const getCommonModelConfig = (pathPrefix = ""): CommonModelConfig => ({
-    provider: `dyad-engine`,
+    provider: `kapable-engine`,
     url: ({ path }) => {
       const url = new URL(`${baseURL}${pathPrefix}${path}`);
       if (options.queryParams) {
@@ -147,16 +147,16 @@ export function createDyadEngine(
     return input;
   };
 
-  // Custom fetch implementation that adds dyad-specific options to the request
-  const createDyadFetch = ({
+  // Custom fetch implementation that adds kapable-specific options to the request
+  const createKapableFetch = ({
     providerId,
-    dyadProviderOptions,
-    disableDyadOptions = false,
+    kapableProviderOptions,
+    disableKapableOptions = false,
     includeFreeQuotaKey = false,
   }: {
     providerId: string;
-    dyadProviderOptions?: DyadEngineProviderOptions;
-    disableDyadOptions?: boolean;
+    kapableProviderOptions?: KapableEngineProviderOptions;
+    disableKapableOptions?: boolean;
     includeFreeQuotaKey?: boolean;
   }): FetchFunction => {
     return (input: RequestInfo | URL, init?: RequestInit) => {
@@ -174,44 +174,44 @@ export function createDyadEngine(
           ...getExtraProviderOptionsForEngine(providerId, modelSelection),
         };
 
-        const getDyadOption = (key: string) =>
-          key in parsedBody ? parsedBody[key] : dyadProviderOptions?.[key];
+        const getKapableOption = (key: string) =>
+          key in parsedBody ? parsedBody[key] : kapableProviderOptions?.[key];
 
-        const dyadVersionedFiles = getDyadOption("dyadVersionedFiles");
-        if ("dyadVersionedFiles" in parsedBody) {
-          delete parsedBody.dyadVersionedFiles;
+        const kapableVersionedFiles = getKapableOption("kapableVersionedFiles");
+        if ("kapableVersionedFiles" in parsedBody) {
+          delete parsedBody.kapableVersionedFiles;
         }
-        const dyadFiles = getDyadOption("dyadFiles");
-        if ("dyadFiles" in parsedBody) {
-          delete parsedBody.dyadFiles;
+        const kapableFiles = getKapableOption("kapableFiles");
+        if ("kapableFiles" in parsedBody) {
+          delete parsedBody.kapableFiles;
         }
         // Read from body (OpenAICompatible models spread providerOptions into
         // the body) with a fallback to an internal header (OpenAIResponses
         // models don't forward providerOptions, so we pass it via header).
         const requestId =
-          getDyadOption("dyadRequestId") ??
+          getKapableOption("kapableRequestId") ??
           (init.headers as Record<string, string> | undefined)?.[
-            DYAD_INTERNAL_REQUEST_ID_HEADER
+            KAPABLE_INTERNAL_REQUEST_ID_HEADER
           ];
-        if ("dyadRequestId" in parsedBody) {
-          delete parsedBody.dyadRequestId;
+        if ("kapableRequestId" in parsedBody) {
+          delete parsedBody.kapableRequestId;
         }
-        const dyadAppId = getDyadOption("dyadAppId");
-        if ("dyadAppId" in parsedBody) {
-          delete parsedBody.dyadAppId;
+        const kapableAppId = getKapableOption("kapableAppId");
+        if ("kapableAppId" in parsedBody) {
+          delete parsedBody.kapableAppId;
         }
-        const dyadDisableFiles =
-          disableDyadOptions || getDyadOption("dyadDisableFiles");
-        if ("dyadDisableFiles" in parsedBody) {
-          delete parsedBody.dyadDisableFiles;
+        const kapableDisableFiles =
+          disableKapableOptions || getKapableOption("kapableDisableFiles");
+        if ("kapableDisableFiles" in parsedBody) {
+          delete parsedBody.kapableDisableFiles;
         }
-        const dyadMentionedApps = getDyadOption("dyadMentionedApps");
-        if ("dyadMentionedApps" in parsedBody) {
-          delete parsedBody.dyadMentionedApps;
+        const kapableMentionedApps = getKapableOption("kapableMentionedApps");
+        if ("kapableMentionedApps" in parsedBody) {
+          delete parsedBody.kapableMentionedApps;
         }
-        const dyadSmartContextMode = getDyadOption("dyadSmartContextMode");
-        if ("dyadSmartContextMode" in parsedBody) {
-          delete parsedBody.dyadSmartContextMode;
+        const kapableSmartContextMode = getKapableOption("kapableSmartContextMode");
+        if ("kapableSmartContextMode" in parsedBody) {
+          delete parsedBody.kapableSmartContextMode;
         }
 
         // Track and modify requestId with attempt number
@@ -223,35 +223,35 @@ export function createDyadEngine(
         }
 
         // Add files to the request if they exist
-        if (!dyadDisableFiles) {
-          parsedBody.dyad_options = {
-            files: dyadFiles,
-            versioned_files: dyadVersionedFiles,
-            enable_lazy_edits: options.dyadOptions.enableLazyEdits,
+        if (!kapableDisableFiles) {
+          parsedBody.kapable_options = {
+            files: kapableFiles,
+            versioned_files: kapableVersionedFiles,
+            enable_lazy_edits: options.kapableOptions.enableLazyEdits,
             enable_smart_files_context:
-              options.dyadOptions.enableSmartFilesContext,
-            smart_context_mode: dyadSmartContextMode,
-            enable_web_search: options.dyadOptions.enableWebSearch,
-            app_id: dyadAppId,
+              options.kapableOptions.enableSmartFilesContext,
+            smart_context_mode: kapableSmartContextMode,
+            enable_web_search: options.kapableOptions.enableWebSearch,
+            app_id: kapableAppId,
           };
-          if (dyadMentionedApps?.length) {
-            parsedBody.dyad_options.mentioned_apps = dyadMentionedApps;
+          if (kapableMentionedApps?.length) {
+            parsedBody.kapable_options.mentioned_apps = kapableMentionedApps;
           }
         }
 
         // Return modified request with files included and requestId in headers
-        const { [DYAD_INTERNAL_REQUEST_ID_HEADER]: _, ...outgoingHeaders } =
+        const { [KAPABLE_INTERNAL_REQUEST_ID_HEADER]: _, ...outgoingHeaders } =
           (init.headers as Record<string, string>) ?? {};
         const modifiedInit = {
           ...init,
           headers: {
             ...outgoingHeaders,
             ...(modifiedRequestId && {
-              "X-Dyad-Request-Id": modifiedRequestId,
+              "X-KapAble-Request-Id": modifiedRequestId,
             }),
             ...(includeFreeQuotaKey &&
               requestId && {
-                "X-Dyad-Free-Quota-Key": requestId,
+                "X-KapAble-Free-Quota-Key": requestId,
               }),
           },
           body: JSON.stringify(parsedBody),
@@ -274,9 +274,9 @@ export function createDyadEngine(
   ) => {
     const config = {
       ...getCommonModelConfig(pathPrefix),
-      fetch: createDyadFetch({
+      fetch: createKapableFetch({
         providerId: chatParams.providerId,
-        disableDyadOptions: pathPrefix === "/free",
+        disableKapableOptions: pathPrefix === "/free",
         includeFreeQuotaKey: pathPrefix === "/free",
       }),
     };
@@ -295,7 +295,7 @@ export function createDyadEngine(
   ) => {
     const config = {
       ...getCommonModelConfig(),
-      fetch: createDyadFetch({ providerId: chatParams.providerId }),
+      fetch: createKapableFetch({ providerId: chatParams.providerId }),
     };
 
     return new OpenAIResponsesLanguageModel(modelId, config);
@@ -305,26 +305,26 @@ export function createDyadEngine(
     modelId: ExampleChatModelId,
     chatParams: ChatParams,
   ) => {
-    const createModel = (dyadProviderOptions?: DyadEngineProviderOptions) => {
+    const createModel = (kapableProviderOptions?: KapableEngineProviderOptions) => {
       const provider = createAnthropic({
-        authToken: getDyadEngineApiKey(options.apiKey),
+        authToken: getKapableEngineApiKey(options.apiKey),
         baseURL,
         headers: options.headers,
-        fetch: createDyadFetch({
+        fetch: createKapableFetch({
           providerId: chatParams.providerId,
-          dyadProviderOptions,
+          kapableProviderOptions,
         }),
-        name: "dyad-engine",
+        name: "kapable-engine",
       });
 
       return provider(modelId);
     };
     const model = createModel();
-    const getDyadProviderOptions = (callOptions: {
+    const getKapableProviderOptions = (callOptions: {
       providerOptions?: Record<string, unknown>;
     }) =>
-      callOptions.providerOptions?.["dyad-engine"] as
-        | DyadEngineProviderOptions
+      callOptions.providerOptions?.["kapable-engine"] as
+        | KapableEngineProviderOptions
         | undefined;
 
     const wrappedModel = {
@@ -333,11 +333,11 @@ export function createDyadEngine(
       modelId: model.modelId,
       supportedUrls: model.supportedUrls,
       doGenerate: (callOptions) =>
-        createModel(getDyadProviderOptions(callOptions)).doGenerate(
+        createModel(getKapableProviderOptions(callOptions)).doGenerate(
           callOptions,
         ),
       doStream: (callOptions) =>
-        createModel(getDyadProviderOptions(callOptions)).doStream(callOptions),
+        createModel(getKapableProviderOptions(callOptions)).doStream(callOptions),
     } satisfies LanguageModel;
 
     const defaultObjectGenerationMode = (
@@ -361,15 +361,15 @@ export function createDyadEngine(
   return provider;
 }
 
-export async function transcribeWithDyadEngine(
+export async function transcribeWithKapableEngine(
   audioBuffer: Buffer,
   filename: string,
   requestId: string,
   options: ExampleProviderSettings,
 ): Promise<string> {
   const baseURL = withoutTrailingSlash(options.baseURL);
-  const apiKey = getDyadEngineApiKey(options.apiKey);
-  logger.info("transcribing with dyad engine with baseURL", baseURL);
+  const apiKey = getKapableEngineApiKey(options.apiKey);
+  logger.info("transcribing with kapable engine with baseURL", baseURL);
 
   const formData = new FormData();
   const mimeType = filename.endsWith(".webm")
@@ -388,14 +388,14 @@ export async function transcribeWithDyadEngine(
   );
   const blob = new Blob([audioBytes], { type: mimeType });
   formData.append("file", blob, filename);
-  formData.append("model", "dyad/transcribe");
+  formData.append("model", "kapable/transcribe");
 
   const fetchFn = options.fetch || getTestFetchOption().fetch || fetch;
   const response = await fetchFn(`${baseURL}/audio/transcriptions`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
-      "X-Dyad-Request-Id": requestId,
+      "X-KapAble-Request-Id": requestId,
       ...options.headers,
     },
     body: formData,
@@ -403,27 +403,27 @@ export async function transcribeWithDyadEngine(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new DyadError(
-      `Dyad Engine transcription failed: ${response.status} ${response.statusText} - ${errorText}`,
-      DyadErrorKind.External,
+    throw new KapableError(
+      `KapAble Engine transcription failed: ${response.status} ${response.statusText} - ${errorText}`,
+      KapableErrorKind.External,
     );
   }
   const data = (await response.json()) as { text: string };
   return data.text;
 }
 
-function getDyadEngineApiKey(apiKey: string | undefined): string {
+function getKapableEngineApiKey(apiKey: string | undefined): string {
   const loadedApiKey = loadApiKey({
     apiKey,
-    environmentVariableName: "DYAD_PRO_API_KEY",
-    description: "Dyad Pro API key",
+    environmentVariableName: "KAPABLE_PRO_API_KEY",
+    description: "KapAble Pro API key",
   });
   const normalizedApiKey = normalizeProviderApiKeyInput(loadedApiKey);
   const invalidCharacter = findInvalidProviderApiKeyCharacter(normalizedApiKey);
   if (invalidCharacter) {
-    throw new DyadError(
-      formatInvalidProviderApiKeyMessage("Dyad", invalidCharacter),
-      DyadErrorKind.Validation,
+    throw new KapableError(
+      formatInvalidProviderApiKeyMessage("KapAble", invalidCharacter),
+      KapableErrorKind.Validation,
     );
   }
   return normalizedApiKey;

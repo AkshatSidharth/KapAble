@@ -10,7 +10,7 @@ import { desc, eq, and, gt, gte } from "drizzle-orm";
 import type { GitCommit } from "../git_types";
 import fs from "node:fs";
 import path from "node:path";
-import { getDyadAppPath } from "../../paths/paths";
+import { getKapableAppPath } from "../../paths/paths";
 import {
   appOperationCoordinator,
   readAppResource,
@@ -58,7 +58,7 @@ import {
 } from "../utils/app_env_var_utils";
 import { storeDbTimestampAtCurrentVersion } from "../utils/neon_timestamp_utils";
 import { retryOnLocked } from "../utils/retryOnLocked";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { syncCloudSandboxSnapshot } from "../utils/cloud_sandbox_provider";
 import {
   DIFF_BINARY_PLACEHOLDER,
@@ -354,10 +354,10 @@ async function resolveRestoreRef({
 }> {
   const currentBranch = await gitCurrentBranch({ path: appPath });
   if (!currentBranch && !targetBranchName) {
-    throw new DyadError(
+    throw new KapableError(
       "Cannot restore while viewing a historical version. Close the version " +
         "preview to return to your branch, then try again.",
-      DyadErrorKind.Conflict,
+      KapableErrorKind.Conflict,
     );
   }
   const revertRef = currentBranch ?? targetBranchName!;
@@ -390,12 +390,12 @@ async function getVersionAppPath(appId: number): Promise<string> {
   });
 
   if (!app) {
-    throw new DyadError("App not found", DyadErrorKind.NotFound);
+    throw new KapableError("App not found", KapableErrorKind.NotFound);
   }
 
-  const appPath = getDyadAppPath(app.path);
+  const appPath = getKapableAppPath(app.path);
   if (!fs.existsSync(path.join(appPath, ".git"))) {
-    throw new DyadError("Not a git repository", DyadErrorKind.External);
+    throw new KapableError("Not a git repository", KapableErrorKind.External);
   }
 
   return appPath;
@@ -413,7 +413,7 @@ async function assertVersionExists({
     commitHash: versionId,
   });
   if (!exists) {
-    throw new DyadError("Version not found", DyadErrorKind.NotFound);
+    throw new KapableError("Version not found", KapableErrorKind.NotFound);
   }
 }
 
@@ -539,15 +539,15 @@ async function revertCodebaseToVersion({
   // emitting progress or making any mutation.
   const repositoryHealth = await inspectRepositoryHealth({ path: appPath });
   if (repositoryHealth.unmergedFiles.length > 0) {
-    throw new DyadError(
+    throw new KapableError(
       "Cannot revert: repository has unresolved file conflicts.",
-      DyadErrorKind.Conflict,
+      KapableErrorKind.Conflict,
     );
   }
   if (repositoryHealth.operationInProgress) {
-    throw new DyadError(
-      `Cannot revert: a Git ${repositoryHealth.operationInProgress} is in progress. Finish or cancel it outside Dyad, then try again.`,
-      DyadErrorKind.Conflict,
+    throw new KapableError(
+      `Cannot revert: a Git ${repositoryHealth.operationInProgress} is in progress. Finish or cancel it outside KapAble, then try again.`,
+      KapableErrorKind.Conflict,
     );
   }
 
@@ -598,7 +598,7 @@ async function revertCodebaseToVersion({
       `Preserving dirty tree in a checkpoint commit before restoring app ${appId}. ` +
         `User-visible uncommitted file(s): ${preservedFiles.length}` +
         (preservedUserVisibleFiles ? ` (${preservedUserVisibleFiles})` : "") +
-        ". Dyad-managed runtime files may also be included in the checkpoint.",
+        ". KapAble-managed runtime files may also be included in the checkpoint.",
     );
     checkpointGitStep("preserve-dirty-tree");
     await gitAddAll({ path: appPath });
@@ -618,9 +618,9 @@ async function revertCodebaseToVersion({
       path: appPath,
     });
     if (userVisibleChanges.length > 0) {
-      throw new DyadError(
+      throw new KapableError(
         "Cannot revert: working tree has uncommitted changes.",
-        DyadErrorKind.Conflict,
+        KapableErrorKind.Conflict,
       );
     }
   }
@@ -741,9 +741,9 @@ async function revertCodebaseToVersion({
 
         const preserveBranchId = response.data.branch.parent_id;
         if (!preserveBranchId) {
-          throw new DyadError(
+          throw new KapableError(
             "Preserve branch ID not found",
-            DyadErrorKind.NotFound,
+            KapableErrorKind.NotFound,
           );
         }
         logger.info(
@@ -876,7 +876,7 @@ export function registerVersionHandlers() {
       return [];
     }
 
-    const appPath = getDyadAppPath(app.path);
+    const appPath = getKapableAppPath(app.path);
 
     // Just return an empty array if the app is not a git repo.
     if (!fs.existsSync(path.join(appPath, ".git"))) {
@@ -941,14 +941,14 @@ export function registerVersionHandlers() {
     });
 
     if (!app) {
-      throw new DyadError("App not found", DyadErrorKind.NotFound);
+      throw new KapableError("App not found", KapableErrorKind.NotFound);
     }
 
-    const appPath = getDyadAppPath(app.path);
+    const appPath = getKapableAppPath(app.path);
 
     // Return appropriate result if the app is not a git repo
     if (!fs.existsSync(path.join(appPath, ".git"))) {
-      throw new DyadError("Not a git repository", DyadErrorKind.External);
+      throw new KapableError("Not a git repository", KapableErrorKind.External);
     }
 
     try {
@@ -959,9 +959,9 @@ export function registerVersionHandlers() {
       };
     } catch (error: any) {
       logger.error(`Error getting current branch for app ${appId}:`, error);
-      throw new DyadError(
+      throw new KapableError(
         `Failed to get current branch: ${error.message}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
   });
@@ -973,13 +973,13 @@ export function registerVersionHandlers() {
     });
 
     if (!app) {
-      throw new DyadError("App not found", DyadErrorKind.NotFound);
+      throw new KapableError("App not found", KapableErrorKind.NotFound);
     }
 
-    const appPath = getDyadAppPath(app.path);
+    const appPath = getKapableAppPath(app.path);
 
     if (!fs.existsSync(path.join(appPath, ".git"))) {
-      throw new DyadError("Not a git repository", DyadErrorKind.External);
+      throw new KapableError("Not a git repository", KapableErrorKind.External);
     }
 
     try {
@@ -1024,18 +1024,18 @@ export function registerVersionHandlers() {
       }
       return results;
     } catch (error: any) {
-      // Preserve the original error kind for DyadErrors thrown by inner
-      // functions; only wrap unexpected (non-Dyad) failures as External.
-      if (error instanceof DyadError) {
+      // Preserve the original error kind for KapableErrors thrown by inner
+      // functions; only wrap unexpected (non-KapAble) failures as External.
+      if (error instanceof KapableError) {
         throw error;
       }
       logger.error(
         `Error getting version changes for app ${appId} version ${versionId}:`,
         error,
       );
-      throw new DyadError(
+      throw new KapableError(
         `Failed to get version changes: ${error.message}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
   });
@@ -1074,10 +1074,10 @@ export function registerVersionHandlers() {
         });
 
         if (!app) {
-          throw new DyadError("App not found", DyadErrorKind.NotFound);
+          throw new KapableError("App not found", KapableErrorKind.NotFound);
         }
 
-        const appPath = getDyadAppPath(app.path);
+        const appPath = getKapableAppPath(app.path);
 
         if (expectedHeadOid) {
           const currentHeadOid = await getCurrentCommitHash({
@@ -1085,9 +1085,9 @@ export function registerVersionHandlers() {
             ref: targetBranchName ?? "HEAD",
           });
           if (currentHeadOid !== expectedHeadOid) {
-            throw new DyadError(
+            throw new KapableError(
               "The app's history changed since you confirmed. Please retry the undo.",
-              DyadErrorKind.Conflict,
+              KapableErrorKind.Conflict,
             );
           }
         }
@@ -1253,9 +1253,9 @@ export function registerVersionHandlers() {
           where: eq(apps.id, appId),
         });
         if (!app) {
-          throw new DyadError("App not found", DyadErrorKind.NotFound);
+          throw new KapableError("App not found", KapableErrorKind.NotFound);
         }
-        const appPath = getDyadAppPath(app.path);
+        const appPath = getKapableAppPath(app.path);
         if (restoreCodebase) {
           // Validate the branch anchor before cancelling any streams. The same
           // check runs again during the mutation to protect against a ref change
@@ -1272,21 +1272,21 @@ export function registerVersionHandlers() {
           },
         });
         if (!chat) {
-          throw new DyadError("Chat not found", DyadErrorKind.NotFound);
+          throw new KapableError("Chat not found", KapableErrorKind.NotFound);
         }
         // Defense in depth: make sure the chat actually belongs to this app so
         // a mismatched (appId, chatId) from the renderer can't create a chat
         // under the wrong app or revert to a commit from another app's repo.
         if (chat.appId !== appId) {
-          throw new DyadError(
+          throw new KapableError(
             "Chat does not belong to this app",
-            DyadErrorKind.Validation,
+            KapableErrorKind.Validation,
           );
         }
 
         const targetIndex = chat.messages.findIndex((m) => m.id === messageId);
         if (targetIndex === -1) {
-          throw new DyadError("Message not found", DyadErrorKind.NotFound);
+          throw new KapableError("Message not found", KapableErrorKind.NotFound);
         }
 
         const messagesBefore = chat.messages
@@ -1331,8 +1331,8 @@ export function registerVersionHandlers() {
             });
           } catch (error) {
             if (
-              error instanceof DyadError &&
-              error.kind === DyadErrorKind.NotFound
+              error instanceof KapableError &&
+              error.kind === KapableErrorKind.NotFound
             ) {
               return {
                 status: "warn" as const,
@@ -1394,9 +1394,9 @@ export function registerVersionHandlers() {
       releaseRecordingBlock =
         blockRecordingStart(appId, "restore a version") ?? undefined;
       if (!releaseRecordingBlock) {
-        throw new DyadError(
+        throw new KapableError(
           "Stop the recording session before you restore this version — it's holding this app while it records.",
-          DyadErrorKind.Precondition,
+          KapableErrorKind.Precondition,
         );
       }
 
@@ -1457,13 +1457,13 @@ export function registerVersionHandlers() {
             where: eq(apps.id, appId),
           });
           if (!latestApp) {
-            throw new DyadError("App not found", DyadErrorKind.NotFound);
+            throw new KapableError("App not found", KapableErrorKind.NotFound);
           }
           // The app directory can be renamed while phase 2 awaits stream
           // cancellation without holding the app lock. Re-resolve it from the
           // row fetched after reacquiring the lock so every phase-3 filesystem
           // operation targets the current directory.
-          const latestAppPath = getDyadAppPath(latestApp.path);
+          const latestAppPath = getKapableAppPath(latestApp.path);
 
           const latestChat = await db.query.chats.findFirst({
             where: eq(chats.id, chatId),
@@ -1474,12 +1474,12 @@ export function registerVersionHandlers() {
             },
           });
           if (!latestChat) {
-            throw new DyadError("Chat not found", DyadErrorKind.NotFound);
+            throw new KapableError("Chat not found", KapableErrorKind.NotFound);
           }
           if (latestChat.appId !== appId) {
-            throw new DyadError(
+            throw new KapableError(
               "Chat does not belong to this app",
-              DyadErrorKind.Validation,
+              KapableErrorKind.Validation,
             );
           }
 
@@ -1487,7 +1487,7 @@ export function registerVersionHandlers() {
             (m) => m.id === messageId,
           );
           if (latestTargetIndex === -1) {
-            throw new DyadError("Message not found", DyadErrorKind.NotFound);
+            throw new KapableError("Message not found", KapableErrorKind.NotFound);
           }
 
           const latestTargetTurnOutcome = await getRestoreTargetTurnOutcome({
@@ -1540,8 +1540,8 @@ export function registerVersionHandlers() {
               });
             } catch (error) {
               if (
-                error instanceof DyadError &&
-                error.kind === DyadErrorKind.NotFound
+                error instanceof KapableError &&
+                error.kind === KapableErrorKind.NotFound
               ) {
                 return versionCommandResult({
                   repositoryOutcome: "unchanged",
@@ -1825,7 +1825,7 @@ export function registerVersionHandlers() {
         });
 
         if (!app) {
-          throw new DyadError("App not found", DyadErrorKind.NotFound);
+          throw new KapableError("App not found", KapableErrorKind.NotFound);
         }
 
         if (
@@ -1925,7 +1925,7 @@ export function registerVersionHandlers() {
             }
           }
         }
-        const fullAppPath = getDyadAppPath(app.path);
+        const fullAppPath = getKapableAppPath(app.path);
         await gitCheckout({
           path: fullAppPath,
           ref: gitRef,

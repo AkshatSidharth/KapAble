@@ -111,8 +111,8 @@ async function verifyReleaseAssets() {
     console.log(`🔍 Verifying release assets for version ${version}...`);
 
     // GitHub API configuration
-    const owner = "dyad-sh";
-    const repo = "dyad";
+    const owner = "AkshatSidharth";
+    const repo = "KapAble";
     const token = process.env.GITHUB_TOKEN;
 
     if (!token) {
@@ -129,7 +129,7 @@ async function verifyReleaseAssets() {
       headers: {
         Authorization: `token ${token}`,
         Accept: "application/vnd.github.v3+json",
-        "User-Agent": "dyad-release-verifier",
+        "User-Agent": "kapable-release-verifier",
       },
     });
 
@@ -182,13 +182,13 @@ async function verifyReleaseAssets() {
 
     // Define expected assets with platform-specific version handling
     const expectedAssets = [
-      `dyad-${normalizeVersionForPlatform(version, "rpm")}-1.x86_64.rpm`,
-      `dyad-${normalizeVersionForPlatform(version, "nupkg")}-full.nupkg`,
-      `dyad-${version}.Setup.exe`,
-      `dyad-darwin-arm64-${version}.zip`,
-      `dyad-darwin-x64-${version}.zip`,
-      `dyad_${normalizeVersionForPlatform(version, "deb")}_amd64.deb`,
-      `dyad_${version}_x86_64.AppImage`,
+      `kapable-${normalizeVersionForPlatform(version, "rpm")}-1.x86_64.rpm`,
+      `kapable-${normalizeVersionForPlatform(version, "nupkg")}-full.nupkg`,
+      `kapable-${version}.Setup.exe`,
+      `kapable-darwin-arm64-${version}.zip`,
+      `kapable-darwin-x64-${version}.zip`,
+      `kapable_${normalizeVersionForPlatform(version, "deb")}_amd64.deb`,
+      `kapable_${version}_x86_64.AppImage`,
       "RELEASES",
       "release-provenance-linux.json",
       "release-provenance-macos-intel.json",

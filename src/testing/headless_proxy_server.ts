@@ -16,7 +16,7 @@
  *
  * This module returns a drop-in module shape with the identical contract but
  * an absolute path to the real `worker/proxy_server.js`, so everything
- * downstream (proxyUrl, `[dyad-proxy-server]started=[…]`, the app-run actor's
+ * downstream (proxyUrl, `[kapable-proxy-server]started=[…]`, the app-run actor's
  * PROXY_READY transition, `waitForAppReady`) behaves exactly as in production.
  *
  * Install it from a test file's hoisted section:
@@ -35,7 +35,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { Worker } from "node:worker_threads";
 
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   PROXY_FALLBACK_MAX_ATTEMPTS,
   getProxyFallbackPortStart,
@@ -46,7 +46,7 @@ import {
  * detect a missing `vi.mock` immediately instead of stalling for two minutes
  * inside `waitForAppReady`.
  */
-export const HEADLESS_PROXY_MARKER = "__dyadHeadlessProxy" as const;
+export const HEADLESS_PROXY_MARKER = "__kapableHeadlessProxy" as const;
 
 export function resolveProxyWorkerPath(): string {
   const candidates = [
@@ -68,7 +68,7 @@ export function resolveProxyWorkerPath(): string {
 export interface HeadlessStartProxyOptions {
   port: number;
   onStarted?: (proxyUrl: string) => void;
-  onError?: (error: DyadError) => void;
+  onError?: (error: KapableError) => void;
   fixedHeaders?: Record<string, string>;
 }
 
@@ -85,9 +85,9 @@ export function createHeadlessProxyModule(): {
     opts: HeadlessStartProxyOptions,
   ): Promise<Worker> => {
     if (!/^https?:\/\//.test(targetOrigin)) {
-      throw new DyadError(
+      throw new KapableError(
         "startProxy: targetOrigin must be absolute http/https URL",
-        DyadErrorKind.Validation,
+        KapableErrorKind.Validation,
       );
     }
     const { port, onStarted, onError, fixedHeaders } = opts;
@@ -108,22 +108,22 @@ export function createHeadlessProxyModule(): {
         onStarted?.(m.substring("proxy-server-start url=".length));
       } else if (typeof m === "string" && m.startsWith("proxy-server-error")) {
         onError?.(
-          new DyadError(
+          new KapableError(
             `Could not start the preview proxy: every port from ${port} to ${
               fallbackPortStart + PROXY_FALLBACK_MAX_ATTEMPTS - 1
             } is in use. Free up a port and restart the app.`,
-            DyadErrorKind.Conflict,
+            KapableErrorKind.Conflict,
           ),
         );
       }
     });
     worker.on("error", (error) => {
       onError?.(
-        new DyadError(
+        new KapableError(
           `Preview proxy worker failed: ${
             error instanceof Error ? error.message : String(error)
           }`,
-          DyadErrorKind.External,
+          KapableErrorKind.External,
         ),
       );
     });

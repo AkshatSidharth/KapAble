@@ -1,4 +1,4 @@
-import { buildDyadAttachmentTag } from "../../shared/dyadAttachment";
+import { buildKapableAttachmentTag } from "../../shared/kapableAttachment";
 import {
   parseMediaMentions,
   stripResolvedMediaMentions,
@@ -20,12 +20,12 @@ export function buildOptimisticChatDisplay(
         name = ref;
       }
       const file = files.find((candidate) => candidate.fileName === name);
-      return buildDyadAttachmentTag({
+      return buildKapableAttachmentTag({
         name,
         type: file?.mimeType ?? "application/octet-stream",
         url:
           appPath && file
-            ? `dyad-media://media/${encodeURIComponent(appPath)}/.dyad/media/${encodeURIComponent(name)}`
+            ? `kapable-media://media/${encodeURIComponent(appPath)}/.kapable/media/${encodeURIComponent(name)}`
             : "",
         path: "",
         attachmentType: "chat-context",

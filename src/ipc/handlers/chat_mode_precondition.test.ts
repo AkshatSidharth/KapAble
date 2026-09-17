@@ -27,9 +27,9 @@ describe("chat mode preconditions", () => {
       selectedModel: { provider: "auto", name: "free-pro" },
       settings: {
         defaultChatMode: "build",
-        enableDyadPro: true,
+        enableKapablePro: true,
         providerSettings: {
-          auto: { apiKey: { value: "dyad-pro-key" } },
+          auto: { apiKey: { value: "kapable-pro-key" } },
         },
       },
     });

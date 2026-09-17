@@ -1,7 +1,7 @@
 OK, I'm going to write an app with an image now...
 
-<dyad-write path="src/pages/Index.tsx" description="write-description">
-import { MadeWithDyad } from "@/components/made-with-dyad";
+<kapable-write path="src/pages/Index.tsx" description="write-description">
+import { MadeWithKapable } from "@/components/made-with-kapable";
 
 const Index = () => {
   return (
@@ -13,12 +13,12 @@ const Index = () => {
           Start building your amazing project here!
         </p>
       </div>
-      <MadeWithDyad />
+      <MadeWithKapable />
     </div>
   );
 };
 
 export default Index;
-</dyad-write>
+</kapable-write>
 
 And it's done!

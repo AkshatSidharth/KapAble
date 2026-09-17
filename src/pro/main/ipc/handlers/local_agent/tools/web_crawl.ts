@@ -7,7 +7,7 @@ import {
   isImageTooLarge,
   MAX_IMAGE_DIMENSION,
 } from "./image_utils";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 const logger = log.scope("web_crawl");
 
@@ -86,7 +86,7 @@ Always include the placeholder.svg file in your output file tree.
 
 async function callWebCrawl(
   url: string,
-  ctx: Pick<AgentContext, "dyadRequestId" | "abortSignal">,
+  ctx: Pick<AgentContext, "kapableRequestId" | "abortSignal">,
 ): Promise<z.infer<typeof webCrawlResponseSchema>> {
   const response = await engineFetch(ctx, "/tools/web-crawl", {
     method: "POST",
@@ -111,17 +111,17 @@ export const webCrawlTool: ToolDefinition<z.infer<typeof webCrawlSchema>> = {
   defaultConsent: "ask",
   usesEngineEndpoint: true,
 
-  // Requires Dyad Pro engine API
-  isEnabled: (ctx) => ctx.isDyadPro,
+  // Requires KapAble Pro engine API
+  isEnabled: (ctx) => ctx.isKapablePro,
 
   getConsentPreview: (args) => `Crawl URL: "${args.url}"`,
 
   buildXml: (args, isComplete) => {
     if (!args.url) return undefined;
 
-    let xml = `<dyad-web-crawl>${escapeXmlContent(args.url)}`;
+    let xml = `<kapable-web-crawl>${escapeXmlContent(args.url)}`;
     if (isComplete) {
-      xml += "</dyad-web-crawl>";
+      xml += "</kapable-web-crawl>";
     }
     return xml;
   },
@@ -132,23 +132,23 @@ export const webCrawlTool: ToolDefinition<z.infer<typeof webCrawlSchema>> = {
     const result = await callWebCrawl(args.url, ctx);
 
     if (!result) {
-      throw new DyadError(
+      throw new KapableError(
         "Web crawl returned no results",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
     if (!result.markdown) {
-      throw new DyadError(
+      throw new KapableError(
         "No content available from web crawl",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
     if (!result.screenshot) {
-      throw new DyadError(
+      throw new KapableError(
         "No screenshot available from web crawl",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
     logger.log(`Web crawl completed for URL: ${args.url}`);

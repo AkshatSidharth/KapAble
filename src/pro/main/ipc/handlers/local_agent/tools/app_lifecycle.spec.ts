@@ -46,10 +46,10 @@ describe("app lifecycle tools", () => {
       timeoutMs: undefined,
     });
     expect(ctx.onXmlStream).toHaveBeenCalledWith(
-      '<dyad-status title="Restarting app"></dyad-status>',
+      '<kapable-status title="Restarting app"></kapable-status>',
     );
     expect(ctx.onXmlComplete).toHaveBeenCalledWith(
-      '<dyad-status title="App restarted" state="finished"></dyad-status>',
+      '<kapable-status title="App restarted" state="finished"></kapable-status>',
     );
   });
 
@@ -78,10 +78,10 @@ describe("app lifecycle tools", () => {
       timeoutMs: 10 * 60 * 1_000,
     });
     expect(ctx.onXmlStream).toHaveBeenCalledWith(
-      '<dyad-status title="Reinstalling dependencies"></dyad-status>',
+      '<kapable-status title="Reinstalling dependencies"></kapable-status>',
     );
     expect(ctx.onXmlComplete).toHaveBeenCalledWith(
-      '<dyad-status title="Dependencies reinstalled; app restarted" state="finished"></dyad-status>',
+      '<kapable-status title="Dependencies reinstalled; app restarted" state="finished"></kapable-status>',
     );
   });
 

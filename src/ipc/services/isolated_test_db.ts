@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import log from "electron-log";
 
-import { getDyadAppPath } from "../../paths/paths";
+import { getKapableAppPath } from "../../paths/paths";
 import { apps } from "../../db/schema";
 import {
   createTempTestBranch,
@@ -152,7 +152,7 @@ export async function prepareIsolatedTestDatabase({
     };
   }
 
-  const appPath = getDyadAppPath(app.path);
+  const appPath = getKapableAppPath(app.path);
   let envSnapshot: string | null = null;
   let envModified = false;
   let branchId: string | undefined;
@@ -176,7 +176,7 @@ export async function prepareIsolatedTestDatabase({
           `Failed to restore .env.local for app ${app.id}: ${error}`,
         );
         emit(
-          "Warning: Dyad couldn't restore your real database settings, so the temporary Neon branch was kept tracked for retry. Restore .env.local before running more tests.\n",
+          "Warning: KapAble couldn't restore your real database settings, so the temporary Neon branch was kept tracked for retry. Restore .env.local before running more tests.\n",
           "setup",
         );
       }
@@ -188,7 +188,7 @@ export async function prepareIsolatedTestDatabase({
             `Failed to restart app ${app.id} back onto its real branch: ${error}`,
           );
           emit(
-            "Warning: Dyad restored your real database settings, but couldn't restart the preview. Restart the app manually before continuing.\n",
+            "Warning: KapAble restored your real database settings, but couldn't restart the preview. Restart the app manually before continuing.\n",
             "setup",
           );
         }
@@ -278,8 +278,8 @@ export async function prepareIsolatedTestDatabase({
           appId: app.id,
         });
         testCredentials = {
-          DYAD_TEST_USER_EMAIL: account.email,
-          DYAD_TEST_USER_PASSWORD: account.password,
+          KAPABLE_TEST_USER_EMAIL: account.email,
+          KAPABLE_TEST_USER_PASSWORD: account.password,
         };
         authSetup = {
           mode: "neon-better-auth",
@@ -427,7 +427,7 @@ async function prepareSupabaseTestUserIsolation({
     // happen — and one that reads as "my login is broken" rather than "my key
     // was retired". Warn (never block) and let the panel offer the switch.
     const legacyKey = await detectLegacyAppKey({
-      appPath: getDyadAppPath(app.path),
+      appPath: getKapableAppPath(app.path),
       projectId,
       organizationSlug,
     });
@@ -469,13 +469,13 @@ async function prepareSupabaseTestUserIsolation({
     }
 
     const testCredentials: Record<string, string> = {
-      DYAD_TEST_USER_EMAIL: testUser.email,
-      DYAD_TEST_USER_PASSWORD: testUser.password,
-      DYAD_TEST_SUPABASE_URL: testUser.projectUrl,
+      KAPABLE_TEST_USER_EMAIL: testUser.email,
+      KAPABLE_TEST_USER_PASSWORD: testUser.password,
+      KAPABLE_TEST_SUPABASE_URL: testUser.projectUrl,
     };
     let authSetup: IsolationAuthSetup | undefined;
     if (anonKey) {
-      testCredentials.DYAD_TEST_SUPABASE_ANON_KEY = anonKey;
+      testCredentials.KAPABLE_TEST_SUPABASE_ANON_KEY = anonKey;
       authSetup = {
         mode: "supabase-password",
         email: testUser.email,
@@ -529,7 +529,7 @@ function buildRlsWarning(rls: {
   unverified?: boolean;
 }): string | undefined {
   if (rls.unverified) {
-    return "Tests ran as an isolated test user, but Dyad couldn't verify Row-Level Security — some real data may be reachable.";
+    return "Tests ran as an isolated test user, but KapAble couldn't verify Row-Level Security — some real data may be reachable.";
   }
   if (rls.tablesWithoutRls.length === 0) {
     return undefined;

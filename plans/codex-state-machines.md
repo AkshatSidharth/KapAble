@@ -1,4 +1,4 @@
-# Hardening Dyad State Machines
+# Hardening KapAble State Machines
 
 ## Status
 

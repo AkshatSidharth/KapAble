@@ -1,5 +1,5 @@
 import type { IpcMainInvokeEvent } from "electron";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 type RendererTrustPolicy = {
   devServerOrigin: string | null;
@@ -160,16 +160,16 @@ function isSenderMainFrame(event: IpcMainInvokeEvent): boolean {
 
 export function assertTrustedRenderer(event: IpcMainInvokeEvent): void {
   if (trustPolicy.packagedRendererProtocol === null) {
-    throw new DyadError(
+    throw new KapableError(
       "Renderer trust policy is not configured. Call configureTrustedRenderer() before handling IPC.",
-      DyadErrorKind.Internal,
+      KapableErrorKind.Internal,
     );
   }
   const frame = event.senderFrame;
   if (!frame || !isSenderMainFrame(event) || !isTrustedRendererUrl(frame.url)) {
-    throw new DyadError(
-      "IPC requests must originate from the trusted Dyad renderer.",
-      DyadErrorKind.Validation,
+    throw new KapableError(
+      "IPC requests must originate from the trusted KapAble renderer.",
+      KapableErrorKind.Validation,
     );
   }
 }

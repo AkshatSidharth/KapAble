@@ -58,10 +58,10 @@ describe("pickPromoMessage", () => {
 });
 
 describe("shouldShowPromoMessage", () => {
-  it("shows for a non-Pro user even when the Dyad Pro toggle is enabled", () => {
+  it("shows for a non-Pro user even when the KapAble Pro toggle is enabled", () => {
     const settings = {
       ...settingsWithAutoKey(),
-      enableDyadPro: true,
+      enableKapablePro: true,
     };
 
     expect(
@@ -78,7 +78,7 @@ describe("shouldShowPromoMessage", () => {
     expect(
       shouldShowPromoMessage({
         promoSeed: 123,
-        settings: settingsWithAutoKey("dyad-pro-key"),
+        settings: settingsWithAutoKey("kapable-pro-key"),
         userBudget: null,
         messagesLength: 2,
       }),

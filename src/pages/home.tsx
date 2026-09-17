@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 
 import type { FileAttachment } from "@/ipc/types";
 import type { ListedApp } from "@/ipc/types/app";
-import { hasDyadProKey, type ChatMode } from "@/lib/schemas";
+import { hasKapableProKey, type ChatMode } from "@/lib/schemas";
 import {
   FREE_PRO_MODEL_FALLBACK_CHAT_MODE,
   isFreeProBuildModeCombination,
@@ -52,7 +52,7 @@ export default function HomePage() {
   const { settings, envVars, loading: isSettingsLoading } = useSettings();
   const { isAnyProviderSetup, isLoading: isLoadingLanguageModelProviders } =
     useLanguageModelProviders();
-  const hasDyadProApiKey = settings ? hasDyadProKey(settings) : false;
+  const hasKapableProApiKey = settings ? hasKapableProKey(settings) : false;
   const hasConfiguredAiProvider =
     !isLoadingLanguageModelProviders && isAnyProviderSetup();
   const homeInitialChatMode = useMemo<ChatMode | undefined>(() => {
@@ -185,7 +185,7 @@ export default function HomePage() {
               What do you want to build?
             </h1>
             <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
-              Describe your idea. Dyad will turn it into a working app.
+              Describe your idea. KapAble will turn it into a working app.
             </p>
             <div className="mt-4 flex justify-center gap-3">
               <ImportAppButton
@@ -193,12 +193,12 @@ export default function HomePage() {
                 variant="outline"
                 size="sm"
               />
-              {!hasDyadProApiKey && (
+              {!hasKapableProApiKey && (
                 <Button
                   size="sm"
                   onClick={() =>
                     ipc.system.openExternalUrl(
-                      "https://www.dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=home-upgrade-to-pro",
+                      "https://www.kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=home-upgrade-to-pro",
                     )
                   }
                 >
@@ -215,7 +215,7 @@ export default function HomePage() {
 
           {!isSettingsLoading &&
             !isLoadingLanguageModelProviders &&
-            !hasDyadProApiKey && (
+            !hasKapableProApiKey && (
               <div className="-mt-2 flex justify-end px-4">
                 <button
                   type="button"

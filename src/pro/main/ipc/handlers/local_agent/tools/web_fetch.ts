@@ -2,7 +2,7 @@ import { z } from "zod";
 import log from "electron-log";
 import { ToolDefinition, escapeXmlContent, AgentContext } from "./types";
 import { engineFetch } from "./engine_fetch";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 const logger = log.scope("web_fetch");
 
@@ -11,7 +11,7 @@ function validateHttpUrl(url: string): void {
   try {
     parsed = new URL(url);
   } catch {
-    throw new DyadError(`Invalid URL: ${url}`, DyadErrorKind.Validation);
+    throw new KapableError(`Invalid URL: ${url}`, KapableErrorKind.Validation);
   }
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
     throw new Error(
@@ -63,7 +63,7 @@ Examples:
 
 async function callWebFetch(
   url: string,
-  ctx: Pick<AgentContext, "dyadRequestId" | "abortSignal">,
+  ctx: Pick<AgentContext, "kapableRequestId" | "abortSignal">,
 ): Promise<z.infer<typeof webFetchResponseSchema>> {
   const response = await engineFetch(ctx, "/tools/web-crawl", {
     method: "POST",
@@ -88,8 +88,8 @@ export const webFetchTool: ToolDefinition<z.infer<typeof webFetchSchema>> = {
   defaultConsent: "always",
   usesEngineEndpoint: true,
 
-  // Requires Dyad Pro engine API
-  isEnabled: (ctx) => ctx.isDyadPro,
+  // Requires KapAble Pro engine API
+  isEnabled: (ctx) => ctx.isKapablePro,
 
   getConsentPreview: (args) => `Fetch URL: "${args.url}"`,
 
@@ -97,7 +97,7 @@ export const webFetchTool: ToolDefinition<z.infer<typeof webFetchSchema>> = {
     if (!args.url) return undefined;
     // When complete, return undefined so execute's onXmlComplete provides the final XML
     if (isComplete) return undefined;
-    return `<dyad-web-fetch>${escapeXmlContent(args.url)}`;
+    return `<kapable-web-fetch>${escapeXmlContent(args.url)}`;
   },
 
   execute: async (args, ctx) => {
@@ -105,15 +105,15 @@ export const webFetchTool: ToolDefinition<z.infer<typeof webFetchSchema>> = {
 
     validateHttpUrl(args.url);
 
-    ctx.onXmlStream(`<dyad-web-fetch>${escapeXmlContent(args.url)}`);
+    ctx.onXmlStream(`<kapable-web-fetch>${escapeXmlContent(args.url)}`);
 
     try {
       const result = await callWebFetch(args.url, ctx);
 
       if (!result) {
-        throw new DyadError(
+        throw new KapableError(
           "Web fetch returned no results",
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
 
@@ -123,9 +123,9 @@ export const webFetchTool: ToolDefinition<z.infer<typeof webFetchSchema>> = {
         .join("\n\n---\n\n");
 
       if (!allContent) {
-        throw new DyadError(
+        throw new KapableError(
           "No content available from web fetch",
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
 
@@ -134,13 +134,13 @@ export const webFetchTool: ToolDefinition<z.infer<typeof webFetchSchema>> = {
       );
 
       ctx.onXmlComplete(
-        `<dyad-web-fetch>${escapeXmlContent(args.url)}</dyad-web-fetch>`,
+        `<kapable-web-fetch>${escapeXmlContent(args.url)}</kapable-web-fetch>`,
       );
 
       return truncateContent(allContent);
     } catch (error) {
       ctx.onXmlComplete(
-        `<dyad-web-fetch>${escapeXmlContent(args.url)}</dyad-web-fetch>`,
+        `<kapable-web-fetch>${escapeXmlContent(args.url)}</kapable-web-fetch>`,
       );
       throw error;
     }

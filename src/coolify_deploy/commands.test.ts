@@ -36,7 +36,7 @@ vi.mock("@/ipc/utils/git_utils", () => ({
 
 // Real key handling writes a keypair to disk, which a test must not do.
 vi.mock("@/ipc/utils/coolify_deploy_key", () => ({
-  repoKeyName: (owner: string, repo: string) => `dyad_${owner}_${repo}`,
+  repoKeyName: (owner: string, repo: string) => `kapable_${owner}_${repo}`,
   // Identity here: the fingerprint suffix is this module's own concern, and
   // routing it through would only make every route name in these tests noisier.
   coolifyKeyName: (keyName: string) => keyName,
@@ -101,7 +101,7 @@ import { apps, coolifyAppConnections } from "@/db/schema";
 import { setupHandlerTestHarness } from "@/testing/handler_test_harness";
 import type { HandlerTestHarness } from "@/testing/handler_test_harness";
 import { createFakeClock, type FakeClock } from "@/state_machines/testing";
-import { DyadError, DyadErrorKind, isDyadError } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
 import { runDeployPipeline, type DeployReporter } from "./commands";
 
 const POLL_INTERVAL_MS = 5_000;
@@ -249,7 +249,7 @@ async function seedApp(
     .insert(apps)
     .values({
       name: "demo",
-      path: "/tmp/dyad-demo",
+      path: "/tmp/kapable-demo",
       githubOrg: "acme",
       githubRepo: "demo",
       githubBranch: "main",
@@ -277,7 +277,7 @@ function readApp(appId: number) {
 /** Routes for a deployment that starts and immediately reports finished. */
 function happyPathRoutes(uuid = APP_UUID) {
   route("GET /security/keys", [
-    { uuid: "key-1", name: "dyad_acme_demo", id: 7 },
+    { uuid: "key-1", name: "kapable_acme_demo", id: 7 },
   ]);
   route("POST /applications/private-deploy-key", { uuid });
   route(`PATCH /applications/${uuid}`, {});
@@ -897,7 +897,7 @@ describe("build configuration", () => {
     const created = bodyOf("POST /applications/private-deploy-key");
     expect(created.build_pack).toBe("railpack");
     expect(created.ports_exposes).toBe("3000");
-    // Nothing else is claimed about an app Dyad does not recognise, so railpack
+    // Nothing else is claimed about an app KapAble does not recognise, so railpack
     // reads it and decides for itself.
     expect(created.start_command).toBeUndefined();
     expect(created.publish_directory).toBeUndefined();
@@ -1438,7 +1438,7 @@ describe("pre-deploy warnings", () => {
   it("says when edits are only on disk, which no commit hash reveals", async () => {
     // Deploying what is on GitHub is the intent, but uncommitted work does
     // not move HEAD, so the push check above cannot see it. A user looking at
-    // edits Dyad just made would otherwise get a green deploy without them.
+    // edits KapAble just made would otherwise get a green deploy without them.
     git.uncommitted = ["src/App.tsx", "src/main.tsx"];
     const app = await seedApp();
     happyPathRoutes();
@@ -1552,13 +1552,13 @@ describe("pre-deploy warnings", () => {
 
 describe("database resolution failures", () => {
   it("keeps the kind Neon assigned rather than reporting every failure as a crash", async () => {
-    // rules/dyad-errors.md keeps Precondition out of telemetry; rewrapping it
+    // rules/kapable-errors.md keeps Precondition out of telemetry; rewrapping it
     // as External would report a missing branch as a crash on every deploy.
     const { resolveNeonBranchEnvVars } = await import("@/ipc/utils/neon_utils");
     vi.mocked(resolveNeonBranchEnvVars).mockRejectedValueOnce(
-      new DyadError(
+      new KapableError(
         "This app has no development branch.",
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       ),
     );
     const app = await seedApp({ neonProjectId: "proj-1" });
@@ -1575,7 +1575,7 @@ describe("database resolution failures", () => {
       }),
     ).catch((e) => e);
 
-    expect(error.kind).toBe(DyadErrorKind.Precondition);
+    expect(error.kind).toBe(KapableErrorKind.Precondition);
     expect(error.message).toBe("This app has no development branch.");
   });
 
@@ -1598,7 +1598,7 @@ describe("database resolution failures", () => {
       }),
     ).catch((e) => e);
 
-    expect(error.kind).toBe(DyadErrorKind.External);
+    expect(error.kind).toBe(KapableErrorKind.External);
     expect(error.message).toMatch(/socket hang up/);
   });
 });
@@ -1660,7 +1660,7 @@ describe("keeping the Coolify application in step with the repo", () => {
   it("leaves settings it has no opinion on untouched", async () => {
     // A redeploy that rewrote every field would replace anything the user set
     // in Coolify, and anything an app configured for itself, with a default
-    // Dyad invented. Only what Dyad actually has a value for is sent.
+    // KapAble invented. Only what KapAble actually has a value for is sent.
     framework.type = "nextjs";
     const app = await seedApp({ connection: { applicationUuid: APP_UUID } });
     happyPathRoutes();
@@ -1900,8 +1900,8 @@ describe("failing after the old application is already gone", () => {
       }),
     ).catch((e) => e);
 
-    expect(isDyadError(error)).toBe(true);
-    expect(error.kind).toBe(DyadErrorKind.Auth);
+    expect(isKapableError(error)).toBe(true);
+    expect(error.kind).toBe(KapableErrorKind.Auth);
   });
 
   it("stays quiet when nothing was removed", async () => {

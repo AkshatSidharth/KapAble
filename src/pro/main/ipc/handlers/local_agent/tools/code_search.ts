@@ -8,11 +8,11 @@ import {
 } from "./types";
 import { extractCodebase } from "../../../../../../utils/codebase";
 import { engineFetch } from "./engine_fetch";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { isCodeExplorerReady } from "@/ipc/processors/code_explorer";
 import { readSettings } from "@/main/settings";
 import {
-  filterDyadInternalFiles,
+  filterKapableInternalFiles,
   resolveTargetAppPath,
 } from "./resolve_app_context";
 
@@ -57,7 +57,7 @@ async function callCodeSearch(
 ): Promise<string[]> {
   // Stream initial state to UI
   ctx.onXmlStream(
-    `<dyad-code-search${buildCodeSearchAttributes({
+    `<kapable-code-search${buildCodeSearchAttributes({
       query: params.query,
       app_name: params.app_name,
     })}>`,
@@ -73,9 +73,9 @@ async function callCodeSearch(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new DyadError(
+    throw new KapableError(
       `Code search failed: ${response.status} ${response.statusText} - ${errorText}`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 
@@ -110,7 +110,7 @@ export const codeSearchTool: ToolDefinition<CodeSearchArgs> = {
   // available. Inside Explorer, retain code_search as a fallback unless the
   // compiler-backed exploration surface is ready.
   isEnabled: (ctx) => {
-    if (!ctx.isDyadPro) return false;
+    if (!ctx.isKapablePro) return false;
     if (!ctx.subagentThreadId && ctx.canUseExplorerSubagent) return false;
 
     const exploreCodeAvailable =
@@ -128,7 +128,7 @@ export const codeSearchTool: ToolDefinition<CodeSearchArgs> = {
   buildXml: (args, isComplete) => {
     if (!args.query) return undefined;
     if (isComplete) return undefined;
-    return `<dyad-code-search${buildCodeSearchAttributes(args)}>Searching...`;
+    return `<kapable-code-search${buildCodeSearchAttributes(args)}>Searching...`;
   },
 
   execute: async (args, ctx: AgentContext) => {
@@ -145,7 +145,7 @@ export const codeSearchTool: ToolDefinition<CodeSearchArgs> = {
       },
     });
 
-    const filteredFiles = filterDyadInternalFiles(files, args.app_name);
+    const filteredFiles = filterKapableInternalFiles(files, args.app_name);
 
     // Map files to FileContext format
     const filesContext = filteredFiles.map((file) => ({
@@ -173,9 +173,9 @@ export const codeSearchTool: ToolDefinition<CodeSearchArgs> = {
         ? "No relevant files found."
         : relevantFiles.map((f) => ` - ${f}`).join("\n");
 
-    // Write final result to UI and DB with dyad-code-search wrapper
+    // Write final result to UI and DB with kapable-code-search wrapper
     ctx.onXmlComplete(
-      `<dyad-code-search${buildCodeSearchAttributes(args)}>${escapeXmlContent(resultText)}</dyad-code-search>`,
+      `<kapable-code-search${buildCodeSearchAttributes(args)}>${escapeXmlContent(resultText)}</kapable-code-search>`,
     );
 
     logger.log(`Code search completed for query: ${args.query}`);

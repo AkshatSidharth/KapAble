@@ -12,7 +12,7 @@ import { createTypedHandler } from "./base";
 import { registerTrustedIpcHandler } from "./trusted_handle";
 import { systemContracts } from "../types/system";
 import { IS_TEST_BUILD } from "../utils/test_utils";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { safeSend } from "@/ipc/utils/safe_sender";
 import { getPathEnvKey } from "@/ipc/utils/path_env";
 import {
@@ -54,7 +54,7 @@ async function reloadNodePath() {
   const pathKey = getPathEnvKey(process.env);
   if (platform() === "win32") {
     // Re-read PATH from the registry: spawning a child (e.g. `cmd /c echo
-    // %PATH%`) can never observe PATH entries an installer added while Dyad
+    // %PATH%`) can never observe PATH entries an installer added while KapAble
     // was running, because children inherit this process's stale copy.
     const refreshedPath = await readRefreshedWindowsPath(
       process.env.PATH ?? "",
@@ -125,7 +125,7 @@ async function installManagedPnpm(): Promise<string> {
   if (!existsSync(managedPackageJsonPath)) {
     await fs.writeFile(
       managedPackageJsonPath,
-      `${JSON.stringify({ name: "dyad-managed-pnpm", private: true }, null, 2)}\n`,
+      `${JSON.stringify({ name: "kapable-managed-pnpm", private: true }, null, 2)}\n`,
     );
   }
   // Install via cwd instead of a --prefix argument: on Windows, absolute
@@ -182,42 +182,42 @@ function scheduleManagedPnpmInstall(currentPnpmVersion: string | null): void {
   // `nodejs-status` query; the flag lets them opt out of the side effect. It
   // only skips the *implicit* convenience install — an explicit `installPnpm`
   // handler call is unaffected. Gated to test environments (like the other
-  // DYAD_TEST_* escapes) so a stray env var can't disable the install in a
+  // KAPABLE_TEST_* escapes) so a stray env var can't disable the install in a
   // shipped build, and logged so a skip is never silent.
   if (
     (IS_TEST_BUILD || process.env.VITEST) &&
-    process.env.DYAD_SKIP_MANAGED_PNPM_INSTALL === "true"
+    process.env.KAPABLE_SKIP_MANAGED_PNPM_INSTALL === "true"
   ) {
     logger.info(
-      "Skipping implicit Dyad-managed pnpm install (DYAD_SKIP_MANAGED_PNPM_INSTALL).",
+      "Skipping implicit KapAble-managed pnpm install (KAPABLE_SKIP_MANAGED_PNPM_INSTALL).",
     );
     return;
   }
   if (managedPnpmInstallPromise) {
-    logger.info("Dyad-managed pnpm install is already in progress.");
+    logger.info("KapAble-managed pnpm install is already in progress.");
     return;
   }
   if (managedPnpmImplicitInstallFailed) {
     logger.info(
-      "Skipping implicit Dyad-managed pnpm install because it already failed this session.",
+      "Skipping implicit KapAble-managed pnpm install because it already failed this session.",
     );
     return;
   }
 
   if (currentPnpmVersion) {
     logger.info(
-      `Existing pnpm ${currentPnpmVersion} is older than ${PNPM_MINIMUM_RELEASE_AGE_VERSION}; installing Dyad-managed pnpm in the background.`,
+      `Existing pnpm ${currentPnpmVersion} is older than ${PNPM_MINIMUM_RELEASE_AGE_VERSION}; installing KapAble-managed pnpm in the background.`,
     );
   } else {
     logger.info(
-      "pnpm not found; installing Dyad-managed pnpm in the background.",
+      "pnpm not found; installing KapAble-managed pnpm in the background.",
     );
   }
 
   void getManagedPnpmInstallPromise()
     .then((managedPnpmVersion) => {
       managedPnpmImplicitInstallFailed = false;
-      logger.info(`Installed Dyad-managed pnpm ${managedPnpmVersion}.`);
+      logger.info(`Installed KapAble-managed pnpm ${managedPnpmVersion}.`);
     })
     .catch((error) => {
       managedPnpmImplicitInstallFailed = true;
@@ -469,7 +469,7 @@ export function registerNodeHandlers() {
     );
 
     const nodeDownloadUrl = getNodeDownloadUrl();
-    const devNodejsStatus = process.env.DYAD_DEV_NODEJS_STATUS;
+    const devNodejsStatus = process.env.KAPABLE_DEV_NODEJS_STATUS;
 
     if (process.env.NODE_ENV === "development" && devNodejsStatus) {
       logger.log("Using dev Node.js status override:", devNodejsStatus);
@@ -521,7 +521,7 @@ export function registerNodeHandlers() {
         if (managedNodeInstalled && managedNodeVersion) {
           return {
             nodeVersion: managedNodeVersion,
-            pnpmVersion: process.env.DYAD_TEST_PNPM_VERSION ?? null,
+            pnpmVersion: process.env.KAPABLE_TEST_PNPM_VERSION ?? null,
             nodeDownloadUrl,
             source: "managed" as const,
             nodePath: getManagedNodeBinaryPath(),
@@ -549,7 +549,7 @@ export function registerNodeHandlers() {
       writeSettings({
         // Preserve a valid custom path; it remains the most explicit runtime
         // selection. If there is no valid custom runtime, the install button
-        // switches Dyad to the newly installed managed runtime.
+        // switches KapAble to the newly installed managed runtime.
         nodeRuntimePreference: customNode
           ? (settings.nodeRuntimePreference ?? "system")
           : "managed",
@@ -566,8 +566,8 @@ export function registerNodeHandlers() {
       return { nodeVersion };
     } catch (error) {
       if (
-        error instanceof DyadError &&
-        error.kind === DyadErrorKind.UserCancelled
+        error instanceof KapableError &&
+        error.kind === KapableErrorKind.UserCancelled
       ) {
         sendTelemetryEvent("managed_node_install", { status: "cancelled" });
         throw error;
@@ -596,10 +596,10 @@ export function registerNodeHandlers() {
   createTypedHandler(systemContracts.installPnpm, async () => {
     try {
       const testInstallPnpmVersion = IS_TEST_BUILD
-        ? process.env.DYAD_TEST_INSTALL_PNPM_VERSION
+        ? process.env.KAPABLE_TEST_INSTALL_PNPM_VERSION
         : undefined;
       if (testInstallPnpmVersion) {
-        process.env.DYAD_TEST_PNPM_VERSION = testInstallPnpmVersion;
+        process.env.KAPABLE_TEST_PNPM_VERSION = testInstallPnpmVersion;
         await reloadNodePath();
         return { pnpmVersion: testInstallPnpmVersion };
       }
@@ -615,9 +615,9 @@ export function registerNodeHandlers() {
       }
 
       const reason = formatInstallFailureReason(error);
-      throw new DyadError(
+      throw new KapableError(
         `Could not install pnpm because of ${reason}`,
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
   });

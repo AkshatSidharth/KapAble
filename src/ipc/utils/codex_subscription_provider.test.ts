@@ -23,9 +23,9 @@ import {
   startSubscriptionUsage,
 } from "../services/codex_subscription_usage";
 import {
-  DyadErrorKind,
-  isDyadErrorKindFilteredFromTelemetry,
-} from "@/errors/dyad_error";
+  KapableErrorKind,
+  isKapableErrorKindFilteredFromTelemetry,
+} from "@/errors/kapable_error";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -113,7 +113,7 @@ describe("Codex subscription Responses adapter", () => {
     vi.stubGlobal("fetch", fetch);
     const model = await createCodexSubscriptionModel("test", null);
     await expect(model.doStream({ prompt: [] })).rejects.toMatchObject({
-      kind: DyadErrorKind.External,
+      kind: KapableErrorKind.External,
       message: "ChatGPT subscription request failed (HTTP 503).",
       cause: undefined,
     });
@@ -158,14 +158,14 @@ describe("Codex subscription Responses adapter", () => {
     async (body) => {
       await expect(rejectedRequest(JSON.stringify(body))).rejects.toMatchObject(
         {
-          name: "DyadError",
-          kind: DyadErrorKind.Validation,
+          name: "KapableError",
+          kind: KapableErrorKind.Validation,
           message:
             "ChatGPT subscription request failed (HTTP 400). Encrypted content could not be verified. (code: invalid_encrypted_content)",
         },
       );
       expect(
-        isDyadErrorKindFilteredFromTelemetry(DyadErrorKind.Validation),
+        isKapableErrorKindFilteredFromTelemetry(KapableErrorKind.Validation),
       ).toBe(true);
     },
   );
@@ -225,7 +225,7 @@ describe("Codex subscription Responses adapter", () => {
         500,
       ),
     ).rejects.toMatchObject({
-      kind: DyadErrorKind.External,
+      kind: KapableErrorKind.External,
       message: "ChatGPT subscription request failed (HTTP 500).",
     });
   });
@@ -234,7 +234,7 @@ describe("Codex subscription Responses adapter", () => {
     const body = shapeSubscriptionRequest({
       model: "test",
       input: [
-        { role: "system", content: "Dyad instructions" },
+        { role: "system", content: "KapAble instructions" },
         { role: "user", content: "hello" },
       ],
       tools: [{ type: "function", name: "read_file" }],
@@ -245,7 +245,7 @@ describe("Codex subscription Responses adapter", () => {
     expect(body).toMatchObject({
       store: false,
       stream: true,
-      instructions: "Dyad instructions",
+      instructions: "KapAble instructions",
       input: [{ role: "user", content: "hello" }],
       tools: [{ type: "function", name: "read_file" }],
     });
@@ -330,7 +330,7 @@ describe("Codex subscription Responses adapter", () => {
       );
       const options = {
         model: await createCodexSubscriptionModel("requested-model", null),
-        system: "Dyad",
+        system: "KapAble",
         prompt: "Hello",
         maxRetries: 0,
       };
@@ -342,7 +342,7 @@ describe("Codex subscription Responses adapter", () => {
       expect(sent).toMatchObject({
         store: false,
         stream: true,
-        instructions: "Dyad",
+        instructions: "KapAble",
       });
       expect(finishSubscriptionUsage).toHaveBeenCalledWith(
         "usage-id",

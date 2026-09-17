@@ -7,21 +7,21 @@ import type {
 
 import type { UserSettings } from "../../lib/schemas";
 import {
-  createDyadEngine,
-  transcribeWithDyadEngine,
+  createKapableEngine,
+  transcribeWithKapableEngine,
 } from "./llm_engine_provider";
 
-describe("createDyadEngine", () => {
+describe("createKapableEngine", () => {
   test("uses Anthropic messages API for Anthropic engine models", async () => {
     const requests: Array<{
       input: RequestInfo | URL;
       init?: RequestInit;
     }> = [];
 
-    const provider = createDyadEngine({
-      apiKey: "dyad-pro-key",
+    const provider = createKapableEngine({
+      apiKey: "kapable-pro-key",
       baseURL: "https://engine.example.test/v1",
-      dyadOptions: {
+      kapableOptions: {
         enableLazyEdits: true,
         enableSmartFilesContext: true,
         enableWebSearch: false,
@@ -65,10 +65,10 @@ describe("createDyadEngine", () => {
         { role: "user", content: [{ type: "text", text: "Hello" }] },
       ],
       providerOptions: {
-        "dyad-engine": {
-          dyadAppId: 42,
-          dyadRequestId: "request-1",
-          dyadFiles: [{ path: "src/App.tsx", content: "export {}" }],
+        "kapable-engine": {
+          kapableAppId: 42,
+          kapableRequestId: "request-1",
+          kapableFiles: [{ path: "src/App.tsx", content: "export {}" }],
         },
       },
     } satisfies LanguageModelV3CallOptions);
@@ -79,8 +79,8 @@ describe("createDyadEngine", () => {
       "https://engine.example.test/v1/messages",
     );
     expect(request.init?.headers).toMatchObject({
-      authorization: "Bearer dyad-pro-key",
-      "X-Dyad-Request-Id": "request-1:attempt-1",
+      authorization: "Bearer kapable-pro-key",
+      "X-KapAble-Request-Id": "request-1:attempt-1",
     });
 
     const body = JSON.parse(String(request.init?.body));
@@ -90,7 +90,7 @@ describe("createDyadEngine", () => {
       system: [{ type: "text", text: "You are concise." }],
       thinking: { type: "adaptive", display: "summarized" },
       output_config: { effort: "medium" },
-      dyad_options: {
+      kapable_options: {
         app_id: 42,
         enable_lazy_edits: true,
         enable_smart_files_context: true,
@@ -98,9 +98,9 @@ describe("createDyadEngine", () => {
         files: [{ path: "src/App.tsx", content: "export {}" }],
       },
     });
-    expect(body).not.toHaveProperty("dyadAppId");
-    expect(body).not.toHaveProperty("dyadRequestId");
-    expect(body).not.toHaveProperty("dyadFiles");
+    expect(body).not.toHaveProperty("kapableAppId");
+    expect(body).not.toHaveProperty("kapableRequestId");
+    expect(body).not.toHaveProperty("kapableFiles");
     expect(body).not.toHaveProperty("reasoning_effort");
   });
 
@@ -110,14 +110,14 @@ describe("createDyadEngine", () => {
       init?: RequestInit;
     }> = [];
 
-    const provider = createDyadEngine({
-      apiKey: "dyad-pro-key",
+    const provider = createKapableEngine({
+      apiKey: "kapable-pro-key",
       baseURL: "https://engine.example.test/v1",
       queryParams: {
         feature: "anthropic-direct",
         source: "test",
       },
-      dyadOptions: {},
+      kapableOptions: {},
       settings: {} as UserSettings,
       fetch: async (input, init) => {
         requests.push({ input, init });
@@ -164,10 +164,10 @@ describe("createDyadEngine", () => {
       init?: RequestInit;
     }> = [];
 
-    const provider = createDyadEngine({
-      apiKey: "dyad-pro-key",
+    const provider = createKapableEngine({
+      apiKey: "kapable-pro-key",
       baseURL: "https://engine.example.test/v1",
-      dyadOptions: {},
+      kapableOptions: {},
       settings: {} as UserSettings,
       fetch: async (input, init) => {
         requests.push({ input, init });
@@ -205,8 +205,8 @@ describe("createDyadEngine", () => {
     await model.doGenerate({
       prompt: [{ role: "user", content: [{ type: "text", text: "Hello" }] }],
       providerOptions: {
-        "dyad-engine": {
-          dyadRequestId: "visible-turn-1",
+        "kapable-engine": {
+          kapableRequestId: "visible-turn-1",
         },
       },
     } satisfies LanguageModelV3CallOptions);
@@ -216,24 +216,24 @@ describe("createDyadEngine", () => {
       "https://engine.example.test/v1/free/chat/completions",
     );
     expect(requests[0].init?.headers).toMatchObject({
-      "X-Dyad-Request-Id": "visible-turn-1:attempt-1",
-      "X-Dyad-Free-Quota-Key": "visible-turn-1",
+      "X-KapAble-Request-Id": "visible-turn-1:attempt-1",
+      "X-KapAble-Free-Quota-Key": "visible-turn-1",
     });
   });
 });
 
-describe("transcribeWithDyadEngine", () => {
-  test("uses the Dyad transcription model alias", async () => {
+describe("transcribeWithKapableEngine", () => {
+  test("uses the KapAble transcription model alias", async () => {
     let request: { input: RequestInfo | URL; init?: RequestInit } | undefined;
 
-    const text = await transcribeWithDyadEngine(
+    const text = await transcribeWithKapableEngine(
       Buffer.from("audio"),
       "recording.webm",
       "request-1",
       {
-        apiKey: "dyad-pro-key",
+        apiKey: "kapable-pro-key",
         baseURL: "https://engine.example.test/v1",
-        dyadOptions: {},
+        kapableOptions: {},
         settings: {} as UserSettings,
         fetch: async (input, init) => {
           request = { input, init };
@@ -247,6 +247,6 @@ describe("transcribeWithDyadEngine", () => {
       "https://engine.example.test/v1/audio/transcriptions",
     );
     const formData = request?.init?.body as FormData;
-    expect(formData.get("model")).toBe("dyad/transcribe");
+    expect(formData.get("model")).toBe("kapable/transcribe");
   });
 });

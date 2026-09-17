@@ -26,24 +26,24 @@ import {
 
 const expectGitContextGuidance = (prompt: string) => {
   expect(prompt).toContain("<git_context>");
-  expect(prompt).toContain("Dyad may add Git provenance to a user message");
+  expect(prompt).toContain("KapAble may add Git provenance to a user message");
   expect(prompt).toContain(
     "identifies the app state at the start of that turn",
   );
   expect(prompt).toContain(
     "use the provided commit hash with Git inspection tools",
   );
-  expect(prompt).not.toContain("<dyad-git-context>");
+  expect(prompt).not.toContain("<kapable-git-context>");
 };
 
 const expectBuildGitContextGuidance = (prompt: string) => {
   expect(prompt).toContain("<git_context>");
-  expect(prompt).toContain("Dyad may add Git provenance to a user message");
+  expect(prompt).toContain("KapAble may add Git provenance to a user message");
   expect(prompt).toContain(
     "identifies the app state at the start of that turn",
   );
   expect(prompt).not.toContain("Git inspection tools");
-  expect(prompt).not.toContain("<dyad-git-context>");
+  expect(prompt).not.toContain("<kapable-git-context>");
 };
 
 describe("local_agent_prompt", () => {
@@ -107,12 +107,12 @@ describe("local_agent_prompt", () => {
       "Reinstalling dependencies already includes a restart, so never call both lifecycle tools for the same reason",
     );
     expect(prompt).not.toContain(
-      '<dyad-command type="restart"></dyad-command>',
+      '<kapable-command type="restart"></kapable-command>',
     );
     expect(prompt).not.toContain(
-      '<dyad-command type="rebuild"></dyad-command>',
+      '<kapable-command type="rebuild"></kapable-command>',
     );
-    expect(prompt).toContain('<dyad-command type="refresh"></dyad-command>');
+    expect(prompt).toContain('<kapable-command type="refresh"></kapable-command>');
     expect(prompt).toContain(
       "selecting **Clear Cache** to clear cookies, local storage, service workers, and cached data",
     );
@@ -179,7 +179,7 @@ describe("local_agent_prompt", () => {
       supabaseConnected: true,
     });
 
-    expect(prompt).toContain("You are Dyad Implementer");
+    expect(prompt).toContain("You are KapAble Implementer");
     expect(prompt).toContain('<provider_invariants provider="supabase">');
     expect(prompt).toContain(SUPABASE_SERVICE_ROLE_BROWSER_RULE);
     expect(prompt).toContain(SUPABASE_GRANTS_AND_RLS_RULE);
@@ -195,7 +195,7 @@ describe("local_agent_prompt", () => {
     expect(prompt).not.toContain("set_chat_summary");
     expect(prompt).not.toContain("planning_questionnaire");
     expect(prompt).not.toContain("execute SQL");
-    expect(prompt).not.toContain("dyad-execute-sql");
+    expect(prompt).not.toContain("kapable-execute-sql");
     expect(prompt).not.toContain("add_integration");
   });
 
@@ -315,7 +315,7 @@ describe("local_agent_prompt", () => {
     expect(prompt).toContain('guide="add-password-reset"');
     expect(prompt).toContain("Never hand-roll a reset-token flow");
     expect(prompt).not.toContain("execute SQL");
-    expect(prompt).not.toContain("dyad-execute-sql");
+    expect(prompt).not.toContain("kapable-execute-sql");
   });
 
   it("omits the Neon email-verification guide when it is disabled", () => {
@@ -426,7 +426,7 @@ describe("local_agent_prompt", () => {
     expect(prompt).toContain('<app_blueprint mode="required">');
     expect(prompt).toContain("Required App Blueprint Gate");
     expect(prompt).toContain(
-      "Blueprint mode is enabled for this turn. Dyad has already determined",
+      "Blueprint mode is enabled for this turn. KapAble has already determined",
     );
     expect(prompt).toContain("write_app_blueprint");
     expect(prompt).toContain("planning_questionnaire");

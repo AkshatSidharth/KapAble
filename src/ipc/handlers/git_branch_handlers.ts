@@ -1,5 +1,5 @@
 import { IpcMainInvokeEvent } from "electron";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { readSettings } from "../../main/settings";
 import {
   gitMergeAbort,
@@ -23,7 +23,7 @@ import {
   isMissingRemoteBranchError,
 } from "../utils/git_utils";
 import { gitService } from "../services/git_service";
-import { getDyadAppPath } from "../../paths/paths";
+import { getKapableAppPath } from "../../paths/paths";
 import { safeJoin } from "../utils/path_utils";
 import { promises as fsPromises } from "node:fs";
 import { db } from "../../db";
@@ -37,7 +37,7 @@ import {
 import { updateAppGithubRepo, ensureCleanWorkspace } from "./github_handlers";
 import { createTypedHandler } from "./base";
 import { githubContracts, gitContracts, gitEvents } from "../types/github";
-import { ensureDyadGitignored } from "./gitignoreUtils";
+import { ensureKapableGitignored } from "./gitignoreUtils";
 import { safeSend } from "../utils/safe_sender";
 import type {
   CancelCommitParams,
@@ -67,8 +67,8 @@ export async function handleAbortMerge(
   { appId }: GitBranchAppIdParams,
 ): Promise<void> {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-  if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-  const appPath = getDyadAppPath(app.path);
+  if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+  const appPath = getKapableAppPath(app.path);
 
   await gitMergeAbort({ path: appPath });
 }
@@ -81,16 +81,16 @@ export async function handleFetchFromGithub(
   const settings = readSettings();
   const accessToken = settings.githubAccessToken?.value;
   if (!accessToken) {
-    throw new DyadError("Not authenticated with GitHub.", DyadErrorKind.Auth);
+    throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
   }
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
   if (!app || !app.githubOrg || !app.githubRepo) {
-    throw new DyadError(
+    throw new KapableError(
       "App is not linked to a GitHub repo.",
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
     );
   }
-  const appPath = getDyadAppPath(app.path);
+  const appPath = getKapableAppPath(app.path);
 
   await gitFetch({
     path: appPath,
@@ -107,15 +107,15 @@ export async function handleCreateBranch(
 ): Promise<void> {
   // Validate branch name
   if (!branch || branch.length === 0 || branch.length > 255) {
-    throw new DyadError(
+    throw new KapableError(
       "Branch name must be between 1 and 255 characters",
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
   if (!/^[a-zA-Z0-9/_.-]+$/.test(branch) || /\.\./.test(branch)) {
-    throw new DyadError(
+    throw new KapableError(
       "Branch name contains invalid characters",
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
   if (
@@ -127,11 +127,11 @@ export async function handleCreateBranch(
     branch.endsWith("/") ||
     branch.includes("@{")
   ) {
-    throw new DyadError("Invalid branch name", DyadErrorKind.Validation);
+    throw new KapableError("Invalid branch name", KapableErrorKind.Validation);
   }
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-  if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-  const appPath = getDyadAppPath(app.path);
+  if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+  const appPath = getKapableAppPath(app.path);
 
   await gitCreateBranch({
     path: appPath,
@@ -145,8 +145,8 @@ export async function handleDeleteBranch(
   { appId, branch }: GitBranchParams,
 ): Promise<void> {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-  if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-  const appPath = getDyadAppPath(app.path);
+  if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+  const appPath = getKapableAppPath(app.path);
 
   // Check if branch exists locally
   const localBranches = await gitListBranches({ path: appPath });
@@ -169,9 +169,9 @@ export async function handleDeleteBranch(
         `Failed to list remote branches while checking for branch '${branch}' to delete.`,
         error,
       );
-      throw new DyadError(
+      throw new KapableError(
         `Branch '${branch}' does not exist locally and remote branches could not be checked. Please try again later.`,
-        DyadErrorKind.Conflict,
+        KapableErrorKind.Conflict,
       );
     }
 
@@ -185,14 +185,14 @@ export async function handleDeleteBranch(
 
     // Branch only exists remotely - inform user they need to delete it on GitHub
     if (app.githubOrg && app.githubRepo) {
-      throw new DyadError(
+      throw new KapableError(
         `Branch '${branch}' only exists on the remote. To delete it, please delete the branch on GitHub directly. Visit https://github.com/${app.githubOrg}/${app.githubRepo}/branches to manage remote branches.`,
-        DyadErrorKind.Conflict,
+        KapableErrorKind.Conflict,
       );
     }
-    throw new DyadError(
+    throw new KapableError(
       `Branch '${branch}' only exists on the remote and cannot be deleted locally. Please delete it from your remote Git hosting provider.`,
-      DyadErrorKind.Conflict,
+      KapableErrorKind.Conflict,
     );
   }
 }
@@ -202,8 +202,8 @@ export async function handleSwitchBranch(
   { appId, branch }: GitBranchParams,
 ): Promise<void> {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-  if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-  const appPath = getDyadAppPath(app.path);
+  if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+  const appPath = getKapableAppPath(app.path);
 
   // Check for merge or rebase in progress before attempting to switch
   // This provides structured error codes instead of relying on string matching
@@ -241,8 +241,8 @@ export async function handleRenameBranch(
   { appId, oldBranch, newBranch }: RenameGitBranchParams,
 ): Promise<void> {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-  if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-  const appPath = getDyadAppPath(app.path);
+  if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+  const appPath = getKapableAppPath(app.path);
 
   // Check if we're renaming the current branch BEFORE renaming to avoid race conditions
   const currentBranch = await gitCurrentBranch({ path: appPath });
@@ -271,8 +271,8 @@ export async function handleMergeBranch(
   { appId, branch }: GitBranchParams,
 ): Promise<void> {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-  if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-  const appPath = getDyadAppPath(app.path);
+  if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+  const appPath = getKapableAppPath(app.path);
 
   // Check if branch exists locally, if not, check if it's a remote branch
   const localBranches = await gitListBranches({ path: appPath });
@@ -305,8 +305,8 @@ async function handleListLocalBranches(
   { appId }: GitBranchAppIdParams,
 ): Promise<{ branches: string[]; current: string | null }> {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-  if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-  const appPath = getDyadAppPath(app.path);
+  if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+  const appPath = getKapableAppPath(app.path);
 
   const branches = await gitListBranches({ path: appPath });
   const current = await gitCurrentBranch({ path: appPath });
@@ -318,8 +318,8 @@ async function handleListRemoteBranches(
   { appId, remote = "origin" }: { appId: number; remote?: string },
 ): Promise<string[]> {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-  if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-  const appPath = getDyadAppPath(app.path);
+  if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+  const appPath = getKapableAppPath(app.path);
 
   const branches = await gitListRemoteBranches({ path: appPath, remote });
   return branches;
@@ -330,8 +330,8 @@ async function handleGetUncommittedFiles(
   { appId }: GitBranchAppIdParams,
 ): Promise<UncommittedFile[]> {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-  if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-  const appPath = getDyadAppPath(app.path);
+  if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+  const appPath = getKapableAppPath(app.path);
 
   return getGitUncommittedFilesWithStatus({ path: appPath });
 }
@@ -341,8 +341,8 @@ async function handleGetUncommittedFileDiff(
   { appId, filePath }: GetUncommittedFileDiffParams,
 ): Promise<UncommittedFileDiff> {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-  if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-  const appPath = getDyadAppPath(app.path);
+  if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+  const appPath = getKapableAppPath(app.path);
 
   // `filePath` comes from the renderer, so validate up front that it stays
   // within the app directory before using it to read files or git objects. This
@@ -352,7 +352,7 @@ async function handleGetUncommittedFileDiff(
   try {
     resolvedPath = safeJoin(appPath, filePath);
   } catch {
-    throw new DyadError("Invalid file path", DyadErrorKind.Validation);
+    throw new KapableError("Invalid file path", KapableErrorKind.Validation);
   }
 
   // "before" side: the file at HEAD. Missing (newly added file) → empty.
@@ -407,8 +407,8 @@ async function withAppGitOp<T>(
     },
     async () => {
       const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-      if (!app) throw new DyadError("App not found", DyadErrorKind.NotFound);
-      const appPath = getDyadAppPath(app.path);
+      if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+      const appPath = getKapableAppPath(app.path);
 
       if (isGitMergeInProgress({ path: appPath })) {
         throw GitStateError(
@@ -434,9 +434,9 @@ async function handleCommitChanges(
   { appId, message, operationId }: CommitChangesParams,
 ): Promise<string> {
   if (activeCommitOperations.has(operationId)) {
-    throw new DyadError(
+    throw new KapableError(
       "A commit operation with this identifier is already active.",
-      DyadErrorKind.Conflict,
+      KapableErrorKind.Conflict,
     );
   }
 
@@ -462,7 +462,7 @@ async function handleCommitChanges(
           GIT_ERROR_CODES.COMMIT_CANCELLED,
         );
       }
-      await ensureDyadGitignored(appPath);
+      await ensureKapableGitignored(appPath);
       return gitService.stageAllAndCommitWithPreCommit({
         path: appPath,
         message,
@@ -554,16 +554,16 @@ export async function handlePullFromGithub(
   const settings = readSettings();
   const accessToken = settings.githubAccessToken?.value;
   if (!accessToken) {
-    throw new DyadError("Not authenticated with GitHub.", DyadErrorKind.Auth);
+    throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
   }
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
   if (!app || !app.githubOrg || !app.githubRepo) {
-    throw new DyadError(
+    throw new KapableError(
       "App is not linked to a GitHub repo.",
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
     );
   }
-  const appPath = getDyadAppPath(app.path);
+  const appPath = getKapableAppPath(app.path);
   const currentBranch = await gitCurrentBranch({ path: appPath });
 
   try {

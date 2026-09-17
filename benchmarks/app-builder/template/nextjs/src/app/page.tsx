@@ -1,4 +1,4 @@
-import { MadeWithDyad } from "@/components/made-with-dyad";
+import { MadeWithKapable } from "@/components/made-with-kapable";
 
 export default function Home() {
   return (
@@ -6,7 +6,7 @@ export default function Home() {
       <main className="flex flex-col gap-8 row-start-1 items-center sm:items-start">
         <h1>Blank page</h1>
       </main>
-      <MadeWithDyad />
+      <MadeWithKapable />
     </div>
   );
 }

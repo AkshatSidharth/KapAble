@@ -172,7 +172,7 @@ export const planningQuestionnaireTool: ToolDefinition<
       .join("\n");
 
     ctx.onXmlComplete(
-      `<dyad-questionnaire count="${questions.length}">\n${qaEntries}\n</dyad-questionnaire>`,
+      `<kapable-questionnaire count="${questions.length}">\n${qaEntries}\n</kapable-questionnaire>`,
     );
 
     return `${COMPLETED_PLANNING_QUESTIONNAIRE_RESULT_PREFIX}${formattedAnswers}`;

@@ -1,6 +1,6 @@
 import { SubscriptionBillingError } from "@/shared/subscription_billing_error";
 import log from "electron-log";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { fetchUserInfo, UserInfoApiError } from "./user_budget_service";
 
 const logger = log.scope("codex_subscription_credit_check");
@@ -15,9 +15,9 @@ export async function checkSubscriptionCredits(
     info = await fetchUserInfo(apiKey, signal);
   } catch (error) {
     if (signal?.aborted)
-      throw new DyadError(
+      throw new KapableError(
         "Subscription request cancelled.",
-        DyadErrorKind.UserCancelled,
+        KapableErrorKind.UserCancelled,
       );
     if (error instanceof UserInfoApiError) {
       if (error.status === 401 || error.status === 403)
@@ -33,9 +33,9 @@ export async function checkSubscriptionCredits(
     return;
   }
   if (signal?.aborted)
-    throw new DyadError(
+    throw new KapableError(
       "Subscription request cancelled.",
-      DyadErrorKind.UserCancelled,
+      KapableErrorKind.UserCancelled,
     );
   if (info.totalCredits <= info.usedCredits)
     throw new SubscriptionBillingError("OUT_OF_CREDITS");

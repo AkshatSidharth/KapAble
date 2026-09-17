@@ -6,7 +6,7 @@ import { db } from "../../db";
 import { apps } from "../../db/schema";
 import { resolveBoth } from "../utils/dns_resolve";
 import { readSettings, writeSettings } from "../../main/settings";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { forgottenCoolify } from "@/lib/schemas";
 import {
   getClient,
@@ -43,7 +43,7 @@ const logger = log.scope("coolify_handlers");
 async function getApp(appId: number) {
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
   if (!app) {
-    throw new DyadError(`App ${appId} not found`, DyadErrorKind.NotFound);
+    throw new KapableError(`App ${appId} not found`, KapableErrorKind.NotFound);
   }
   return app;
 }
@@ -115,11 +115,11 @@ export function registerCoolifyHandlers() {
     coolifyContracts.saveToken,
     async (_, { instanceUrl, token, acknowledgedInsecure }) => {
       if (!isSecureInstanceUrl(instanceUrl) && !acknowledgedInsecure) {
-        throw new DyadError(
+        throw new KapableError(
           "This address is not encrypted, so your API token would be readable " +
             "by anything on the network between you and the server. Confirm you " +
             "want to continue, or give Coolify a domain and certificate first.",
-          DyadErrorKind.Validation,
+          KapableErrorKind.Validation,
         );
       }
       const probe = new CoolifyClient({ instanceUrl, token });
@@ -129,7 +129,7 @@ export function registerCoolifyHandlers() {
       await probe.listServers();
       const normalized = instanceUrl.replace(/\/+$/, "");
       const previous = readSettings().coolify?.instanceUrl;
-      // Spread: the admin account for a server Dyad just installed is set
+      // Spread: the admin account for a server KapAble just installed is set
       // before there is any token for it, and this is the call that supplies
       // the token. Replacing would drop the password on the way in.
       writeSettings({
@@ -163,12 +163,12 @@ export function registerCoolifyHandlers() {
   });
 
   createTypedHandler(coolifyContracts.clearToken, async () => {
-    // Every field, not just the token. Dyad holds one Coolify at a time, so
+    // Every field, not just the token. KapAble holds one Coolify at a time, so
     // an address or an admin account left behind belongs to an instance
     // nothing is connected to any more — and the next connection would put a
     // stranger's password under its address. The screen that reaches this
     // shows all of it one last time and asks the user to confirm, because
-    // Dyad invented the password and is the only thing that has it.
+    // KapAble invented the password and is the only thing that has it.
     //
     // Every field named rather than an empty object: an absent key reads to
     // writeSettings as one a consumer read could not decrypt, and it hands
@@ -201,9 +201,9 @@ export function registerCoolifyHandlers() {
           coolifyDeployRegistry.getSnapshot(appId),
         ).canEditConnection
       ) {
-        throw new DyadError(
+        throw new KapableError(
           "This app is deploying. Wait for it to finish, or disconnect to stop it, before changing its server.",
-          DyadErrorKind.Precondition,
+          KapableErrorKind.Precondition,
         );
       }
       // Coolify validates this as a URL and rejects a bare hostname, which is
@@ -212,9 +212,9 @@ export function registerCoolifyHandlers() {
         ? normalizeCoolifyDomain(connection.domain)
         : null;
       if (connection.domain && !domain) {
-        throw new DyadError(
+        throw new KapableError(
           `"${connection.domain}" is not a valid domain.`,
-          DyadErrorKind.Validation,
+          KapableErrorKind.Validation,
         );
       }
       await getApp(appId);
@@ -238,10 +238,10 @@ export function registerCoolifyHandlers() {
       const hasApplication =
         current.kind === "provisioned" || current.kind === "deployed";
       if (!movedHost && hasApplication && current.domain && !domain) {
-        throw new DyadError(
-          "A domain cannot be removed from Dyad once it is set. Change it to " +
+        throw new KapableError(
+          "A domain cannot be removed from KapAble once it is set. Change it to " +
             "another domain here, or clear it in Coolify.",
-          DyadErrorKind.Validation,
+          KapableErrorKind.Validation,
         );
       }
       const next = applyCoolifyConnectionChange(current, {
@@ -265,7 +265,7 @@ export function registerCoolifyHandlers() {
    *
    * Coolify asks for a certificate as soon as a real domain is set, so a
    * domain configured ahead of DNS leaves TLS in a failed state that reads
-   * like a Dyad bug.
+   * like a KapAble bug.
    */
   createTypedHandler(
     coolifyContracts.checkDomain,
@@ -334,9 +334,9 @@ export function registerCoolifyHandlers() {
   createTypedHandler(coolifyContracts.deploy, async (_, { appId }) => {
     await getApp(appId);
     if (!readConnection(await readConnectionState(appId))) {
-      throw new DyadError(
+      throw new KapableError(
         "Connect a Coolify server for this app first.",
-        DyadErrorKind.Validation,
+        KapableErrorKind.Validation,
       );
     }
     coolifyDeployRegistry.requestDeploy(appId);

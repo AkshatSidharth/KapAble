@@ -49,25 +49,25 @@ function isIgnoredSnapshotFile(filePath: string | undefined): boolean {
   return (
     normalizedPath !== undefined &&
     (IGNORED_SNAPSHOT_FILE_PATHS.has(normalizedPath) ||
-      normalizedPath.startsWith(".dyad/"))
+      normalizedPath.startsWith(".kapable/"))
   );
 }
 
-function removeIgnoredDyadFileBlocks(text: string): string {
+function removeIgnoredKapableFileBlocks(text: string): string {
   return text
     .replace(
-      /\n?<dyad-file path="\.gitattributes">[\s\S]*?<\/dyad-file>\n*/g,
+      /\n?<kapable-file path="\.gitattributes">[\s\S]*?<\/kapable-file>\n*/g,
       "",
     )
     .replace(
-      /This is my codebase\.\s+(<dyad-file)/g,
+      /This is my codebase\.\s+(<kapable-file)/g,
       "This is my codebase. $1",
     );
 }
 
 function sanitizeContentForSnapshot(content: unknown): unknown {
   if (typeof content === "string") {
-    return removeIgnoredDyadFileBlocks(content);
+    return removeIgnoredKapableFileBlocks(content);
   }
   if (Array.isArray(content)) {
     return content.map((part) => {
@@ -79,7 +79,7 @@ function sanitizeContentForSnapshot(content: unknown): unknown {
       ) {
         return {
           ...part,
-          text: removeIgnoredDyadFileBlocks(part.text),
+          text: removeIgnoredKapableFileBlocks(part.text),
         };
       }
       return part;
@@ -103,14 +103,14 @@ function removeIgnoredSnapshotFilesFromDump(dump: any): void {
     }
   }
 
-  if (Array.isArray(body.dyad_options?.files)) {
-    body.dyad_options.files = body.dyad_options.files.filter(
+  if (Array.isArray(body.kapable_options?.files)) {
+    body.kapable_options.files = body.kapable_options.files.filter(
       (file: any) => !isIgnoredSnapshotFile(file.path),
     );
   }
 
-  if (Array.isArray(body.dyad_options?.mentioned_apps)) {
-    for (const mentionedApp of body.dyad_options.mentioned_apps) {
+  if (Array.isArray(body.kapable_options?.mentioned_apps)) {
+    for (const mentionedApp of body.kapable_options.mentioned_apps) {
       if (Array.isArray(mentionedApp.files)) {
         mentionedApp.files = mentionedApp.files.filter(
           (file: any) => !isIgnoredSnapshotFile(file.path),
@@ -119,7 +119,7 @@ function removeIgnoredSnapshotFilesFromDump(dump: any): void {
     }
   }
 
-  const vf = body.dyad_options?.versioned_files;
+  const vf = body.kapable_options?.versioned_files;
   if (!vf) {
     return;
   }
@@ -397,7 +397,7 @@ export class PageObject {
     }
   }
 
-  async setUpDyadPro({
+  async setUpKapablePro({
     autoApprove = false,
     localAgent = false,
     localAgentUseAutoModel = false,
@@ -409,7 +409,7 @@ export class PageObject {
     await this.baseSetup();
     await this.navigation.goToSettingsTab();
     await this.setAgentToolAutoApprove(autoApprove);
-    await this.settings.setUpDyadProvider();
+    await this.settings.setUpKapableProvider();
     if (!localAgent) {
       await this.settings.disableAppBlueprint();
       await this.pinBuildChatModeForSetup();
@@ -437,7 +437,7 @@ export class PageObject {
     await this.setAgentToolAutoApprove(autoApprove);
     await this.settings.disableAppBlueprint();
     // Azure should already be configured via environment variables
-    // so we don't need additional setup steps like setUpDyadProvider
+    // so we don't need additional setup steps like setUpKapableProvider
     await this.navigation.goToAppsTab();
   }
 
@@ -562,10 +562,10 @@ export class PageObject {
         // Scrub machine-specific paths after snapshotting so React-owned DOM is not mutated.
         normalizedSnapshot = normalizedSnapshot
           .replace(
-            /\.dyad\/chats\/\d+\/compaction-[^\s<"]+\.md/g,
+            /\.kapable\/chats\/\d+\/compaction-[^\s<"]+\.md/g,
             "[[compaction-backup-path]]",
           )
-          .replace(/\[\[dyad-dump-path=([^\]]+)\]\]/g, "[[dyad-dump-path=*]]");
+          .replace(/\[\[kapable-dump-path=([^\]]+)\]\]/g, "[[kapable-dump-path=*]]");
       }
       return `${normalizedSnapshot.trimEnd()}\n`;
     }, name);
@@ -594,7 +594,7 @@ export class PageObject {
 
     // Find ALL dump paths using global regex
     const dumpPathMatches = messagesListText?.match(
-      /\[\[dyad-dump-path=([^\]]+)\]\]/g,
+      /\[\[kapable-dump-path=([^\]]+)\]\]/g,
     );
 
     if (!dumpPathMatches || dumpPathMatches.length === 0) {
@@ -604,7 +604,7 @@ export class PageObject {
     // Extract the actual paths from the matches
     const dumpPaths = dumpPathMatches
       .map((match) => {
-        const pathMatch = match.match(/\[\[dyad-dump-path=([^\]]+)\]\]/);
+        const pathMatch = match.match(/\[\[kapable-dump-path=([^\]]+)\]\]/);
         return pathMatch ? pathMatch[1] : null;
       })
       .filter(Boolean);
@@ -628,11 +628,11 @@ export class PageObject {
 
     // Read the JSON file
     const dumpContent: string = (fs.readFileSync(dumpFilePath, "utf-8") as any)
-      .replaceAll(/\[\[dyad-dump-path=([^\]]+)\]\]/g, "[[dyad-dump-path=*]]")
+      .replaceAll(/\[\[kapable-dump-path=([^\]]+)\]\]/g, "[[kapable-dump-path=*]]")
       // Stabilize compaction backup file paths embedded in message text
-      // e.g. .dyad/chats/1/compaction-2026-02-05T21-25-24-285Z.md
+      // e.g. .kapable/chats/1/compaction-2026-02-05T21-25-24-285Z.md
       .replaceAll(
-        /\.dyad\/chats\/\d+\/compaction-[^\s"\\]+\.md/g,
+        /\.kapable\/chats\/\d+\/compaction-[^\s"\\]+\.md/g,
         "[[compaction-backup-path]]",
       );
 

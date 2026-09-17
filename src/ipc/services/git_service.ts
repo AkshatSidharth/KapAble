@@ -1,5 +1,5 @@
 import log from "electron-log";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 import {
   ensureGitLineEndingPolicy,
@@ -77,9 +77,9 @@ async function runMessageHookPhase({
     result = await run({ path, message, signal });
   } catch (error) {
     const details = error instanceof Error ? error.message : String(error);
-    throw new DyadError(
+    throw new KapableError(
       `${label} could not start. ${details}`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
       { cause: error },
     );
   }
@@ -137,7 +137,7 @@ export class GitService {
    */
   async initRepoWithInitialCommit({
     path,
-    message = "Init Dyad app",
+    message = "Init KapAble app",
     ref = "main",
   }: {
     path: string;
@@ -200,9 +200,9 @@ export class GitService {
         result = await runPreCommitHook({ path, signal });
       } catch (error) {
         const details = error instanceof Error ? error.message : String(error);
-        throw new DyadError(
+        throw new KapableError(
           `Pre-commit checks could not start. ${details}`,
-          DyadErrorKind.External,
+          KapableErrorKind.External,
           { cause: error },
         );
       }

@@ -17,7 +17,7 @@ type Brand =
   | "minimax"
   | "bedrock"
   | "azure"
-  | "dyad"
+  | "kapable"
   | "ollama"
   | "lmstudio"
   | "custom";
@@ -62,7 +62,7 @@ function resolveBrand(providerId: string, apiName?: string): Brand {
     case "bedrock":
       return "bedrock";
     case "auto":
-      return "dyad";
+      return "kapable";
     case "ollama":
       return "ollama";
     case "lmstudio":
@@ -380,7 +380,7 @@ function BrandGlyph({ brand }: { brand: Brand }) {
       return <OllamaMark />;
     case "lmstudio":
       return <LMStudioMark />;
-    case "dyad":
+    case "kapable":
       return <Sparkles className="text-indigo-500" strokeWidth={2.25} />;
     case "custom":
       return <CustomMark />;

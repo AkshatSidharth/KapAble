@@ -9,12 +9,12 @@ export async function getGitAuthor(): Promise<GitAuthor> {
   const user = await getGithubUser();
   const author = user
     ? {
-        name: "Dyad",
+        name: "KapAble",
         email: user.email,
       }
     : {
-        name: "Dyad",
-        email: "git@dyad.sh",
+        name: "KapAble",
+        email: "git@kapable.sh",
       };
   return author;
 }

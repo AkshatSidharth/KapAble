@@ -15,9 +15,9 @@ export interface MentionedAppCodebase {
 }
 
 export interface GetProviderOptionsParams {
-  dyadAppId: number;
-  dyadRequestId?: string;
-  dyadDisableFiles?: boolean;
+  kapableAppId: number;
+  kapableRequestId?: string;
+  kapableDisableFiles?: boolean;
   smartContextMode?: SmartContextMode;
   files: CodebaseFile[];
   versionedFiles?: VersionedFiles;
@@ -32,9 +32,9 @@ export interface GetProviderOptionsParams {
  * Handles provider-specific configuration including thinking configs for Google/Vertex/Anthropic.
  */
 export function getProviderOptions({
-  dyadAppId,
-  dyadRequestId,
-  dyadDisableFiles,
+  kapableAppId,
+  kapableRequestId,
+  kapableDisableFiles,
   smartContextMode,
   files,
   versionedFiles,
@@ -44,14 +44,14 @@ export function getProviderOptions({
   modelSelection,
 }: GetProviderOptionsParams): Record<string, any> {
   const providerOptions: Record<string, any> = {
-    "dyad-engine": {
-      dyadAppId,
-      dyadRequestId,
-      dyadDisableFiles,
-      dyadSmartContextMode: smartContextMode,
-      dyadFiles: versionedFiles ? undefined : files,
-      dyadVersionedFiles: versionedFiles,
-      dyadMentionedApps: mentionedAppsCodebases.map(({ files, appName }) => ({
+    "kapable-engine": {
+      kapableAppId,
+      kapableRequestId,
+      kapableDisableFiles,
+      kapableSmartContextMode: smartContextMode,
+      kapableFiles: versionedFiles ? undefined : files,
+      kapableVersionedFiles: versionedFiles,
+      kapableMentionedApps: mentionedAppsCodebases.map(({ files, appName }) => ({
         appName,
         files,
       })),
@@ -116,12 +116,12 @@ export function getProviderOptions({
 
 // Header used to pass the request ID through AI SDK models that don't forward
 // providerOptions into the request body (e.g. OpenAIResponsesLanguageModel).
-export const DYAD_INTERNAL_REQUEST_ID_HEADER =
-  "x-dyad-internal-request-id" as const;
+export const KAPABLE_INTERNAL_REQUEST_ID_HEADER =
+  "x-kapable-internal-request-id" as const;
 
 export interface GetAiHeadersParams {
   builtinProviderId: string | undefined;
-  dyadRequestId?: string;
+  kapableRequestId?: string;
 }
 
 /**
@@ -131,7 +131,7 @@ export interface GetAiHeadersParams {
 export function getAiHeaders(
   params: GetAiHeadersParams,
 ): Record<string, string> | undefined {
-  return params.dyadRequestId
-    ? { [DYAD_INTERNAL_REQUEST_ID_HEADER]: params.dyadRequestId }
+  return params.kapableRequestId
+    ? { [KAPABLE_INTERNAL_REQUEST_ID_HEADER]: params.kapableRequestId }
     : undefined;
 }

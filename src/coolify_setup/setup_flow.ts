@@ -1,4 +1,4 @@
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import type {
   HostKeyVerifier,
   SshSession,
@@ -18,7 +18,7 @@ import { plainUrlFor, tryEnableHttps } from "./https_setup";
 import type { HttpsOutcome } from "./https_setup";
 
 /**
- * Taking a bare server to a Coolify Dyad can deploy to.
+ * Taking a bare server to a Coolify KapAble can deploy to.
  *
  * The order is not arbitrary: each step is the cheapest way to fail from where
  * it sits. Looking at the server costs a second and rules out the two problems
@@ -59,7 +59,7 @@ export interface SetupResult {
   /**
    * Whether Coolify's API was switched on, which outlives a failed mint.
    *
-   * Not the same question as whether a token came back: Dyad turns the API on
+   * Not the same question as whether a token came back: KapAble turns the API on
    * first, so telling the user to go and enable it is wrong from that point
    * onward whatever happens next.
    */
@@ -101,7 +101,7 @@ export interface SetupOptions {
   /**
    * The account exists on the user's server from here on.
    *
-   * Dyad invented this password and never showed it, so anything that fails
+   * KapAble invented this password and never showed it, so anything that fails
    * after this point and takes the password with it leaves the user locked out
    * of a Coolify that is installed and running. Called again once the address
    * settles, since HTTPS can change it.
@@ -111,9 +111,9 @@ export interface SetupOptions {
     dashboardUrl: string;
   }) => void;
   /**
-   * The password Dyad is about to give the server, before it is given.
+   * The password KapAble is about to give the server, before it is given.
    *
-   * Dyad invents this rather than discovering it, so it is knowable a moment
+   * KapAble invents this rather than discovering it, so it is knowable a moment
    * earlier than the account is — and the installer writes it into Coolify's
    * own .env partway through a run that takes minutes. Quitting in between
    * would otherwise leave a server nobody has the password for, which
@@ -150,9 +150,9 @@ export async function runServerSetup({
     report("checking-server");
     const checks = await preflight(session, { signal });
     if (!checks.ready) {
-      throw new DyadError(
+      throw new KapableError(
         checks.reason ?? "This server cannot be set up automatically.",
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
 
@@ -217,7 +217,7 @@ export async function runServerSetup({
     // certainly on the machine: install.sh writes it into Coolify's own .env
     // and the account is seeded from there. Before the checks below, because
     // every one of them can fail on a server that is running fine — the
-    // dashboard poll runs on the user's side of their firewall — and Dyad is
+    // dashboard poll runs on the user's side of their firewall — and KapAble is
     // the only thing that knows what it invented.
     onAccountKnown?.({
       credentials,
@@ -227,13 +227,13 @@ export async function runServerSetup({
     report("waiting-for-dashboard");
     const answered = await waitForDashboardImpl(target.host, { signal });
     if (!answered) {
-      throw new DyadError(
+      throw new KapableError(
         "Coolify was installed, but nothing answered on port 8000. That is " +
           "usually a firewall or security group blocking the port rather than " +
           "Coolify itself. Open it, then sign in at " +
           `${plainUrlFor(target.host)} — Coolify is already on the server, so ` +
           "starting over would be refused.",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
@@ -249,13 +249,13 @@ export async function runServerSetup({
       // people reach — an address Coolify will not take is the ordinary cause.
       // Saying only what it objected to leaves an installed server, no
       // account, and a preflight that refuses to install again.
-      throw new DyadError(
+      throw new KapableError(
         (seeded.reason
           ? `Coolify would not create its admin account: ${seeded.reason} `
           : `Coolify has not created an admin account for ${credentials.email}. `) +
           `The server is installed — open ${plainUrlFor(target.host)} to ` +
           `finish setting it up there.`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
@@ -335,8 +335,8 @@ export async function runServerSetup({
             // the token step — and naming the API would sit over guidance
             // that rightly no longer mentions it.
             result.apiEnabled
-            ? "Coolify stopped answering while Dyad was making a token."
-            : "Coolify did not answer while Dyad was opening its API."
+            ? "Coolify stopped answering while KapAble was making a token."
+            : "Coolify did not answer while KapAble was opening its API."
           : error instanceof Error
             ? error.message
             : "Coolify's API could not be opened automatically.";

@@ -1,4 +1,4 @@
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 export type OperationRouteState = "unresolved" | "terminal";
 
@@ -64,21 +64,21 @@ export interface OperationRouteRegistryOptions<Route> {
   readonly sameRoute: (left: Route, right: Route) => boolean;
 }
 
-export class OperationRouteIdentityConflictError extends DyadError {
+export class OperationRouteIdentityConflictError extends KapableError {
   constructor(readonly operationId: string) {
     super(
       `Operation ${operationId} was reused with a conflicting presentation owner`,
-      DyadErrorKind.Conflict,
+      KapableErrorKind.Conflict,
     );
     this.name = "OperationRouteIdentityConflictError";
   }
 }
 
-export class OperationRouteCapacityError extends DyadError {
+export class OperationRouteCapacityError extends KapableError {
   constructor() {
     super(
       "Authoritative operation route capacity is exhausted",
-      DyadErrorKind.RateLimited,
+      KapableErrorKind.RateLimited,
     );
     this.name = "OperationRouteCapacityError";
   }
@@ -386,9 +386,9 @@ export class OperationRouteRegistry<Route> {
 
   private assertOpen(): void {
     if (!this.disposed) return;
-    throw new DyadError(
+    throw new KapableError(
       "Operation route registry is disposed",
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
     );
   }
 

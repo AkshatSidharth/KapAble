@@ -15,7 +15,7 @@ describe("swapManagedNodeInstallDir", () => {
   let testDir: string;
 
   beforeEach(() => {
-    testDir = fs.mkdtempSync(path.join(os.tmpdir(), "dyad-managed-node-"));
+    testDir = fs.mkdtempSync(path.join(os.tmpdir(), "kapable-managed-node-"));
   });
 
   afterEach(() => {

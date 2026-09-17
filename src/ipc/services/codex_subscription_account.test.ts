@@ -14,9 +14,9 @@ vi.mock("../shared/language_model_helpers", () => ({
 import { resolveSubscriptionModel } from "./resolve_subscription_model";
 import { usesChatGPTSubscription } from "@/lib/subscriptionModels";
 import type { UserSettings } from "@/lib/schemas";
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 const settings = {
-  enableDyadPro: true,
+  enableKapablePro: true,
   proModelUsage: "subscription",
   providerSettings: { auto: { apiKey: { value: "test-key" } } },
 } as unknown as UserSettings;
@@ -351,7 +351,7 @@ it.each([401, 403, "credentials"])(
         { provider: "openai", name: "gpt-fallback", effortLevel: "medium" },
         settings,
       ),
-    ).rejects.toMatchObject({ kind: DyadErrorKind.Auth });
+    ).rejects.toMatchObject({ kind: KapableErrorKind.Auth });
   },
 );
 
@@ -423,7 +423,7 @@ it("refuses unknown eligibility when both catalogs are empty instead of routing 
       { provider: "openai", name: "unknown", effortLevel: "medium" },
       settings,
     ),
-  ).rejects.toMatchObject({ kind: DyadErrorKind.External });
+  ).rejects.toMatchObject({ kind: KapableErrorKind.External });
 });
 
 it("preserves authentication errors even when the built-in catalog is empty", async () => {
@@ -436,5 +436,5 @@ it("preserves authentication errors even when the built-in catalog is empty", as
       { provider: "openai", name: "unknown", effortLevel: "medium" },
       settings,
     ),
-  ).rejects.toMatchObject({ kind: DyadErrorKind.Auth });
+  ).rejects.toMatchObject({ kind: KapableErrorKind.Auth });
 });

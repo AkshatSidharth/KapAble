@@ -3,19 +3,19 @@ import log from "electron-log";
 import path from "node:path";
 import { createLoggedHandler } from "./safe_handle";
 import { IS_TEST_BUILD } from "../utils/test_utils";
-import { isFileWithinAnyDyadMediaDir } from "../utils/media_path_utils";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
-import { registerDyadProtocolLinux } from "../../main/linux_protocol_registration";
+import { isFileWithinAnyKapableMediaDir } from "../utils/media_path_utils";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
+import { registerKapableProtocolLinux } from "../../main/linux_protocol_registration";
 
 const logger = log.scope("shell_handlers");
 const handle = createLoggedHandler(logger);
 
-// Hosts whose OAuth flows redirect back into the app via a dyad:// deep link
-// (Neon, Supabase, and Dyad Pro all live under *.dyad.sh).
-function isDyadOAuthUrl(url: string): boolean {
+// Hosts whose OAuth flows redirect back into the app via a kapable:// deep link
+// (Neon, Supabase, and KapAble Pro all live under *.kapable.sh).
+function isKapableOAuthUrl(url: string): boolean {
   try {
     const host = new URL(url).hostname;
-    return host === "dyad.sh" || host.endsWith(".dyad.sh");
+    return host === "kapable.sh" || host.endsWith(".kapable.sh");
   } catch {
     return false;
   }
@@ -23,7 +23,7 @@ function isDyadOAuthUrl(url: string): boolean {
 
 // Only allow opening files with known safe media extensions via shell.openPath.
 // This prevents execution of arbitrary executables even if they reside under a
-// .dyad/media directory.
+// .kapable/media directory.
 const ALLOWED_MEDIA_EXTENSIONS = new Set([
   ".png",
   ".jpg",
@@ -49,7 +49,7 @@ const ALLOWED_MEDIA_EXTENSIONS = new Set([
 export function registerShellHandlers() {
   handle("open-external-url", async (_event, url: string) => {
     if (!url) {
-      throw new DyadError("No URL provided.", DyadErrorKind.External);
+      throw new KapableError("No URL provided.", KapableErrorKind.External);
     }
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
       throw new Error("Attempted to open invalid or non-http URL: " + url);
@@ -59,17 +59,17 @@ export function registerShellHandlers() {
       logger.debug("E2E test mode: skipped opening external URL:", url);
       return;
     }
-    // On Linux, dev and packaged builds share the single dyad:// scheme and it's
+    // On Linux, dev and packaged builds share the single kapable:// scheme and it's
     // "last registration wins", so launching the packaged app steals the handler
-    // and OAuth callbacks (dyad://neon-oauth-return, etc.) open packaged instead
+    // and OAuth callbacks (kapable://neon-oauth-return, etc.) open packaged instead
     // of this dev instance. Reclaim the handler just before the browser opens so
     // the callback routes back here. Best-effort; the helper self-guards platform.
     if (
       !app.isPackaged &&
       process.platform === "linux" &&
-      isDyadOAuthUrl(url)
+      isKapableOAuthUrl(url)
     ) {
-      await registerDyadProtocolLinux(app.getPath("userData"));
+      await registerKapableProtocolLinux(app.getPath("userData"));
     }
     await shell.openExternal(url);
     logger.debug("Opened external URL:", url);
@@ -78,7 +78,7 @@ export function registerShellHandlers() {
   handle("show-item-in-folder", async (_event, fullPath: string) => {
     // Validate that a path was provided
     if (!fullPath) {
-      throw new DyadError("No file path provided.", DyadErrorKind.External);
+      throw new KapableError("No file path provided.", KapableErrorKind.External);
     }
 
     shell.showItemInFolder(fullPath);
@@ -87,18 +87,18 @@ export function registerShellHandlers() {
 
   handle("open-file-path", async (_event, fullPath: string) => {
     if (!fullPath) {
-      throw new DyadError("No file path provided.", DyadErrorKind.External);
+      throw new KapableError("No file path provided.", KapableErrorKind.External);
     }
 
-    // Security: only allow opening files within .dyad/media subdirectories.
-    // The dyad-apps tree contains AI-generated code, so opening arbitrary files
+    // Security: only allow opening files within .kapable/media subdirectories.
+    // The kapable-apps tree contains AI-generated code, so opening arbitrary files
     // there via shell.openPath could execute malicious executables.
-    // App paths may be under the default dyad-apps base directory (normal) or
+    // App paths may be under the default kapable-apps base directory (normal) or
     // at an external location (imported with skipCopy).
-    if (!isFileWithinAnyDyadMediaDir(fullPath)) {
-      throw new DyadError(
-        "Can only open files within .dyad/media directories.",
-        DyadErrorKind.External,
+    if (!isFileWithinAnyKapableMediaDir(fullPath)) {
+      throw new KapableError(
+        "Can only open files within .kapable/media directories.",
+        KapableErrorKind.External,
       );
     }
     const resolvedPath = path.resolve(fullPath);
@@ -114,9 +114,9 @@ export function registerShellHandlers() {
     const result = await shell.openPath(resolvedPath);
     if (result) {
       // shell.openPath returns an error string if it fails, empty string on success
-      throw new DyadError(
+      throw new KapableError(
         `Failed to open file: ${result}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
     logger.debug("Opened file:", resolvedPath);

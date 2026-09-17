@@ -6,7 +6,7 @@
 // Scores one checkpoint with the fixed single judge (gpt-5.6-sol; --judges
 // overrides for testing). Writes results/judge/<cellId>-m<m>.json.
 //
-// Env: DYAD_PRO_KEY (or DYAD_PRO_API_KEY); DYAD_ENGINE_URL optional (defaults
+// Env: KAPABLE_PRO_KEY (or KAPABLE_PRO_API_KEY); KAPABLE_ENGINE_URL optional (defaults
 // to the real engine — deliberately NOT the recording proxy, so judge tokens
 // never pollute a cell's cost attribution).
 import fs from "node:fs";
@@ -17,10 +17,10 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BENCH = path.resolve(__dirname, "..");
 const ENGINE =
-  process.env.DYAD_ENGINE_URL?.replace(/\/$/, "") ??
-  "https://engine.dyad.sh/v1";
-const KEY = process.env.DYAD_PRO_API_KEY || process.env.DYAD_PRO_KEY;
-if (!KEY) throw new Error("DYAD_PRO_KEY required");
+  process.env.KAPABLE_ENGINE_URL?.replace(/\/$/, "") ??
+  "https://engine.kapable.sh/v1";
+const KEY = process.env.KAPABLE_PRO_API_KEY || process.env.KAPABLE_PRO_KEY;
+if (!KEY) throw new Error("KAPABLE_PRO_KEY required");
 
 const DIFF_CAP = 40_000;
 const FILES_CAP = 20_000;

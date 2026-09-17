@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 import { apps, chats } from "@/db/schema";
 import {
   type HandlerTestHarness,
@@ -16,7 +16,7 @@ import { appOperationCoordinator } from "@/ipc/services/app_operation_coordinato
 
 // All app folders live under one throwaway base so the filesystem-probing
 // conflict checks (and actual folder moves) run against real directories.
-const TEMP_BASE = path.join(os.tmpdir(), "dyad-app-naming-handler-tests");
+const TEMP_BASE = path.join(os.tmpdir(), "kapable-app-naming-handler-tests");
 
 // Captures handlers registered through createLoggedHandler (import_handlers
 // uses it instead of createTypedHandler, so the harness registry misses it).
@@ -41,7 +41,7 @@ vi.mock("electron", () => ({
     on: vi.fn(),
   },
   app: {
-    getPath: vi.fn(() => path.join(os.tmpdir(), "dyad-app-naming-user-data")),
+    getPath: vi.fn(() => path.join(os.tmpdir(), "kapable-app-naming-user-data")),
     getAppPath: vi.fn(() => process.cwd()),
   },
   dialog: { showOpenDialog: vi.fn() },
@@ -52,11 +52,11 @@ vi.mock("@/paths/paths", async (importOriginal) => {
   const nodePath = await import("node:path");
   const base = nodePath.join(
     (await import("node:os")).tmpdir(),
-    "dyad-app-naming-handler-tests",
+    "kapable-app-naming-handler-tests",
   );
   return {
     ...actual,
-    getDyadAppPath: (appPath: string) =>
+    getKapableAppPath: (appPath: string) =>
       nodePath.isAbsolute(appPath) ? appPath : nodePath.join(base, appPath),
     isAppLocationAccessible: () => true,
   };
@@ -78,7 +78,7 @@ vi.mock("@/ipc/handlers/createFromTemplate", () => ({
 }));
 
 vi.mock("@/ipc/handlers/gitignoreUtils", () => ({
-  ensureDyadGitignored: vi.fn(async () => {}),
+  ensureKapableGitignored: vi.fn(async () => {}),
 }));
 
 vi.mock("@/ipc/handlers/chat_mode_resolution", () => ({
@@ -248,7 +248,7 @@ describe("app naming handlers", () => {
 
       await expect(
         harness.invokeHandler("create-app", { name: "My App" }),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.Conflict });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.Conflict });
     });
 
     it("treats folder conflicts case-insensitively", async () => {
@@ -354,14 +354,14 @@ describe("app naming handlers", () => {
           newAppName: "Taken",
           withHistory: false,
         }),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.Conflict });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.Conflict });
     });
 
     it("includes safe filesystem details when copying fails", async () => {
       const sourceId = seedAppWithFolder("Source", "source");
       const copyError = Object.assign(
         new Error(
-          "EACCES: permission denied, copyfile '/Users/alice/Dyad/source/private.txt' -> '/Users/alice/Dyad/copy/private.txt'",
+          "EACCES: permission denied, copyfile '/Users/alice/KapAble/source/private.txt' -> '/Users/alice/KapAble/copy/private.txt'",
         ),
         { code: "EACCES" },
       );
@@ -378,7 +378,7 @@ describe("app naming handlers", () => {
       ).rejects.toMatchObject({
         message:
           "Failed to copy app directory.\nEACCES: permission denied, copyfile '[redacted path]' -> '[redacted path]'",
-        kind: DyadErrorKind.External,
+        kind: KapableErrorKind.External,
         cause: copyError,
       });
 
@@ -445,11 +445,11 @@ describe("app naming handlers", () => {
         .run();
       restoreAppFromTestBranchMock.mockResolvedValueOnce(false);
 
-      // No in-memory mark exists: this models a fresh Dyad process whose
+      // No in-memory mark exists: this models a fresh KapAble process whose
       // startup recovery could not restore the durable branch marker.
       await expect(
         harness.invokeHandler("run-app", { appId }),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
       expect(restoreAppFromTestBranchMock).toHaveBeenCalledWith(
         expect.objectContaining({
           id: appId,
@@ -483,7 +483,7 @@ describe("app naming handlers", () => {
 
       await expect(
         harness.invokeHandler("run-app", { appId }),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
       expect(stopReason).toBe("app-stopped");
       expect(restoreAppFromTestBranchMock).toHaveBeenCalled();
     });
@@ -497,7 +497,7 @@ describe("app naming handlers", () => {
         await expect(
           harness.invokeHandler("delete-app", { appId }),
         ).rejects.toMatchObject({
-          kind: DyadErrorKind.Precondition,
+          kind: KapableErrorKind.Precondition,
           message: expect.stringMatching(/already being deleted/i),
         });
       } finally {
@@ -535,7 +535,7 @@ describe("app naming handlers", () => {
           },
           async () => undefined,
         ),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
 
       finishTeardown({ envRestored: true });
       await deletion;
@@ -649,7 +649,7 @@ describe("app naming handlers", () => {
             appName: "My App",
             appPath: invalidPath,
           }),
-        ).rejects.toMatchObject({ kind: DyadErrorKind.Validation });
+        ).rejects.toMatchObject({ kind: KapableErrorKind.Validation });
       }
     });
 
@@ -684,7 +684,7 @@ describe("app naming handlers", () => {
           appName: " My\u0000 App ",
           appPath: "other",
         }),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.Conflict });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.Conflict });
 
       const result = await harness.invokeHandler<{
         name: string;
@@ -709,7 +709,7 @@ describe("app naming handlers", () => {
           appName: "My App",
           appPath: "taken-folder",
         }),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.Conflict });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.Conflict });
     });
 
     it("performs a case-only folder rename without destroying the app", async () => {

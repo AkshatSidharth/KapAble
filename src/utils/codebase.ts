@@ -421,9 +421,9 @@ async function formatFile({
   try {
     // Check if we should read file contents
     if (!shouldReadFileContents({ filePath, normalizedRelativePath })) {
-      return `<dyad-file path="${normalizedRelativePath}">
+      return `<kapable-file path="${normalizedRelativePath}">
 ${OMITTED_FILE_CONTENT}
-</dyad-file>
+</kapable-file>
 
 `;
     }
@@ -431,23 +431,23 @@ ${OMITTED_FILE_CONTENT}
     const content = await readFileWithCache(filePath);
 
     if (content == null) {
-      return `<dyad-file path="${normalizedRelativePath}">
+      return `<kapable-file path="${normalizedRelativePath}">
 // Error reading file
-</dyad-file>
+</kapable-file>
 
 `;
     }
 
-    return `<dyad-file path="${normalizedRelativePath}">
+    return `<kapable-file path="${normalizedRelativePath}">
 ${content}
-</dyad-file>
+</kapable-file>
 
 `;
   } catch (error) {
     logger.error(`Error reading file: ${filePath}`, error);
-    return `<dyad-file path="${normalizedRelativePath}">
+    return `<kapable-file path="${normalizedRelativePath}">
 // Error reading file: ${error}
-</dyad-file>
+</kapable-file>
 
 `;
   }
@@ -485,7 +485,7 @@ async function prepareCodebaseFiles({
 }): Promise<PreparedCodebase | undefined> {
   const settings = readSettings();
   const isSmartContextEnabled =
-    settings?.enableDyadPro && settings?.enableProSmartFilesContextMode;
+    settings?.enableKapablePro && settings?.enableProSmartFilesContextMode;
 
   try {
     await fsAsync.access(appPath);

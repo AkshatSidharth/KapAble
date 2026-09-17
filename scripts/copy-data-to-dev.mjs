@@ -21,7 +21,7 @@ const TRANSIENT_TOP_LEVEL_ENTRIES = new Set([
   "DawnGraphiteCache",
   "DawnWebGPUCache",
   "GPUCache",
-  "dyad-crash-reports",
+  "kapable-crash-reports",
   "logs",
   "typescript-cache",
 ]);
@@ -42,26 +42,26 @@ export function getProductionUserDataPath({
   env = process.env,
   homeDir = os.homedir(),
 } = {}) {
-  if (env.DYAD_PROD_USER_DATA_DIR) {
-    return path.resolve(env.DYAD_PROD_USER_DATA_DIR);
+  if (env.KAPABLE_PROD_USER_DATA_DIR) {
+    return path.resolve(env.KAPABLE_PROD_USER_DATA_DIR);
   }
 
   if (platform === "darwin") {
-    return path.join(homeDir, "Library", "Application Support", "dyad");
+    return path.join(homeDir, "Library", "Application Support", "kapable");
   }
 
   if (platform === "win32") {
     if (!env.APPDATA) {
       throw new Error(
-        "APPDATA is not set; cannot locate Dyad's production data.",
+        "APPDATA is not set; cannot locate KapAble's production data.",
       );
     }
-    return path.join(env.APPDATA, "dyad");
+    return path.join(env.APPDATA, "kapable");
   }
 
   return path.join(
     env.XDG_CONFIG_HOME || path.join(homeDir, ".config"),
-    "dyad",
+    "kapable",
   );
 }
 
@@ -90,7 +90,7 @@ export function getProcessesUsingDataDirectories(
     try {
       const output = runSync(
         "tasklist",
-        ["/FI", "IMAGENAME eq dyad.exe", "/FO", "CSV", "/NH"],
+        ["/FI", "IMAGENAME eq kapable.exe", "/FO", "CSV", "/NH"],
         {
           encoding: "utf8",
           stdio: ["ignore", "pipe", "ignore"],
@@ -98,11 +98,11 @@ export function getProcessesUsingDataDirectories(
       );
       return output
         .split(/\r?\n/)
-        .map((line) => line.match(/^"dyad\.exe","(\d+)"/i)?.[1])
+        .map((line) => line.match(/^"kapable\.exe","(\d+)"/i)?.[1])
         .filter(Boolean);
     } catch (error) {
       throw new Error(
-        "Could not check whether Dyad is running. Close Dyad and try again.",
+        "Could not check whether KapAble is running. Close KapAble and try again.",
         { cause: error },
       );
     }
@@ -127,7 +127,7 @@ export function getProcessesUsingDataDirectories(
     // lsof exits with status 1 when no process has any of the files open.
     if (error?.status === 1) return [];
     throw new Error(
-      "Could not check whether Dyad is running. Install lsof or close Dyad and try again.",
+      "Could not check whether KapAble is running. Install lsof or close KapAble and try again.",
       { cause: error },
     );
   }
@@ -160,7 +160,7 @@ export function copyProductionDataToDev({
   });
   if (activePids.length > 0) {
     throw new Error(
-      `Dyad is using the production or development data (PID${activePids.length === 1 ? "" : "s"} ${activePids.join(", ")}). Close all Dyad instances and try again.`,
+      `KapAble is using the production or development data (PID${activePids.length === 1 ? "" : "s"} ${activePids.join(", ")}). Close all KapAble instances and try again.`,
     );
   }
 
@@ -201,7 +201,7 @@ export function copyProductionDataToDev({
 function main() {
   const { source, destination } = copyProductionDataToDev();
   console.log(
-    `Copied Dyad production data from:\n  ${source}\nto:\n  ${destination}`,
+    `Copied KapAble production data from:\n  ${source}\nto:\n  ${destination}`,
   );
 }
 

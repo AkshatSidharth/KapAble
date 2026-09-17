@@ -1,4 +1,4 @@
-import { DyadError, DyadErrorKind, isDyadError } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
 import { IS_TEST_BUILD } from "@/ipc/utils/test_utils";
 import { retryWithRateLimit } from "@/ipc/utils/retryWithRateLimit";
 import { renderTestDatabaseSchema } from "@/lib/test_database_schema";
@@ -65,20 +65,20 @@ export async function getPublishableKey({
     keys = await getProjectApiKeys({ projectId, organizationSlug });
   } catch (error) {
     // getProjectApiKeys acquires the Management client itself, so an expired
-    // Supabase login arrives here as a DyadErrorKind.Auth. Re-wrapping it as
+    // Supabase login arrives here as a KapableErrorKind.Auth. Re-wrapping it as
     // External would drop the classification that drives the re-auth prompt.
-    if (isDyadError(error)) {
+    if (isKapableError(error)) {
       throw error;
     }
-    throw new DyadError(
+    throw new KapableError(
       `Failed to fetch API keys for Supabase project "${projectId}". This could be due to: 1) Invalid project ID, 2) Network connectivity issues, or 3) Supabase API unavailability. Original error: ${error instanceof Error ? error.message : String(error)}`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
   if (!keys?.length) {
-    throw new DyadError(
+    throw new KapableError(
       "No keys found for Supabase project " + projectId,
-      DyadErrorKind.NotFound,
+      KapableErrorKind.NotFound,
     );
   }
   const publishableKey = pickPublishableKey(keys);
@@ -87,9 +87,9 @@ export async function getPublishableKey({
   // alone, so a key listed without its value would otherwise be baked into the
   // generated client as `undefined`.
   if (!publishableKey?.api_key) {
-    throw new DyadError(
-      "Dyad couldn't find a publishable key for this Supabase project. It may be paused or connected through the wrong Supabase account. Resume the project in Supabase, or reconnect the correct project in Dyad. See https://dyad.sh/docs/integrations/supabase#no-publishable-keys",
-      DyadErrorKind.NotFound,
+    throw new KapableError(
+      "KapAble couldn't find a publishable key for this Supabase project. It may be paused or connected through the wrong Supabase account. Resume the project in Supabase, or reconnect the correct project in KapAble. See https://kapable.sh/docs/integrations/supabase#no-publishable-keys",
+      KapableErrorKind.NotFound,
     );
   }
   return publishableKey.api_key;
@@ -341,12 +341,12 @@ export async function getSupabaseTableSchema({
         : "-- No public tables found.",
     });
   } catch (error) {
-    if (isDyadError(error)) {
+    if (isKapableError(error)) {
       throw error;
     }
-    throw new DyadError(
+    throw new KapableError(
       `Failed to get table schema for Supabase project "${supabaseProjectId}": ${error instanceof Error ? error.message : String(error)}`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 }

@@ -127,7 +127,7 @@ const mockUser = {
   email: "testuser@example.com",
 };
 
-let mockReposRoot = fs.mkdtempSync(path.join(os.tmpdir(), "dyad-git-mock-"));
+let mockReposRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kapable-git-mock-"));
 
 const mockRepos = [
   {
@@ -471,7 +471,7 @@ export function handleResetRepos(req: Request, res: Response) {
   } catch (err) {
     console.warn("* Warning: failed to remove old repos root", err);
   }
-  mockReposRoot = fs.mkdtempSync(path.join(os.tmpdir(), "dyad-git-mock-"));
+  mockReposRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kapable-git-mock-"));
   fakeLlmLog(`* New repos root: ${mockReposRoot}`);
   res.json({ reset: true, timestamp: new Date() });
 }
@@ -511,7 +511,7 @@ export function handleGitPush(req: Request, res: Response, next?: Function) {
         execSync(`git init --bare`, { cwd: bareRepoPath });
 
         // Most repos are created via the "create new repo" + sync flow, so they
-        // must start out empty: the very first push from Dyad is a fresh,
+        // must start out empty: the very first push from KapAble is a fresh,
         // fast-forward "create" of the default branch. Pre-seeding those repos
         // would make that push diverge (non-fast-forward) and fail.
         //
@@ -520,7 +520,7 @@ export function handleGitPush(req: Request, res: Response, next?: Function) {
         // seeded with an initial commit so they can be cloned/imported.
         if (repoName === "existing-vite-app") {
           const tmpClone = fs.mkdtempSync(
-            path.join(os.tmpdir(), "dyad-git-clone-"),
+            path.join(os.tmpdir(), "kapable-git-clone-"),
           );
           try {
             execSync(`git clone "${bareRepoPath}" "${tmpClone}"`, {
@@ -560,7 +560,7 @@ export function handleGitPush(req: Request, res: Response, next?: Function) {
             );
             execSync(`git add -A`, { cwd: tmpClone, stdio: "pipe" });
             execSync(
-              `git -c user.name=dyad -c user.email=dyad@example.com commit -m "initial commit"`,
+              `git -c user.name=kapable -c user.email=kapable@example.com commit -m "initial commit"`,
               { cwd: tmpClone, stdio: "pipe" },
             );
             execSync(`git push origin HEAD:refs/heads/main`, {

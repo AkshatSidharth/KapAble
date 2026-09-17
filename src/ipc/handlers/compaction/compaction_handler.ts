@@ -34,10 +34,10 @@ import { getPostCompactionMessages } from "./compaction_utils";
 import {
   getProviderOptions,
   getAiHeaders,
-  DYAD_INTERNAL_REQUEST_ID_HEADER,
+  KAPABLE_INTERNAL_REQUEST_ID_HEADER,
 } from "@/ipc/utils/provider_options";
 import { escapeXmlContent } from "../../../../shared/xmlEscape";
-import { isDyadProEnabled } from "@/lib/schemas";
+import { isKapableProEnabled } from "@/lib/schemas";
 import {
   normalizeModelSelection,
   resolveDefaultModelSelection,
@@ -52,7 +52,7 @@ const logger = log.scope("compaction_handler");
 // quality at ~2x lower latency, which matters because compaction blocks the
 // turn mid-stream. Matches the durable Explorer persona model.
 // Non-Pro users keep their selected chat model — the pinned model is only
-// reachable through the Dyad Engine gateway.
+// reachable through the KapAble Engine gateway.
 const PRO_COMPACTION_MODEL = {
   provider: "openai",
   name: "gpt-5.6-luna",
@@ -162,7 +162,7 @@ export async function performCompaction(
   event: IpcMainInvokeEvent,
   chatId: number,
   appPath: string,
-  dyadRequestId: string,
+  kapableRequestId: string,
   onSummaryChunk?: (accumulatedText: string) => void,
   options?: {
     createdAtStrategy?: "before-latest-user" | "now";
@@ -203,7 +203,7 @@ export async function performCompaction(
       : await resolveDefaultModelSelection(storedSettings);
     // Stored connections describe an earlier turn, not this auxiliary request.
     const { connection: _connection, ...modelIdentity } = selectedModel;
-    const compactionModel = isDyadProEnabled(storedSettings)
+    const compactionModel = isKapableProEnabled(storedSettings)
       ? await resolveModelSelection({
           model: PRO_COMPACTION_MODEL,
           preferredEffortLevel:
@@ -241,7 +241,7 @@ export async function performCompaction(
       }),
     );
 
-    // Store readable transcript backup in the app's .dyad/chats/ directory
+    // Store readable transcript backup in the app's .kapable/chats/ directory
     const backupPath = await storePreCompactionMessages(
       appPath,
       chatId,
@@ -273,12 +273,12 @@ export async function performCompaction(
         ...getAiHeaders({
           builtinProviderId: modelClient.builtinProviderId,
         }),
-        [DYAD_INTERNAL_REQUEST_ID_HEADER]: dyadRequestId,
+        [KAPABLE_INTERNAL_REQUEST_ID_HEADER]: kapableRequestId,
       },
       providerOptions: getProviderOptions({
-        dyadAppId: 0,
-        dyadRequestId,
-        dyadDisableFiles: true,
+        kapableAppId: 0,
+        kapableRequestId,
+        kapableDisableFiles: true,
         files: [],
         mentionedAppsCodebases: [],
         builtinProviderId: modelClient.builtinProviderId,
@@ -313,9 +313,9 @@ export async function performCompaction(
 
     // Create the compaction indicator message
     // Include relative backup path so the AI can read the full original conversation later
-    const compactionMessageContent = `<dyad-compaction title="Conversation compacted" state="finished">
+    const compactionMessageContent = `<kapable-compaction title="Conversation compacted" state="finished">
 ${escapeXmlContent(summary)}
-</dyad-compaction>
+</kapable-compaction>
 
 If you need to retrieve earlier parts of the conversation history, you can read the backup file at: ${backupPath}
 Note: This file may be large. Read only the sections you need or use grep to search for specific content rather than reading the entire file.`;

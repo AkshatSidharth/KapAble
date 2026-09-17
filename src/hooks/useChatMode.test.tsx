@@ -119,9 +119,9 @@ describe("useChatMode with an active chat", () => {
     mocks.isQuotaLoading = false;
     mocks.settings = makeSettings({
       defaultChatMode: "build",
-      enableDyadPro: true,
+      enableKapablePro: true,
       providerSettings: {
-        auto: { apiKey: { value: "dyad-pro-key" } },
+        auto: { apiKey: { value: "kapable-pro-key" } },
       },
       selectedModel: { provider: "auto", name: "free-pro" },
     });

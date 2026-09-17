@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { runServerSetup, type SetupStep } from "./setup_flow";
 import { waitForAdminSeeded } from "./install";
 import { tryEnableHttps } from "./https_setup";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { SshError } from "@/ipc/utils/ssh_client";
 import type { SshSession } from "@/ipc/utils/ssh_client";
 
@@ -10,10 +10,10 @@ const REAL_TOKEN = "1|EcaUxT43T5fgdLJmnYj0702tEUC6viy5jEhO3Ujk2298db95";
 
 function transcript(output: string): string {
   return [
-    '> echo "__DYAD_OUT_START__" . PHP_EOL;',
-    "> __DYAD_OUT_START__",
+    '> echo "__KAPABLE_OUT_START__" . PHP_EOL;',
+    "> __KAPABLE_OUT_START__",
     output,
-    "__DYAD_OUT_END__",
+    "__KAPABLE_OUT_END__",
   ].join("\n");
 }
 
@@ -269,7 +269,7 @@ describe("runServerSetup", () => {
         throw new SshError(
           "command-timeout",
           "timed out",
-          DyadErrorKind.External,
+          KapableErrorKind.External,
         );
       }
       return answering(command, options);
@@ -312,7 +312,7 @@ describe("runServerSetup", () => {
         throw new SshError(
           "timeout",
           "the connection stopped answering",
-          DyadErrorKind.External,
+          KapableErrorKind.External,
         );
       }
       return original(command, options);
@@ -322,7 +322,7 @@ describe("runServerSetup", () => {
 
     expect(result.apiEnabled).toBe(true);
     expect(result.tokenUnavailableReason).toBe(
-      "Coolify stopped answering while Dyad was making a token.",
+      "Coolify stopped answering while KapAble was making a token.",
     );
   });
 
@@ -512,7 +512,7 @@ describe("runServerSetup", () => {
 
   it("hands over the account as soon as it exists, not at the end", async () => {
     // Everything after this point can fail on a server that is installed and
-    // running. Dyad invented this password and never showed it, so a caller
+    // running. KapAble invented this password and never showed it, so a caller
     // that only learns it on success cannot store what it never received.
     const server = fakeServer();
     const seen: Array<{ password: string; dashboardUrl: string }> = [];
@@ -692,7 +692,7 @@ describe("runServerSetup", () => {
     await expect(
       run(server, {
         onCredentialsBuilt: () => {
-          throw new DyadError("nowhere to keep it", DyadErrorKind.External);
+          throw new KapableError("nowhere to keep it", KapableErrorKind.External);
         },
       }).promise,
     ).rejects.toThrow(/nowhere to keep it/);
@@ -712,7 +712,7 @@ describe("runServerSetup", () => {
           throw new SshError(
             "timeout",
             "the connection stopped answering",
-            DyadErrorKind.External,
+            KapableErrorKind.External,
           );
         }
         if (command.includes("MemTotal")) {
@@ -736,7 +736,7 @@ describe("runServerSetup", () => {
 
     expect(result.token).toBeNull();
     expect(result.tokenUnavailableReason).toBe(
-      "Coolify did not answer while Dyad was opening its API.",
+      "Coolify did not answer while KapAble was opening its API.",
     );
     expect(result.credentials.password).toBeTruthy();
     // The step that would have opened it is the one that failed, so it is

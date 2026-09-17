@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { LanguageModelV3 } from "@ai-sdk/provider";
 import type { UserSettings } from "@/lib/schemas";
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 
 vi.mock("../services/codex_subscription_auth", () => ({
   getCodexSubscriptionStatus: () => ({ connected: true, pending: false }),
@@ -31,16 +31,16 @@ vi.mock("../shared/remote_language_model_catalog", () => ({
     modelsByProvider: { openai: [{ apiName: "gpt-fallback" }] },
   }),
   resolveBuiltinModelAlias: async (alias: string) =>
-    alias === "dyad/auto/openai"
+    alias === "kapable/auto/openai"
       ? { providerId: "openai", apiName: "gpt-fallback" }
-      : alias === "dyad/auto/anthropic"
+      : alias === "kapable/auto/anthropic"
         ? { providerId: "anthropic", apiName: "claude-paid" }
         : null,
 }));
 vi.mock("../shared/language_model_helpers", () => ({
   getLanguageModels: async () => [],
   getLanguageModelProviders: async () => [
-    { id: "auto", name: "Dyad", gatewayPrefix: "dyad/", type: "cloud" },
+    { id: "auto", name: "KapAble", gatewayPrefix: "kapable/", type: "cloud" },
     { id: "openai", name: "OpenAI", gatewayPrefix: "", type: "cloud" },
     {
       id: "anthropic",
@@ -61,7 +61,7 @@ import {
 import { usesChatGPTSubscription } from "@/lib/subscriptionModels";
 
 const settings = {
-  enableDyadPro: true,
+  enableKapablePro: true,
   proModelUsage: "subscription",
   selectedChatMode: "ask",
   providerSettings: { auto: { apiKey: { value: "pro-test-key" } } },
@@ -132,7 +132,7 @@ it.each([
         ? model.doStream({ prompt: [] })
         : model.doGenerate({ prompt: [] }),
     ).rejects.toMatchObject({
-      kind: DyadErrorKind.Validation,
+      kind: KapableErrorKind.Validation,
       message: expect.stringContaining("Model is not available"),
     });
     expect(

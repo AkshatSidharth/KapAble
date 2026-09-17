@@ -9,13 +9,13 @@ import {
 describe("legacy Build fixture adapter", () => {
   it("converts ordered file and SQL tags into native tool turns", () => {
     const fixture = convertLegacyFixtureToLocalAgent(`Starting
-<dyad-write path="src/App.tsx" description="replace app">
+<kapable-write path="src/App.tsx" description="replace app">
 export default function App() {}
-</dyad-write>
-<dyad-rename from="old.ts" to="new.ts"></dyad-rename>
-<dyad-execute-sql description="create users">
+</kapable-write>
+<kapable-rename from="old.ts" to="new.ts"></kapable-rename>
+<kapable-execute-sql description="create users">
 CREATE TABLE users (id int);
-</dyad-execute-sql>
+</kapable-execute-sql>
 Done`);
 
     expect(fixture.turns).toEqual([
@@ -57,13 +57,13 @@ Done`);
 
   it("converts search-replace blocks without trimming their match text", () => {
     const fixture =
-      convertLegacyFixtureToLocalAgent(`<dyad-search-replace path="src/App.tsx">
+      convertLegacyFixtureToLocalAgent(`<kapable-search-replace path="src/App.tsx">
 <<<<<<< SEARCH
   old text
 =======
   new text
 >>>>>>> REPLACE
-</dyad-search-replace>`);
+</kapable-search-replace>`);
 
     expect(fixture.turns).toEqual([
       {

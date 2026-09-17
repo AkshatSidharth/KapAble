@@ -1,16 +1,16 @@
 {
-  "name": "dyad",
+  "name": "kapable",
   "version": "1.16.0",
-  "description": "Free, local, open-source AI app builder",
+  "description": "KapAble - a local, open-source AI app builder",
   "keywords": [],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
-    "name": "Will Chen",
-    "email": "willchen90@gmail.com"
+    "name": "Akshat Sidharth",
+    "email": "akshat.sidharth@kapturecrm.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dyad-sh/dyad.git"
+    "url": "https://github.com/AkshatSidharth/KapAble.git"
   },
   "main": ".vite/build/main_bootstrap.js",
   "scripts": {
@@ -18,15 +18,15 @@
     "clean": "rimraf out scaffold/node_modules",
     "start": "node scripts/start-supervisor.mjs",
     "start:onboarding": "node scripts/start-onboarding.mjs",
-    "start:out-of-quota": "cross-env NODE_ENV=development DYAD_SIMULATE_FREE_AGENT_QUOTA_EXCEEDED=true npm start",
+    "start:out-of-quota": "cross-env NODE_ENV=development KAPABLE_SIMULATE_FREE_AGENT_QUOTA_EXCEEDED=true npm start",
     "copy-data-to-dev": "node scripts/copy-data-to-dev.mjs",
     "start:expired-sub": "node scripts/start-subscription-status.mjs payment_past_due",
     "start:ending-sub": "node scripts/start-subscription-status.mjs subscription_ending",
     "start:paused-sub": "node scripts/start-subscription-status.mjs subscription_paused",
     "start:healthy-sub": "node scripts/start-subscription-status.mjs healthy",
     "dev": "cross-env NODE_ENV=development npm start",
-    "dev:engine": "cross-env DYAD_ENGINE_URL=http://localhost:8080/v1 npm start",
-    "staging:engine": "cross-env DYAD_ENGINE_URL=https://staging---dyad-llm-engine-kq7pivehnq-uc.a.run.app/v1 npm start",
+    "dev:engine": "cross-env KAPABLE_ENGINE_URL=http://localhost:8080/v1 npm start",
+    "staging:engine": "cross-env KAPABLE_ENGINE_URL=https://staging---kapable-llm-engine-kq7pivehnq-uc.a.run.app/v1 npm start",
     "package": "npm run rebuild:keychain-reader && npm run clean && electron-forge package",
     "make": "npm run rebuild:keychain-reader && npm run clean && electron-forge make",
     "publish": "npm run rebuild:keychain-reader && npm run clean && electron-forge publish",
@@ -162,7 +162,7 @@
     "zod": "^4.3.6"
   },
   "optionalDependencies": {
-    "dyad-keychain-reader": "file:native/keychain-reader"
+    "kapable-keychain-reader": "file:native/keychain-reader"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.11.1",
@@ -220,5 +220,5 @@
   "engines": {
     "node": ">=24 <26"
   },
-  "productName": "dyad"
+  "productName": "kapable"
 }

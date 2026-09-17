@@ -8,17 +8,17 @@ import {
   supportsAutomaticToken,
   tryAutomaticAccess,
 } from "./api_token";
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 import { SshError } from "@/ipc/utils/ssh_client";
 import type { SshSession } from "@/ipc/utils/ssh_client";
 
 /** Wraps a value the way a real tinker transcript carries it. */
 function transcript(output: string): string {
   return [
-    '> echo "__DYAD_OUT_START__" . PHP_EOL;',
-    "> __DYAD_OUT_START__",
+    '> echo "__KAPABLE_OUT_START__" . PHP_EOL;',
+    "> __KAPABLE_OUT_START__",
     output,
-    "__DYAD_OUT_END__",
+    "__KAPABLE_OUT_END__",
   ].join("\n");
 }
 
@@ -108,10 +108,10 @@ describe("readCoolifyVersion", () => {
       run: vi.fn(async () => {
         throw new SshError(
           // The connection stopped answering, which is the case this tells
-          // apart from a bound Dyad set on one command.
+          // apart from a bound KapAble set on one command.
           "timeout",
           "the connection stopped answering",
-          DyadErrorKind.External,
+          KapableErrorKind.External,
         );
       }),
       end: vi.fn(),
@@ -129,7 +129,7 @@ describe("readCoolifyVersion", () => {
         throw new SshError(
           "command-timeout",
           "timed out",
-          DyadErrorKind.External,
+          KapableErrorKind.External,
         );
       }),
       end: vi.fn(),
@@ -203,13 +203,13 @@ describe("mintApiToken", () => {
     expect(session.scripts[0]).toContain("session(['currentTeam' => $team])");
   });
 
-  it("asks for the scopes Dyad tells users to tick", async () => {
+  it("asks for the scopes KapAble tells users to tick", async () => {
     // Narrower tokens hide a server's private key id, which the deploy path
     // reads to tell a stale key from one it simply cannot see.
     const session = fakeSession([REAL_TOKEN]);
     await mintApiToken(session, "admin@gmail.com");
     // The same list the panel tells a user to tick and the 403 message names,
-    // so a token Dyad mints and one made by hand behave alike. Not root, which
+    // so a token KapAble mints and one made by hand behave alike. Not root, which
     // Coolify treats as a bypass of the ability check rather than a scope.
     expect(session.scripts[0]).toContain(COOLIFY_SCOPES_PHP_ARRAY);
     expect(session.scripts[0]).not.toContain("root");
@@ -220,7 +220,7 @@ describe("mintApiToken", () => {
     await mintApiToken(session, "admin@gmail.com");
     expect(session.scripts[0]).not.toContain("admin@gmail.com");
     expect(session.commands[0]).toContain(
-      "-e DYAD_ADMIN_EMAIL='admin@gmail.com'",
+      "-e KAPABLE_ADMIN_EMAIL='admin@gmail.com'",
     );
   });
 
@@ -280,7 +280,7 @@ describe("tryAutomaticAccess", () => {
   });
 
   it("declines quietly on an instance it does not know", async () => {
-    // Not a failure: an instance Dyad did not install is the ordinary case,
+    // Not a failure: an instance KapAble did not install is the ordinary case,
     // and the caller asks for a token by hand instead.
     const session = fakeSession(["3.1.0"]);
     expect(await tryAutomaticAccess(session, "admin@gmail.com")).toBeNull();

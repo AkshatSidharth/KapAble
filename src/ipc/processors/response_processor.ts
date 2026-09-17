@@ -2,7 +2,7 @@ import { db } from "../../db";
 import { chats, messages } from "../../db/schema";
 import { and, eq } from "drizzle-orm";
 import fs from "node:fs";
-import { getDyadAppPath } from "../../paths/paths";
+import { getKapableAppPath } from "../../paths/paths";
 import path from "node:path";
 import {
   assertNotProjectRootPath,
@@ -38,17 +38,17 @@ import {
   hasStagedChanges,
 } from "../utils/git_utils";
 import { readSettings } from "@/main/settings";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { writeMigrationFile } from "../utils/file_utils";
 import {
-  getDyadWriteTags,
-  getDyadRenameTags,
-  getDyadDeleteTags,
-  getDyadAddDependencyTags,
-  getDyadExecuteSqlTags,
-  getDyadSearchReplaceTags,
-  getDyadCopyTags,
-} from "../utils/dyad_tag_parser";
+  getKapableWriteTags,
+  getKapableRenameTags,
+  getKapableDeleteTags,
+  getKapableAddDependencyTags,
+  getKapableExecuteSqlTags,
+  getKapableSearchReplaceTags,
+  getKapableCopyTags,
+} from "../utils/kapable_tag_parser";
 import { applySearchReplace } from "../../pro/main/ipc/processors/search_replace_processor";
 import { storeDbTimestampAtCurrentVersion } from "../utils/neon_timestamp_utils";
 import { executeNeonSql } from "../../neon_admin/neon_context";
@@ -74,21 +74,21 @@ function formatOutputError(error: unknown): string {
 
 function formatSkippedActionSummary(fullResponse: string): string {
   const counts: Array<[number, string, string]> = [
-    [getDyadWriteTags(fullResponse).length, "write", "writes"],
-    [getDyadRenameTags(fullResponse).length, "rename", "renames"],
-    [getDyadDeleteTags(fullResponse).length, "delete", "deletes"],
+    [getKapableWriteTags(fullResponse).length, "write", "writes"],
+    [getKapableRenameTags(fullResponse).length, "rename", "renames"],
+    [getKapableDeleteTags(fullResponse).length, "delete", "deletes"],
     [
-      getDyadAddDependencyTags(fullResponse).length,
+      getKapableAddDependencyTags(fullResponse).length,
       "dependency install",
       "dependency installs",
     ],
-    [getDyadExecuteSqlTags(fullResponse).length, "SQL query", "SQL queries"],
+    [getKapableExecuteSqlTags(fullResponse).length, "SQL query", "SQL queries"],
     [
-      getDyadSearchReplaceTags(fullResponse).length,
+      getKapableSearchReplaceTags(fullResponse).length,
       "search-replace",
       "search-replaces",
     ],
-    [getDyadCopyTags(fullResponse).length, "copy", "copies"],
+    [getKapableCopyTags(fullResponse).length, "copy", "copies"],
   ];
 
   return counts
@@ -108,8 +108,8 @@ export async function dryRunSearchReplace({
   appPath: string;
 }) {
   const issues: { filePath: string; error: string }[] = [];
-  const dyadSearchReplaceTags = getDyadSearchReplaceTags(fullResponse);
-  for (const tag of dyadSearchReplaceTags) {
+  const kapableSearchReplaceTags = getKapableSearchReplaceTags(fullResponse);
+  for (const tag of kapableSearchReplaceTags) {
     const filePath = tag.path;
     const fullFilePath = safeJoin(appPath, filePath);
     try {
@@ -174,17 +174,17 @@ export async function processFullResponseActions(
     return {};
   }
 
-  const appPath = getDyadAppPath(chatWithApp.app.path);
-  const dyadDeletePaths = getDyadDeleteTags(fullResponse);
+  const appPath = getKapableAppPath(chatWithApp.app.path);
+  const kapableDeletePaths = getKapableDeleteTags(fullResponse);
   let preparedDeletePaths: PreparedDeletePath[];
   try {
     // Perform the lexical pass across the entire batch first so a later root
     // alias cannot cause even read-only filesystem work for an earlier path.
-    for (const filePath of dyadDeletePaths) {
+    for (const filePath of kapableDeletePaths) {
       assertNotProjectRootPath(appPath, filePath);
     }
     preparedDeletePaths = await Promise.all(
-      dyadDeletePaths.map((filePath) => prepareDeletePath(appPath, filePath)),
+      kapableDeletePaths.map((filePath) => prepareDeletePath(appPath, filePath)),
     );
   } catch (error) {
     logger.error("Refusing unsafe delete response:", error);
@@ -206,10 +206,10 @@ export async function processFullResponseActions(
       });
     } catch (error) {
       logger.error("Error creating Neon branch at current version:", error);
-      throw new DyadError(
+      throw new KapableError(
         "Could not create Neon branch; database versioning functionality is not working: " +
           error,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
   }
@@ -231,14 +231,14 @@ export async function processFullResponseActions(
 
   try {
     // Extract all tags
-    const dyadWriteTags = getDyadWriteTags(fullResponse);
-    const dyadRenameTags = getDyadRenameTags(fullResponse);
-    const dyadAddDependencyPackages = getDyadAddDependencyTags(fullResponse);
+    const kapableWriteTags = getKapableWriteTags(fullResponse);
+    const kapableRenameTags = getKapableRenameTags(fullResponse);
+    const kapableAddDependencyPackages = getKapableAddDependencyTags(fullResponse);
     let installedOrUpdatedDependencyPackages: string[] = [];
     const hasDbProvider =
       chatWithApp.app.supabaseProjectId || chatWithApp.app.neonProjectId;
-    const dyadExecuteSqlQueries = hasDbProvider
-      ? getDyadExecuteSqlTags(fullResponse)
+    const kapableExecuteSqlQueries = hasDbProvider
+      ? getKapableExecuteSqlTags(fullResponse)
       : [];
 
     const message = await db.query.messages.findFirst({
@@ -255,8 +255,8 @@ export async function processFullResponseActions(
     }
 
     // Handle SQL execution tags
-    if (dyadExecuteSqlQueries.length > 0) {
-      for (const query of dyadExecuteSqlQueries) {
+    if (kapableExecuteSqlQueries.length > 0) {
+      for (const query of kapableExecuteSqlQueries) {
         try {
           if (chatWithApp.app.neonProjectId) {
             // Route to Neon executor
@@ -264,9 +264,9 @@ export async function processFullResponseActions(
               chatWithApp.app.neonActiveBranchId ??
               chatWithApp.app.neonDevelopmentBranchId;
             if (!branchId) {
-              throw new DyadError(
+              throw new KapableError(
                 "No active Neon branch found for SQL execution. Please select a branch in the Neon integration settings.",
-                DyadErrorKind.Precondition,
+                KapableErrorKind.Precondition,
               );
             }
             try {
@@ -288,14 +288,14 @@ export async function processFullResponseActions(
                 errorMsg.includes("authentication failed") ||
                 errorMsg.includes("access token")
               ) {
-                throw new DyadError(
+                throw new KapableError(
                   `Neon authentication failed. Please reconnect your Neon account in the integration settings. Details: ${errorMsg}`,
-                  DyadErrorKind.Auth,
+                  KapableErrorKind.Auth,
                 );
               }
-              throw new DyadError(
+              throw new KapableError(
                 `Neon SQL query failed: ${errorMsg}`,
-                DyadErrorKind.External,
+                KapableErrorKind.External,
               );
             }
           } else if (chatWithApp.app.supabaseProjectId) {
@@ -334,19 +334,19 @@ export async function processFullResponseActions(
           });
         }
       }
-      logger.log(`Executed ${dyadExecuteSqlQueries.length} SQL queries`);
+      logger.log(`Executed ${kapableExecuteSqlQueries.length} SQL queries`);
     }
 
     // TODO: Handle add dependency tags
-    if (dyadAddDependencyPackages.length > 0) {
+    if (kapableAddDependencyPackages.length > 0) {
       try {
         const addDependencyResult = await executeAddDependency({
-          packages: dyadAddDependencyPackages,
+          packages: kapableAddDependencyPackages,
           message: message,
           appPath,
         });
         warningMessages.push(...addDependencyResult.warningMessages);
-        installedOrUpdatedDependencyPackages = dyadAddDependencyPackages;
+        installedOrUpdatedDependencyPackages = kapableAddDependencyPackages;
       } catch (error) {
         if (error instanceof ExecuteAddDependencyError) {
           warningMessages.push(...error.warningMessages);
@@ -355,12 +355,12 @@ export async function processFullResponseActions(
             message:
               error.completedPackages.length > 0
                 ? `Partially installed or updated dependencies: ${error.completedPackages.join(", ")}. ${error.displaySummary}`
-                : `Failed to add dependencies: ${dyadAddDependencyPackages.join(", ")}. ${error.displaySummary}`,
+                : `Failed to add dependencies: ${kapableAddDependencyPackages.join(", ")}. ${error.displaySummary}`,
             error: error.displayDetails,
           });
         } else {
           errors.push({
-            message: `Failed to add dependencies: ${dyadAddDependencyPackages.join(", ")}`,
+            message: `Failed to add dependencies: ${kapableAddDependencyPackages.join(", ")}`,
             error: error,
           });
         }
@@ -443,7 +443,7 @@ export async function processFullResponseActions(
     }
 
     // Process all file renames
-    for (const tag of dyadRenameTags) {
+    for (const tag of kapableRenameTags) {
       const fromPath = safeJoin(appPath, tag.from);
       const toPath = safeJoin(appPath, tag.to);
 
@@ -519,8 +519,8 @@ export async function processFullResponseActions(
     }
 
     // Process all search-replace edits
-    const dyadSearchReplaceTags = getDyadSearchReplaceTags(fullResponse);
-    for (const tag of dyadSearchReplaceTags) {
+    const kapableSearchReplaceTags = getKapableSearchReplaceTags(fullResponse);
+    for (const tag of kapableSearchReplaceTags) {
       const filePath = tag.path;
       const fullFilePath = safeJoin(appPath, filePath);
 
@@ -532,14 +532,14 @@ export async function processFullResponseActions(
 
       try {
         if (!fs.existsSync(fullFilePath)) {
-          // Do not show warning to user because we already attempt to do a <dyad-write> tag to fix it.
+          // Do not show warning to user because we already attempt to do a <kapable-write> tag to fix it.
           logger.warn(`Search-replace target file does not exist: ${filePath}`);
           continue;
         }
         const original = await readFile(fullFilePath, "utf8");
         const result = applySearchReplace(original, tag.content);
         if (!result.success || typeof result.content !== "string") {
-          // Do not show warning to user because we already attempt to do a <dyad-write> and/or a subsequent <dyad-search-replace> tag to fix it.
+          // Do not show warning to user because we already attempt to do a <kapable-write> and/or a subsequent <kapable-search-replace> tag to fix it.
           logger.warn(
             `Failed to apply search-replace to ${filePath}: ${result.error ?? "unknown"}`,
           );
@@ -580,8 +580,8 @@ export async function processFullResponseActions(
     }
 
     // Process all file copies
-    const dyadCopyTags = getDyadCopyTags(fullResponse);
-    for (const tag of dyadCopyTags) {
+    const kapableCopyTags = getKapableCopyTags(fullResponse);
+    for (const tag of kapableCopyTags) {
       try {
         const result = await executeCopyFile({
           from: tag.from,
@@ -616,7 +616,7 @@ export async function processFullResponseActions(
     }
 
     // Process all file writes
-    for (const tag of dyadWriteTags) {
+    for (const tag of kapableWriteTags) {
       const filePath = tag.path;
       const content = tag.content;
       const fullFilePath = safeJoin(appPath, filePath);
@@ -704,7 +704,7 @@ export async function processFullResponseActions(
       writtenFiles.length > 0 ||
       renamedFiles.length > 0 ||
       deletedFiles.length > 0 ||
-      dyadAddDependencyPackages.length > 0;
+      kapableAddDependencyPackages.length > 0;
 
     let uncommittedFiles: string[] = [];
     let extraFilesError: string | undefined;
@@ -730,8 +730,8 @@ export async function processFullResponseActions(
         changes.push(
           `installed or updated ${installedOrUpdatedDependencyPackages.join(", ")} package(s)`,
         );
-      if (dyadExecuteSqlQueries.length > 0)
-        changes.push(`executed ${dyadExecuteSqlQueries.length} SQL queries`);
+      if (kapableExecuteSqlQueries.length > 0)
+        changes.push(`executed ${kapableExecuteSqlQueries.length} SQL queries`);
 
       const changeSummary = changes.join(", ");
       const trimmedChatSummary = chatSummary?.trim();
@@ -769,17 +769,17 @@ export async function processFullResponseActions(
           try {
             commitHash = await gitCommit({
               path: appPath,
-              message: message + " + extra files edited outside of Dyad",
+              message: message + " + extra files edited outside of KapAble",
               amend: true,
             });
             logger.log(
-              `Amend commit with changes outside of dyad: ${uncommittedFiles.join(", ")}`,
+              `Amend commit with changes outside of kapable: ${uncommittedFiles.join(", ")}`,
             );
           } catch (error) {
             // Just log, but don't throw an error because the user can still
-            // commit these changes outside of Dyad if needed.
+            // commit these changes outside of KapAble if needed.
             logger.error(
-              `Failed to commit changes outside of dyad: ${uncommittedFiles.join(", ")}`,
+              `Failed to commit changes outside of kapable: ${uncommittedFiles.join(", ")}`,
             );
             extraFilesError = (error as any).toString();
           }
@@ -809,7 +809,7 @@ export async function processFullResponseActions(
         changedPaths: [...writtenFiles, ...renamedFiles],
         deletedPaths: [
           ...processedDeletePaths,
-          ...dyadRenameTags.map((renameTag) => renameTag.from),
+          ...kapableRenameTags.map((renameTag) => renameTag.from),
         ],
       });
     }
@@ -833,13 +833,13 @@ export async function processFullResponseActions(
     ${warnings
       .map(
         (warning) =>
-          `<dyad-output type="warning" message="${escapeXmlAttr(warning.message)}">${escapeXmlContent(formatOutputError(warning.error))}</dyad-output>`,
+          `<kapable-output type="warning" message="${escapeXmlAttr(warning.message)}">${escapeXmlContent(formatOutputError(warning.error))}</kapable-output>`,
       )
       .join("\n")}
     ${errors
       .map(
         (error) =>
-          `<dyad-output type="error" message="${escapeXmlAttr(error.message)}">${escapeXmlContent(formatOutputError(error.error))}</dyad-output>`,
+          `<kapable-output type="error" message="${escapeXmlAttr(error.message)}">${escapeXmlContent(formatOutputError(error.error))}</kapable-output>`,
       )
       .join("\n")}
     `;

@@ -61,9 +61,9 @@ export function createStreamChunk(
 }
 
 export const CANNED_MESSAGE = `
-  <dyad-write path="file1.txt">
+  <kapable-write path="file1.txt">
   A file (2)
-  </dyad-write>
+  </kapable-write>
   More
   EOM`;
 
@@ -272,9 +272,9 @@ export function createFakeLlmApp(getPort: () => number) {
       .type("text/plain")
       .send(
         [
-          "# dyad-default-allow-builds-schema=v1",
-          "# dyad-default-allow-builds-data-version=2026-05-21.2",
-          "# dyad-default-allow-builds-channel=remote",
+          "# kapable-default-allow-builds-schema=v1",
+          "# kapable-default-allow-builds-data-version=2026-05-21.2",
+          "# kapable-default-allow-builds-channel=remote",
           "@swc/core",
           "esbuild",
           "sharp",
@@ -283,8 +283,8 @@ export function createFakeLlmApp(getPort: () => number) {
       );
   });
 
-  // Fake api.dyad.sh user info (Dyad Pro budget). Tests point
-  // DYAD_USER_INFO_URL here so get-user-budget never hits the real API.
+  // Fake api.kapable.sh user info (KapAble Pro budget). Tests point
+  // KAPABLE_USER_INFO_URL here so get-user-budget never hits the real API.
   app.get("/api/user/info", (req, res) => {
     if (!req.headers.authorization?.startsWith("Bearer ")) {
       res.status(401).json({ error: "Unauthorized" });
@@ -330,7 +330,7 @@ export function createFakeLlmApp(getPort: () => number) {
           category: "Other Tools",
           transport: "http",
           url: "http://localhost:3002/mcp",
-          headers: { "X-Test-Header": "dyad-e2e" },
+          headers: { "X-Test-Header": "kapable-e2e" },
         },
         // Valid stdio entry. The package is scoped under @dyad-sh so it
         // can never resolve against the real npm registry: the spec only
@@ -456,7 +456,7 @@ export function createFakeLlmApp(getPort: () => number) {
       },
       aliases: [
         {
-          id: "dyad/theme-generator/google",
+          id: "kapable/theme-generator/google",
           resolvedModel: {
             providerId: "google",
             apiName: "gemini-3.1-pro-preview",
@@ -465,7 +465,7 @@ export function createFakeLlmApp(getPort: () => number) {
           purpose: "theme-generation",
         },
         {
-          id: "dyad/theme-generator/anthropic",
+          id: "kapable/theme-generator/anthropic",
           resolvedModel: {
             providerId: "anthropic",
             apiName: "claude-sonnet-4-6",
@@ -474,7 +474,7 @@ export function createFakeLlmApp(getPort: () => number) {
           purpose: "theme-generation",
         },
         {
-          id: "dyad/theme-generator/openai",
+          id: "kapable/theme-generator/openai",
           resolvedModel: {
             providerId: "openai",
             apiName: "gpt-5.2",
@@ -483,7 +483,7 @@ export function createFakeLlmApp(getPort: () => number) {
           purpose: "theme-generation",
         },
         {
-          id: "dyad/auto/openai",
+          id: "kapable/auto/openai",
           resolvedModel: {
             providerId: "openai",
             apiName: "gpt-5.2",
@@ -491,7 +491,7 @@ export function createFakeLlmApp(getPort: () => number) {
           purpose: "auto-mode",
         },
         {
-          id: "dyad/auto/anthropic",
+          id: "kapable/auto/anthropic",
           resolvedModel: {
             providerId: "anthropic",
             apiName: "claude-sonnet-4-6",
@@ -499,7 +499,7 @@ export function createFakeLlmApp(getPort: () => number) {
           purpose: "auto-mode",
         },
         {
-          id: "dyad/auto/google",
+          id: "kapable/auto/google",
           resolvedModel: {
             providerId: "google",
             apiName: "gemini-3.1-pro-preview",
@@ -507,7 +507,7 @@ export function createFakeLlmApp(getPort: () => number) {
           purpose: "auto-mode",
         },
         {
-          id: "dyad/help-bot/default",
+          id: "kapable/help-bot/default",
           resolvedModel: {
             providerId: "openai",
             apiName: "gpt-5.2",
@@ -518,15 +518,15 @@ export function createFakeLlmApp(getPort: () => number) {
       curatedSelections: {
         themeGenerationOptions: [
           {
-            id: "dyad/theme-generator/google",
+            id: "kapable/theme-generator/google",
             label: "Google Remote",
           },
           {
-            id: "dyad/theme-generator/anthropic",
+            id: "kapable/theme-generator/anthropic",
             label: "Anthropic Remote",
           },
           {
-            id: "dyad/theme-generator/openai",
+            id: "kapable/theme-generator/openai",
             label: "OpenAI Remote",
           },
         ],
@@ -735,7 +735,7 @@ export function createFakeLlmApp(getPort: () => number) {
   // GitHub Git endpoints - intercept all paths with /github/git prefix
   app.all("/github/git/*", handleGitPush);
 
-  // Dyad Engine free-model quota endpoint (free_model_quota_handlers).
+  // KapAble Engine free-model quota endpoint (free_model_quota_handlers).
   app.get("/engine/v1/free/quota", (req, res) => {
     if (!req.headers.authorization?.startsWith("Bearer ")) {
       res.status(401).json({ error: "Unauthorized" });
@@ -749,7 +749,7 @@ export function createFakeLlmApp(getPort: () => number) {
     });
   });
 
-  // Dyad Engine code-search endpoint for code_search tool
+  // KapAble Engine code-search endpoint for code_search tool
   app.post("/engine/v1/tools/code-search", (req, res) => {
     const { query, filesContext } = req.body;
     fakeLlmLog(
@@ -770,7 +770,7 @@ export function createFakeLlmApp(getPort: () => number) {
     }
   });
 
-  // Dyad Engine image generation endpoint for generate_image tool
+  // KapAble Engine image generation endpoint for generate_image tool
   app.post("/engine/v1/images/generations", (req, res) => {
     const { prompt, model } = req.body;
     fakeLlmLog(
@@ -803,7 +803,7 @@ export function createFakeLlmApp(getPort: () => number) {
     res.type("png").send(Buffer.from(tinyPngBase64, "base64"));
   });
 
-  // Dyad Engine web-crawl endpoint for web_fetch tool
+  // KapAble Engine web-crawl endpoint for web_fetch tool
   app.post("/engine/v1/tools/web-crawl", (req, res) => {
     const { url, markdownOnly } = req.body;
     fakeLlmLog(`* web-crawl: url="${url}", markdownOnly=${markdownOnly}`);

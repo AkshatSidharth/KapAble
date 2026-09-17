@@ -199,7 +199,7 @@ async function scheduleHookGeneratedFileSideEffects(
       "Failed to identify Supabase paths changed by pre-commit; skipping Supabase reconciliation:",
       error,
     );
-    return "Dyad could not determine which Supabase files the hook changed, so it skipped automatic function reconciliation.";
+    return "KapAble could not determine which Supabase files the hook changed, so it skipped automatic function reconciliation.";
   }
 
   const afterFunctionEntries = await tryCollectSupabaseFunctionEntryPoints(
@@ -244,7 +244,7 @@ async function scheduleHookGeneratedFileSideEffects(
     );
     if (ctx.skipPruneEdgeFunctions && removedFunctionNames.length > 0) {
       notes.push(
-        `Pre-commit removed local Supabase function(s) ${removedFunctionNames.join(", ")}, but Dyad kept their remote deployments because "Keep extra Supabase edge functions" is enabled.`,
+        `Pre-commit removed local Supabase function(s) ${removedFunctionNames.join(", ")}, but KapAble kept their remote deployments because "Keep extra Supabase edge functions" is enabled.`,
       );
     } else {
       const deletedFunctionNames: string[] = [];
@@ -265,13 +265,13 @@ async function scheduleHookGeneratedFileSideEffects(
             deleteError,
           );
           ctx.onWarningMessage?.(
-            `Pre-commit removed Supabase function ${functionName}, but Dyad could not delete its remote deployment: ${deleteError}`,
+            `Pre-commit removed Supabase function ${functionName}, but KapAble could not delete its remote deployment: ${deleteError}`,
           );
         }
       }
       if (deletedFunctionNames.length > 0) {
         notes.push(
-          `Dyad removed the corresponding remote Supabase function deployment(s): ${deletedFunctionNames.join(", ")}.`,
+          `KapAble removed the corresponding remote Supabase function deployment(s): ${deletedFunctionNames.join(", ")}.`,
         );
       }
     }
@@ -279,7 +279,7 @@ async function scheduleHookGeneratedFileSideEffects(
 
   if (!beforeFunctionEntries || !afterFunctionEntries) {
     notes.push(
-      "Dyad could not compare Supabase function entry points before and after the hook, so it skipped automatic deletion reconciliation.",
+      "KapAble could not compare Supabase function entry points before and after the hook, so it skipped automatic deletion reconciliation.",
     );
   }
   return notes.join("\n\n") || undefined;
@@ -296,7 +296,7 @@ function complete(
   state: "finished" | "warning" = "finished",
 ): string {
   ctx.onXmlComplete(
-    `<dyad-status title="${escapeXmlAttr(title)}" state="${state}">\n${escapeXmlContent(body)}\n</dyad-status>`,
+    `<kapable-status title="${escapeXmlAttr(title)}" state="${state}">\n${escapeXmlContent(body)}\n</kapable-status>`,
   );
   return body;
 }
@@ -427,7 +427,7 @@ export const runPreCommitTool: ToolDefinition<
           return complete(
             ctx,
             "Pre-commit snapshot check failed",
-            `Dyad could not determine whether the staged Git snapshot has changes, so the hook was not run.\n\n${message}`,
+            `KapAble could not determine whether the staged Git snapshot has changes, so the hook was not run.\n\n${message}`,
             "warning",
           );
         }
@@ -439,7 +439,7 @@ export const runPreCommitTool: ToolDefinition<
           return complete(
             ctx,
             "Pre-commit snapshot check failed",
-            "Dyad could not determine whether the staged Git snapshot has changes, so the hook was not run.",
+            "KapAble could not determine whether the staged Git snapshot has changes, so the hook was not run.",
             "warning",
           );
         }
@@ -490,7 +490,7 @@ export const runPreCommitTool: ToolDefinition<
         ctx.preCommitRunCount = previousRunCount + 1;
         ctx.preCommitFileMutationCountAtLastRun = fileMutationCount;
         ctx.onXmlStream(
-          `<dyad-status title="${escapeXmlAttr(`Running pre-commit (${ctx.preCommitRunCount}/${MAX_PRE_COMMIT_RUNS_PER_TURN})`)}"></dyad-status>`,
+          `<kapable-status title="${escapeXmlAttr(`Running pre-commit (${ctx.preCommitRunCount}/${MAX_PRE_COMMIT_RUNS_PER_TURN})`)}"></kapable-status>`,
         );
 
         let result: BufferedProcessResult;
@@ -548,7 +548,7 @@ export const runPreCommitTool: ToolDefinition<
           );
         } else if (result.timedOut && ctx.supabaseProjectId) {
           reconciliationNote =
-            "The hook did not complete, so Dyad skipped automatic Supabase function reconciliation.";
+            "The hook did not complete, so KapAble skipped automatic Supabase function reconciliation.";
         }
 
         if (result.aborted) {
@@ -563,7 +563,7 @@ export const runPreCommitTool: ToolDefinition<
         if (result.timedOut) {
           ctx.preCommitLastRunPassed = false;
           const fingerprintNote = fingerprintUnknown
-            ? "\n\nDyad could not determine whether the hook changed files. A follow-up run is allowed to verify any hook-generated changes."
+            ? "\n\nKapable could not determine whether the hook changed files. A follow-up run is allowed to verify any hook-generated changes."
             : "";
           return complete(
             ctx,
@@ -582,7 +582,7 @@ export const runPreCommitTool: ToolDefinition<
           const remaining =
             MAX_PRE_COMMIT_RUNS_PER_TURN - (ctx.preCommitRunCount ?? 0);
           const fingerprintNote = fingerprintUnknown
-            ? "\n\nDyad could not determine whether the hook changed files. A follow-up run is allowed to verify any hook-generated changes."
+            ? "\n\nKapable could not determine whether the hook changed files. A follow-up run is allowed to verify any hook-generated changes."
             : "";
           return complete(
             ctx,
@@ -612,7 +612,7 @@ export const runPreCommitTool: ToolDefinition<
             ctx,
             "Pre-commit passed; file changes unknown",
             appendNote(
-              `Pre-commit passed, but Dyad could not determine whether the hook changed files. Run pre-commit once more to verify any hook-generated changes.\n\n${output}`,
+              `Pre-commit passed, but KapAble could not determine whether the hook changed files. Run pre-commit once more to verify any hook-generated changes.\n\n${output}`,
               reconciliationNote,
             ),
             "warning",

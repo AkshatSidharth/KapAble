@@ -15,21 +15,21 @@ function getPayload(requestedState) {
       return {
         alert: "payment_past_due",
         effectiveAt: null,
-        actionUrl: "https://academy.dyad.sh/billing?source=desktop_fixture",
+        actionUrl: "https://academy.kapable.sh/billing?source=desktop_fixture",
       };
     case "subscription_ending":
       return {
         alert: "subscription_ending",
         effectiveAt: futureDate(14),
         actionUrl:
-          "https://academy.dyad.sh/subscription?source=desktop_fixture",
+          "https://academy.kapable.sh/subscription?source=desktop_fixture",
       };
     case "subscription_paused":
       return {
         alert: "subscription_paused",
         effectiveAt: futureDate(30),
         actionUrl:
-          "https://academy.dyad.sh/subscription?source=desktop_fixture",
+          "https://academy.kapable.sh/subscription?source=desktop_fixture",
       };
     case "healthy":
       return { alert: null, effectiveAt: null, actionUrl: null };
@@ -72,7 +72,7 @@ server.listen(0, "127.0.0.1", () => {
   }
 
   const endpoint = `http://127.0.0.1:${address.port}/subscription-status`;
-  console.log(`Starting Dyad with subscription fixture: ${state}`);
+  console.log(`Starting KapAble with subscription fixture: ${state}`);
   console.log(`  endpoint: ${endpoint}`);
 
   const child = spawn(npmCommand, ["start"], {
@@ -80,8 +80,8 @@ server.listen(0, "127.0.0.1", () => {
     env: {
       ...process.env,
       NODE_ENV: "development",
-      DYAD_SUBSCRIPTION_STATUS_URL: endpoint,
-      DYAD_SUBSCRIPTION_STATUS_FIXTURE_API_KEY: fixtureApiKey,
+      KAPABLE_SUBSCRIPTION_STATUS_URL: endpoint,
+      KAPABLE_SUBSCRIPTION_STATUS_FIXTURE_API_KEY: fixtureApiKey,
     },
   });
 

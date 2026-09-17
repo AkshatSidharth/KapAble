@@ -9,7 +9,7 @@ import {
   refreshSupabaseToken,
 } from "./supabase_management_client";
 import { hasSupabaseCredentialsForOrganization } from "../lib/schemas";
-import { DyadError, DyadErrorKind, isDyadError } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
 import { readSettings } from "@/main/settings";
 import { SUPABASE_PROJECT_CREATED_BUT_UNLINKED } from "@/ipc/types/supabase";
 
@@ -200,8 +200,8 @@ describe("getProjectApiKeys", () => {
       organizationSlug: "org-1",
     }).catch((thrown) => thrown);
 
-    expect(isDyadError(error)).toBe(true);
-    expect((error as DyadError).kind).toBe(DyadErrorKind.External);
+    expect(isKapableError(error)).toBe(true);
+    expect((error as KapableError).kind).toBe(KapableErrorKind.External);
   });
 
   // Without `reveal`, Supabase lists secret keys but withholds their values.
@@ -345,7 +345,7 @@ describe("getSupabaseProjectLogs", () => {
 });
 
 describe("classifyManagementApiError", () => {
-  it("maps a Management API 401/403 to an Auth DyadError", () => {
+  it("maps a Management API 401/403 to an Auth KapableError", () => {
     for (const status of [401, 403]) {
       const error = classifyManagementApiError(
         new SupabaseManagementAPIError(
@@ -360,15 +360,15 @@ describe("classifyManagementApiError", () => {
         "update this app's API key",
       );
 
-      expect(isDyadError(error)).toBe(true);
+      expect(isKapableError(error)).toBe(true);
       // Auth is telemetry-filtered and drives the reconnect path; an
       // unclassified error would be reported as a product exception instead.
-      expect((error as DyadError).kind).toBe(DyadErrorKind.Auth);
+      expect((error as KapableError).kind).toBe(KapableErrorKind.Auth);
     }
   });
 
-  it("preserves an already-classified DyadError", () => {
-    const original = new DyadError("nope", DyadErrorKind.Precondition);
+  it("preserves an already-classified KapableError", () => {
+    const original = new KapableError("nope", KapableErrorKind.Precondition);
 
     expect(classifyManagementApiError(original, "do a thing")).toBe(original);
   });

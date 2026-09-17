@@ -41,7 +41,7 @@ import {
   sendTelemetryEventToWindow,
 } from "./ipc/utils/telemetry";
 import { handleSupabaseOAuthReturn } from "./supabase_admin/supabase_return_handler";
-import { handleDyadProReturn } from "./main/pro";
+import { handleKapableProReturn } from "./main/pro";
 import { IS_TEST_BUILD } from "./ipc/utils/test_utils";
 import { BackupManager } from "./backup_manager";
 import { db, getDatabasePath, initializeDatabase } from "./db";
@@ -102,8 +102,8 @@ import { encryptStoredMcpSecrets } from "./ipc/utils/mcp_secret_encryption";
 import fs from "fs";
 import { gitAddSafeDirectory } from "./ipc/utils/git_utils";
 import {
-  getDyadAppsBaseDirectory,
-  getDyadAppPath,
+  getKapableAppsBaseDirectory,
+  getKapableAppPath,
   getUserDataPath,
 } from "./paths/paths";
 import { createDeepLinkQueue } from "./main/deep_link_queue";
@@ -115,7 +115,7 @@ import {
   shouldRetainClosedWindowForActivation,
   shouldQuitAfterAllWindowsClosed,
 } from "./main/window_lifecycle_policy";
-import { registerDyadProtocolLinux } from "./main/linux_protocol_registration";
+import { registerKapableProtocolLinux } from "./main/linux_protocol_registration";
 import {
   applyManagedPnpmToProcessPath,
   getManagedPnpmBinDir,
@@ -126,7 +126,7 @@ import {
   getManagedNodeVersion,
   maybeUpgradeManagedNode,
 } from "./ipc/utils/managed_node";
-import { createDyadMediaProtocolHandler } from "./main/dyad_media_protocol";
+import { createKapableMediaProtocolHandler } from "./main/kapable_media_protocol";
 import {
   createPlatformThumbnailFromPath,
   getMediaThumbnailCacheRoot,
@@ -159,7 +159,7 @@ import {
   restorableVisibleEntity,
   type WindowSessionDescriptor,
 } from "./window_infrastructure/main/window_session";
-import { DyadError, DyadErrorKind, isDyadError } from "./errors/dyad_error";
+import { KapableError, KapableErrorKind, isKapableError } from "./errors/kapable_error";
 import {
   formatErrorBanner,
   formatExitBanner,
@@ -185,7 +185,7 @@ log.errorHandler.startCatching({
 
 // In dev, keep minidumps and logs under the project's ./userData, not the OS
 // one. Must run before crashReporter.start and before the first log call, when
-// electron-log caches its dir. macOS logs ignore userData: ~/Library/Logs/dyad.
+// electron-log caches its dir. macOS logs ignore userData: ~/Library/Logs/kapable.
 if (process.env.NODE_ENV === "development") {
   const devUserData = getUserDataPath();
   fs.mkdirSync(devUserData, { recursive: true });
@@ -212,7 +212,7 @@ log.info(
 );
 const execFileAsync = promisify(execFile);
 
-// Prefer the Dyad-managed pnpm (if installed) for everything spawned from the
+// Prefer the KapAble-managed pnpm (if installed) for everything spawned from the
 // main process. Runs after all module imports, so it wins over the shell PATH
 // that fixPath() restores at app_runtime_service load time.
 applyManagedPnpmToProcessPath();
@@ -305,7 +305,7 @@ function processNativeCrashDumps(): void {
   // Where we keep dumps we've already reported, for later examination. Under
   // userData (not inside crashDumpsDir) so it stays separate from Crashpad's
   // own dump dirs and isn't picked up by the scan above.
-  const retainDir = path.join(app.getPath("userData"), "dyad-crash-reports");
+  const retainDir = path.join(app.getPath("userData"), "kapable-crash-reports");
   try {
     fs.mkdirSync(retainDir, { recursive: true });
   } catch (error) {
@@ -404,12 +404,12 @@ if (fs.existsSync(gitDir)) {
 // https://www.electronjs.org/docs/latest/tutorial/launch-app-from-url-in-another-app#main-process-mainjs
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient("dyad", process.execPath, [
+    app.setAsDefaultProtocolClient("kapable", process.execPath, [
       path.resolve(process.argv[1]),
     ]);
   }
 } else {
-  app.setAsDefaultProtocolClient("dyad");
+  app.setAsDefaultProtocolClient("kapable");
 }
 
 export async function onReady() {
@@ -423,10 +423,10 @@ export async function onReady() {
   // crashed: both populations have to be measured the same way.
   claimPreviousSessionAppSize();
 
-  // Linux: claim the dyad:// scheme for this build (best-effort, see module).
+  // Linux: claim the kapable:// scheme for this build (best-effort, see module).
   // setAsDefaultProtocolClient above is unreliable on Linux. Pass this instance's
   // userData so a browser-launched deep link forwards here, not a second window.
-  void registerDyadProtocolLinux(app.getPath("userData"));
+  void registerKapableProtocolLinux(app.getPath("userData"));
 
   // React DevTools extension loading is intentionally disabled. In Electron it
   // can spam startup logs with:
@@ -449,7 +449,7 @@ export async function onReady() {
     const message = error instanceof Error ? error.message : String(error);
     dialog.showErrorBox(
       "Database Migration Failed",
-      `Dyad could not initialize its local database. ${message}`,
+      `KapAble could not initialize its local database. ${message}`,
     );
     app.quit();
     return;
@@ -489,12 +489,12 @@ export async function onReady() {
 
   const settings = await readEffectiveSettings();
 
-  // Add dyad-apps directory to git safe.directory (required for Windows).
+  // Add kapable-apps directory to git safe.directory (required for Windows).
   // The trailing /* allows access to all repositories under the named directory.
   // See: https://git-scm.com/docs/git-config#Documentation/git-config.txt-safedirectory
   // Don't need to await because this only needs to run before
-  // the user starts interacting with Dyad app and uses a git-related feature.
-  gitAddSafeDirectory(`${getDyadAppsBaseDirectory()}/*`);
+  // the user starts interacting with KapAble app and uses a git-related feature.
+  gitAddSafeDirectory(`${getKapableAppsBaseDirectory()}/*`);
 
   // Check if app was force-closed by checking for the crash sentinel file.
   // The sentinel is written at startup and deleted in before-quit on clean exit.
@@ -564,19 +564,19 @@ export async function onReady() {
   // Start performance monitoring
   startPerformanceMonitoring();
 
-  // Handle dyad-media:// requests. Media-library tiles use bounded, cached
+  // Handle kapable-media:// requests. Media-library tiles use bounded, cached
   // derivatives while explicit previews continue to receive the source file.
   protocol.handle(
-    "dyad-media",
-    createDyadMediaProtocolHandler({
+    "kapable-media",
+    createKapableMediaProtocolHandler({
       cacheRoot: getMediaThumbnailCacheRoot(app.getPath("sessionData")),
-      resolveAppPath: getDyadAppPath,
+      resolveAppPath: getKapableAppPath,
       resolveAppId: async (appId) => {
         const appRecord = await db.query.apps.findFirst({
           where: eq(apps.id, appId),
           columns: { path: true },
         });
-        return appRecord ? getDyadAppPath(appRecord.path) : null;
+        return appRecord ? getKapableAppPath(appRecord.path) : null;
       },
       fetchFile: (url) => net.fetch(url),
       createThumbnailFromPath: (sourcePath, size) =>
@@ -618,7 +618,7 @@ export async function onReady() {
     // but this is more explicit and falls back to stable if there's an unknown
     // release channel.
     const postfix = settings.releaseChannel === "beta" ? "beta" : "stable";
-    const host = `https://api.dyad.sh/v1/update/${postfix}`;
+    const host = `https://api.kapable.sh/v1/update/${postfix}`;
     logger.info("Auto-update release channel=", postfix);
     // update-electron-app logs updater errors at info level, which the
     // warn-filtered bug-report logs drop — leaving only the orphaned stack
@@ -632,7 +632,7 @@ export async function onReady() {
       updateInterval: "60 minutes",
       updateSource: {
         type: UpdateSourceType.ElectronPublicUpdateService,
-        repo: "dyad-sh/dyad",
+        repo: "AkshatSidharth/KapAble",
         host,
       },
     }); // additional configuration options available
@@ -860,7 +860,7 @@ const createWindow = ({
   rendererLoad: Promise<void>;
 } => {
   if (isAppQuitting) {
-    throw new DyadError("Dyad is shutting down", DyadErrorKind.Precondition);
+    throw new KapableError("KapAble is shutting down", KapableErrorKind.Precondition);
   }
 
   // Create the browser window.
@@ -1202,9 +1202,9 @@ async function createFreshStartupWindow(): Promise<void> {
 configureWindowProductController({
   openEntityInNewWindow: async (entity) => {
     if (productWindows.size >= MAX_PRODUCT_WINDOWS) {
-      throw new DyadError(
-        `Dyad supports up to ${MAX_PRODUCT_WINDOWS} open windows`,
-        DyadErrorKind.Precondition,
+      throw new KapableError(
+        `KapAble supports up to ${MAX_PRODUCT_WINDOWS} open windows`,
+        KapableErrorKind.Precondition,
       );
     }
     try {
@@ -1228,11 +1228,11 @@ configureWindowProductController({
         },
       });
     } catch (error) {
-      if (isDyadError(error)) throw error;
+      if (isKapableError(error)) throw error;
       const detail = error instanceof Error ? error.message : String(error);
-      throw new DyadError(
+      throw new KapableError(
         `Failed to open a new window: ${detail}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
         { cause: error },
       );
     }
@@ -1299,11 +1299,11 @@ const createApplicationMenu = () => {
       label: "View",
       submenu: [
         {
-          label: "Reload Dyad",
+          label: "Reload KapAble",
           click: () => BrowserWindow.getFocusedWindow()?.reload(),
         },
         {
-          label: "Force Reload Dyad",
+          label: "Force Reload KapAble",
           click: () =>
             BrowserWindow.getFocusedWindow()?.webContents.reloadIgnoringCache(),
         },
@@ -1339,11 +1339,11 @@ const createApplicationMenu = () => {
   Menu.setApplicationMenu(appMenu);
 };
 
-// Register dyad-media:// protocol for serving persistent media attachments.
+// Register kapable-media:// protocol for serving persistent media attachments.
 // Must be called before app.whenReady().
 protocol.registerSchemesAsPrivileged([
   {
-    scheme: "dyad-media",
+    scheme: "kapable-media",
     privileges: {
       standard: true,
       secure: true,
@@ -1356,7 +1356,7 @@ protocol.registerSchemesAsPrivileged([
 // A cold-start protocol URL arrives in argv before any renderer is ready.
 // Queue it in both production and E2E builds; the latter skips only the
 // singleton lock so parallel test processes can coexist.
-const initialDeepLink = process.argv.find((arg) => arg.startsWith("dyad://"));
+const initialDeepLink = process.argv.find((arg) => arg.startsWith("kapable://"));
 if (initialDeepLink) {
   deepLinkQueue.handle(initialDeepLink);
 }
@@ -1375,7 +1375,7 @@ if (IS_TEST_BUILD) {
     app.quit();
   } else {
     app.on("second-instance", (_event, commandLine, _workingDirectory) => {
-      const url = commandLine.find((arg) => arg.startsWith("dyad://"));
+      const url = commandLine.find((arg) => arg.startsWith("kapable://"));
       if (isAppQuitting) {
         requestRelaunchAfterQuit(url);
         return;
@@ -1421,7 +1421,7 @@ function showDeepLinkSettingsError(action: string, error: unknown): void {
 }
 
 async function handleDeepLinkReturn(url: string) {
-  // example url: "dyad://supabase-oauth-return?token=a&refreshToken=b"
+  // example url: "kapable://supabase-oauth-return?token=a&refreshToken=b"
   let parsed: URL;
   try {
     parsed = new URL(url);
@@ -1437,10 +1437,10 @@ async function handleDeepLinkReturn(url: string) {
     "hostname",
     parsed.hostname,
   );
-  if (parsed.protocol !== "dyad:") {
+  if (parsed.protocol !== "kapable:") {
     dialog.showErrorBox(
       "Invalid Protocol",
-      `Expected dyad://, got ${parsed.protocol}. Full URL: ${url}`,
+      `Expected kapable://, got ${parsed.protocol}. Full URL: ${url}`,
     );
     return;
   }
@@ -1503,19 +1503,19 @@ async function handleDeepLinkReturn(url: string) {
     }
     return;
   }
-  // dyad://dyad-pro-return?key=123&budget_reset_at=2025-05-26T16:31:13.492000Z&max_budget=100
-  if (parsed.hostname === "dyad-pro-return") {
+  // kapable://kapable-pro-return?key=123&budget_reset_at=2025-05-26T16:31:13.492000Z&max_budget=100
+  if (parsed.hostname === "kapable-pro-return") {
     const apiKey = parsed.searchParams.get("key");
     if (!apiKey) {
       dialog.showErrorBox("Invalid URL", "Expected key");
       return;
     }
     try {
-      handleDyadProReturn({
+      handleKapableProReturn({
         apiKey,
       });
     } catch (error) {
-      showDeepLinkSettingsError("save Dyad Pro settings", error);
+      showDeepLinkSettingsError("save KapAble Pro settings", error);
       return;
     }
     // Send message to renderer to trigger re-render
@@ -1524,7 +1524,7 @@ async function handleDeepLinkReturn(url: string) {
     });
     return;
   }
-  // Fired by the OAuth callback page to hand focus back to Dyad
+  // Fired by the OAuth callback page to hand focus back to KapAble
   // after consent. Tokens land via the loopback listener; focusing
   // the window is the only side-effect needed here.
   if (parsed.hostname === "chatgpt-connected") {
@@ -1542,7 +1542,7 @@ async function handleDeepLinkReturn(url: string) {
     }
     return;
   }
-  // dyad://add-mcp-server?name=Chrome%20DevTools&config=eyJjb21tYW5kIjpudWxsLCJ0eXBlIjoic3RkaW8ifQ%3D%3D
+  // kapable://add-mcp-server?name=Chrome%20DevTools&config=eyJjb21tYW5kIjpudWxsLCJ0eXBlIjoic3RkaW8ifQ%3D%3D
   if (parsed.hostname === "add-mcp-server") {
     const name = parsed.searchParams.get("name");
     const config = parsed.searchParams.get("config");
@@ -1572,7 +1572,7 @@ async function handleDeepLinkReturn(url: string) {
     }
     return;
   }
-  // dyad://add-prompt?data=<base64-encoded-json>
+  // kapable://add-prompt?data=<base64-encoded-json>
   if (parsed.hostname === "add-prompt") {
     const data = parsed.searchParams.get("data");
     if (!data) {

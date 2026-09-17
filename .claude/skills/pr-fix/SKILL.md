@@ -1,5 +1,5 @@
 ---
-name: dyad:pr-fix
+name: kapable:pr-fix
 description: Address all outstanding issues on a GitHub Pull Request by handling both review comments and failing CI checks.
 ---
 
@@ -23,18 +23,18 @@ When making decisions about review comments, consult `rules/product-principles.m
 
 This is a meta-skill that orchestrates two sub-skills to comprehensively fix PR issues.
 
-1. **Run `/dyad:pr-fix:comments`** to handle all unresolved review comments:
+1. **Run `/kapable:pr-fix:comments`** to handle all unresolved review comments:
    - Address valid code review concerns
    - Resolve invalid concerns with explanations
    - Use product principles to resolve ambiguous feedback autonomously
    - Only flag issues for human attention when product principles are insufficient to decide
 
-2. **Run `/dyad:pr-fix:ci`** to handle failing CI checks from the latest PR run:
+2. **Run `/kapable:pr-fix:ci`** to handle failing CI checks from the latest PR run:
    - Fix failing tests (unit and E2E)
    - Update snapshots if needed
    - Ensure all checks pass
 
-3. **Run `/dyad:pr-push`** to commit and push all changes:
+3. **Run `/kapable:pr-push`** to commit and push all changes:
    - This step is REQUIRED. Do NOT skip it or stop before it completes.
    - It will commit changes, run lint/tests, and push to GitHub.
    - Wait for it to finish and verify the push succeeded.

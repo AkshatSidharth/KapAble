@@ -82,9 +82,9 @@ describe("codeSearchTool", () => {
       isSharedModulesChanged: false,
       sharedServerModulePaths: [],
       pendingFunctionDeploys: [],
-      isDyadPro: true,
+      isKapablePro: true,
       todos: [],
-      dyadRequestId: "test-request",
+      kapableRequestId: "test-request",
       fileEditTracker: {},
       testingEnabled: true,
       testRunAttempts: new Map(),
@@ -153,7 +153,7 @@ describe("codeSearchTool", () => {
       mocks.isCodeExplorerReady.mockReturnValue(false);
 
       expect(
-        codeSearchTool.isEnabled?.({ ...mockContext, isDyadPro: false }),
+        codeSearchTool.isEnabled?.({ ...mockContext, isKapablePro: false }),
       ).toBe(false);
     });
 

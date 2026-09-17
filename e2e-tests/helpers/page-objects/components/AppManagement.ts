@@ -90,11 +90,11 @@ export class AppManagement {
     }
     return path.isAbsolute(appPath)
       ? appPath
-      : path.join(this.userDataDir, "dyad-apps", appPath);
+      : path.join(this.userDataDir, "kapable-apps", appPath);
   }
 
   getAppPath({ appName }: { appName: string }) {
-    return path.join(this.userDataDir, "dyad-apps", appName);
+    return path.join(this.userDataDir, "kapable-apps", appName);
   }
 
   async clickAppListItem({ appName }: { appName: string }) {

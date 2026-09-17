@@ -1,6 +1,6 @@
 ---
-name: dyad:run-benchmark
-description: Run the app-builder benchmark (benchmarks/app-builder) for one or more models — build the three apps through headless Dyad against neon-sim and the recording proxy, score them (Playwright CUJs + security probes + LLM judge), verify the wire ledger, and regenerate RESULTS.md and the scores page. Use this whenever the user asks to benchmark, bench, or eval a model, run it "at low/high effort", compare cost or scores of models on the apps, rerun a lost cell, or asks what a model scored. Also use it for follow-up questions about a run (why a checkpoint failed, how much it cost) — the procedures for diagnosing cells live here.
+name: kapable:run-benchmark
+description: Run the app-builder benchmark (benchmarks/app-builder) for one or more models — build the three apps through headless KapAble against neon-sim and the recording proxy, score them (Playwright CUJs + security probes + LLM judge), verify the wire ledger, and regenerate RESULTS.md and the scores page. Use this whenever the user asks to benchmark, bench, or eval a model, run it "at low/high effort", compare cost or scores of models on the apps, rerun a lost cell, or asks what a model scored. Also use it for follow-up questions about a run (why a checkpoint failed, how much it cost) — the procedures for diagnosing cells live here.
 ---
 
 # Run the app-builder benchmark
@@ -8,7 +8,7 @@ description: Run the app-builder benchmark (benchmarks/app-builder) for one or m
 The benchmark measures cost (exact wire token counts × pinned list prices),
 quality (60% fixed Playwright customer-journey suites + 25% security probes +
 15% single LLM judge, per checkpoint, averaged over three milestones) and
-duration, for building three apps (Relay CRM, Deskhero, Portalis) with Dyad's
+duration, for building three apps (Relay CRM, Deskhero, Portalis) with KapAble's
 local-agent mode. Everything is n=1 per cell, so a single bad line in one
 milestone moves an app column by 30 points; read every number with that in
 mind and say so when reporting.
@@ -17,14 +17,14 @@ mind and say so when reporting.
 
 `BENCH` = the `benchmarks/app-builder` directory. It is not on every
 checkout: look in the current repo first, then the sibling checkout the user
-runs benchmarks from (as of 2026-09 that is `/Volumes/essd/dyad-2`, whose
+runs benchmarks from (as of 2026-09 that is `/Volumes/essd/kapable-2`, whose
 `benchmarks/app-builder` carries uncommitted hardening). Export `BENCH` for the
 bundled scripts if it is not under this repo. Key pieces:
 
 | Piece           | Path                                                                                                                          | Role                                                                                                                                                 |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Cell runner     | `run-cell.sh <provider/model>`                                                                                                | one model × one app × 3 milestones through the headless harness; guards (engine drain probe, proxy effort match, model-in-pin)                       |
-| Recording proxy | `proxy/engine-proxy.mjs --port P --cell ID`                                                                                   | sits at `DYAD_ENGINE_URL`; serves the pinned catalog; forces effort; writes `proxy/logs/requests-<cell>.jsonl`; enforces `APPBENCH_CELL_CEILING_USD` |
+| Recording proxy | `proxy/engine-proxy.mjs --port P --cell ID`                                                                                   | sits at `KAPABLE_ENGINE_URL`; serves the pinned catalog; forces effort; writes `proxy/logs/requests-<cell>.jsonl`; enforces `APPBENCH_CELL_CEILING_USD` |
 | Backend sim     | `neon-sim/server.mjs`                                                                                                         | Neon control-plane + auth + TLS SQL proxy on :7788 / :443 / :5433 (wildcard bind required on macOS)                                                  |
 | Scorer          | `s-score.sh <cellId>` (env `APPBENCH_APP`, `APP_PORT`)                                                                        | clones each checkpoint snapshot, builds, runs the suite, then `judge/judge.mjs`                                                                      |
 | Report          | `node report.mjs` → `RESULTS.md`; `./make-scores.sh` → `results/videos/scores.html`; `./make-gallery.sh` → demo-video gallery | served on the tailnet by `serve-gallery.sh`                                                                                                          |
@@ -43,7 +43,7 @@ cell: `results/s-cell/<cell>.summary.json` (+ `.m<k>.messages.json`,
 
 1. **Preconditions.** `curl -sf http://127.0.0.1:7788/__sim/state` must answer
    (else `cd $BENCH/neon-sim && node server.mjs &`; if :443 is refused, quit
-   the Tailscale app, which holds it, and restart). `DYAD_PRO_KEY` must be in
+   the Tailscale app, which holds it, and restart). `KAPABLE_PRO_KEY` must be in
    the environment or the repo `.env`. Free ports for the arm (below).
 
 2. **New model?** Follow `references/adding-a-model.md` first: pin the live
@@ -80,7 +80,7 @@ cell: `results/s-cell/<cell>.summary.json` (+ `.m<k>.messages.json`,
    for Gemini, `none` for OpenRouter models, which get no effort field), the
    catalog's max output tokens (OpenAI-compatible paths may send none — fine
    unless it is an Anthropic model), all HTTP 200. The `gpt-5.6-luna` rows are
-   Dyad's own side tasks and are normal.
+   KapAble's own side tasks and are normal.
 
 5. **When a build exits.** `exit=0` → read `summary.json`: every milestone has
    a `snapshotDb`, `errorEvents` 0, note `overSoftCap`. `exit=1` → `grep

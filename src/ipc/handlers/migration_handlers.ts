@@ -1,6 +1,6 @@
 import { createTypedHandler } from "./base";
 import { migrationContracts } from "../types/migration";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   logger,
   prepareMigrationContext,
@@ -85,15 +85,15 @@ export function registerMigrationHandlers() {
     // no-op / does not belong to this app).
     const stored = peekPreview(migrationId);
     if (!stored) {
-      throw new DyadError(
+      throw new KapableError(
         "Migration plan expired or already applied. Please start a new migration preview.",
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
     if (stored.appId !== appId) {
-      throw new DyadError(
+      throw new KapableError(
         "Migration plan does not belong to this app.",
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
 
@@ -124,9 +124,9 @@ export function registerMigrationHandlers() {
           `project ${target.projectId}→${projectId}, branch ${target.prodBranchId}→${prodBranchId}, ` +
           `updatedAt ${target.prodUpdatedAt}→${prodUpdatedAt})`,
       );
-      throw new DyadError(
+      throw new KapableError(
         "The production database changed since this migration was previewed. Please regenerate the preview before applying.",
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
 

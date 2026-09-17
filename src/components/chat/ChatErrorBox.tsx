@@ -26,13 +26,13 @@ import { Button } from "@/components/ui/button";
 export function ChatErrorBox({
   onDismiss,
   error,
-  isDyadProEnabled,
+  isKapableProEnabled,
   onStartNewChat,
   onSwitchToBuildMode,
 }: {
   onDismiss: () => void;
   error: string;
-  isDyadProEnabled: boolean;
+  isKapableProEnabled: boolean;
   onStartNewChat?: () => void;
   onSwitchToBuildMode?: () => void;
 }) {
@@ -42,10 +42,10 @@ export function ChatErrorBox({
     : error;
   const freeAgentQuotaError = parseFreeAgentQuotaError(normalizedError);
   const isFreeModelQuotaError =
-    normalizedError.includes("dyad_free_model_quota_exceeded") ||
+    normalizedError.includes("kapable_free_model_quota_exceeded") ||
     normalizedError.includes("FREE_MODEL_QUOTA_EXCEEDED") ||
-    normalizedError.includes("Dyad Free has reached its daily limit.") ||
-    normalizedError.includes("Dyad Free limit");
+    normalizedError.includes("KapAble Free has reached its daily limit.") ||
+    normalizedError.includes("KapAble Free limit");
   const { messagesLimit, resetTime } = useFreeAgentQuota();
   const {
     messagesLimit: freeModelMessagesLimit,
@@ -79,10 +79,10 @@ export function ChatErrorBox({
         {error}
         <span className="ml-1">
           <ExternalLink
-            href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=free-quota-error"
+            href="https://kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=free-quota-error"
             variant="primary"
           >
-            Access with Dyad Pro
+            Access with KapAble Pro
           </ExternalLink>
         </span>{" "}
         or switch to another model.
@@ -93,11 +93,11 @@ export function ChatErrorBox({
   // Important, this needs to come after the "free quota tier" check
   // because it also includes this URL in the error message
   //
-  // Sometimes Dyad Pro can return rate limit errors and we do not want to
-  // show the upgrade to Dyad Pro link in that case because they are
-  // already on the Dyad Pro plan.
+  // Sometimes KapAble Pro can return rate limit errors and we do not want to
+  // show the upgrade to KapAble Pro link in that case because they are
+  // already on the KapAble Pro plan.
   if (
-    !isDyadProEnabled &&
+    !isKapableProEnabled &&
     (error.includes("Resource has been exhausted") ||
       error.includes("https://ai.google.dev/gemini-api/docs/rate-limits") ||
       error.includes("Provider returned error"))
@@ -107,13 +107,13 @@ export function ChatErrorBox({
         {error}
         <div className="mt-2 space-y-2 space-x-2">
           <ExternalLink
-            href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=rate-limit-error"
+            href="https://kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=rate-limit-error"
             variant="primary"
           >
-            Upgrade to Dyad Pro
+            Upgrade to KapAble Pro
           </ExternalLink>
 
-          <ExternalLink href="https://dyad.sh/docs/help/ai-rate-limit">
+          <ExternalLink href="https://kapable.sh/docs/help/ai-rate-limit">
             Troubleshooting guide
           </ExternalLink>
         </div>
@@ -121,7 +121,7 @@ export function ChatErrorBox({
     );
   }
 
-  if (isDyadProEnabled && error.includes("ExceededBudget:")) {
+  if (isKapableProEnabled && error.includes("ExceededBudget:")) {
     return (
       <BillingNotice
         onDismiss={onDismiss}
@@ -158,17 +158,17 @@ export function ChatErrorBox({
     return (
       <ChatErrorContainer onDismiss={onDismiss}>
         You have used all {messagesLimit} free Basic Agent messages for today.
-        {resetText} This message was not sent. Upgrade to Dyad Pro for unlimited
+        {resetText} This message was not sent. Upgrade to KapAble Pro for unlimited
         Agent access
         {onSwitchToBuildMode
           ? ", or switch this chat to Build mode and send it again."
-          : ". To use Build mode, first choose a model other than Dyad Free, then send it again."}
+          : ". To use Build mode, first choose a model other than KapAble Free, then send it again."}
         <div className="mt-2 flex flex-wrap gap-2">
           <ExternalLink
-            href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=free-agent-quota-exceeded"
+            href="https://kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=free-agent-quota-exceeded"
             variant="primary"
           >
-            Upgrade to Dyad Pro
+            Upgrade to KapAble Pro
           </ExternalLink>
           {onSwitchToBuildMode && (
             <Button
@@ -199,11 +199,11 @@ export function ChatErrorBox({
     return (
       <ChatErrorContainer onDismiss={onDismiss}>
         <span>
-          You have reached the {freeModelMessagesLimit}-message Dyad Free model
+          You have reached the {freeModelMessagesLimit}-message KapAble Free model
           limit.
           {resetText} Switch to paid models.{" "}
           <ExternalLink
-            href="https://academy.dyad.sh/subscription?utm_source=dyad-app&utm_medium=app&utm_campaign=exceeded-budget-error"
+            href="https://academy.kapable.sh/subscription?utm_source=kapable-app&utm_medium=app&utm_campaign=exceeded-budget-error"
             variant="primary"
           >
             Get more AI credits
@@ -219,17 +219,17 @@ export function ChatErrorBox({
         <ErrorMarkdown>{error}</ErrorMarkdown>
       </div>
       <div className="mt-2 space-y-2 space-x-2">
-        {!isDyadProEnabled &&
+        {!isKapableProEnabled &&
           error.includes(AI_STREAMING_ERROR_MESSAGE_PREFIX) &&
           !error.includes("TypeError: terminated") && (
             <ExternalLink
-              href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=general-error"
+              href="https://kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=general-error"
               variant="primary"
             >
-              Upgrade to Dyad Pro
+              Upgrade to KapAble Pro
             </ExternalLink>
           )}
-        {isDyadProEnabled && onStartNewChat && (
+        {isKapableProEnabled && onStartNewChat && (
           <Tooltip>
             <TooltipTrigger
               onClick={onStartNewChat}
@@ -243,7 +243,7 @@ export function ChatErrorBox({
             </TooltipContent>
           </Tooltip>
         )}
-        <ExternalLink href="https://www.dyad.sh/docs/faq">
+        <ExternalLink href="https://www.kapable.sh/docs/faq">
           Read docs
         </ExternalLink>
       </div>

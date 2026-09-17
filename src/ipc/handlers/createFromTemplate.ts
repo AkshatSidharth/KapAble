@@ -6,7 +6,7 @@ import { gitClone, getCurrentCommitHash } from "../utils/git_utils";
 import { readSettings } from "@/main/settings";
 import { getTemplateOrThrow } from "../utils/template_utils";
 import log from "electron-log";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 const logger = log.scope("createFromTemplate");
 
@@ -32,9 +32,9 @@ export async function createFromTemplate({
 
   const template = await getTemplateOrThrow(templateId);
   if (!template.githubUrl) {
-    throw new DyadError(
+    throw new KapableError(
       `Template ${templateId} has no GitHub URL`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
   const repoCachePath = await cloneRepo(template.githubUrl);
@@ -44,15 +44,15 @@ export async function createFromTemplate({
 async function cloneRepo(repoUrl: string): Promise<string> {
   const url = new URL(repoUrl);
   if (url.protocol !== "https:") {
-    throw new DyadError(
+    throw new KapableError(
       "Repository URL must use HTTPS.",
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
   if (url.hostname !== "github.com") {
-    throw new DyadError(
+    throw new KapableError(
       "Repository URL must be a github.com URL.",
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
 
@@ -97,7 +97,7 @@ async function cloneRepo(repoUrl: string): Promise<string> {
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
-          "User-Agent": "Dyad", // GitHub API requires this
+          "User-Agent": "KapAble", // GitHub API requires this
           Accept: "application/vnd.github.v3+json",
         },
       });
@@ -111,9 +111,9 @@ async function cloneRepo(repoUrl: string): Promise<string> {
       const commitData = await response.json();
       const remoteSha = commitData.sha;
       if (!remoteSha) {
-        throw new DyadError(
+        throw new KapableError(
           "SHA not found in GitHub API response.",
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
 

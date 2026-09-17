@@ -250,16 +250,16 @@ export class Settings {
     await expect(this.page.getByText(/test.+2345/)).toBeVisible();
   }
 
-  async setUpDyadProvider() {
+  async setUpKapableProvider() {
     await this.page
       .locator("div")
-      .filter({ hasText: /^DyadNeeds Setup$/ })
+      .filter({ hasText: /^KapableNeeds Setup$/ })
       .nth(1)
       .click();
-    await this.page.getByRole("textbox", { name: "Set Dyad API Key" }).click();
+    await this.page.getByRole("textbox", { name: "Set KapAble API Key" }).click();
     await this.page
-      .getByRole("textbox", { name: "Set Dyad API Key" })
-      .fill("testdyadkey");
+      .getByRole("textbox", { name: "Set KapAble API Key" })
+      .fill("testkapablekey");
     await this.page.getByRole("button", { name: "Save Key" }).click();
   }
 }

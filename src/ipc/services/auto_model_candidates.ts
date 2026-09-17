@@ -3,12 +3,12 @@ import { resolveBuiltinModelAlias } from "../shared/remote_language_model_catalo
 import { resolveModelSelection } from "../utils/model_effort";
 import { resolveSubscriptionModel } from "./resolve_subscription_model";
 
-export const AUTO_DYAD_PRO_MODEL_ALIASES = [
-  "dyad/auto/openai",
-  "dyad/auto/anthropic",
-  "dyad/auto/google",
+export const AUTO_KAPABLE_PRO_MODEL_ALIASES = [
+  "kapable/auto/openai",
+  "kapable/auto/anthropic",
+  "kapable/auto/google",
 ] as const;
-export const AUTO_BALANCED_ALIAS = "dyad/auto/balanced";
+export const AUTO_BALANCED_ALIAS = "kapable/auto/balanced";
 
 export type ResolvedAliasModel = NonNullable<
   Awaited<ReturnType<typeof resolveBuiltinModelAlias>>

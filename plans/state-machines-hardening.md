@@ -565,7 +565,7 @@ Close the flagged-but-deferred review findings:
   cross-machine ordering is causal, not approximate (#4026).
 - Per-entity-key ring buffers (or key-aware capacity) so concurrent
   chats/apps stop evicting each other's trace entries (#4026).
-- Dev-gate `window.__dyadMachines`; `defaultDescription` must refuse to
+- Dev-gate `window.__kapableMachines`; `defaultDescription` must refuse to
   retain raw untagged objects (#4026 — retention/exposure hazard).
 - Freeze or defensively clone co-sim snapshots handed to caller callbacks;
   validate `result.state` eagerly (#4027).
@@ -708,7 +708,7 @@ may never need its own PR.
 ### PR 9 — Observability polish + rules doc (no prereqs; rules rewrite lands last)
 
 Trace sequence tiebreaker, per-entity-key rings, dev-gating
-`__dyadMachines`, co-sim snapshot freezing and eager `result.state`
+`__kapableMachines`, co-sim snapshot freezing and eager `result.state`
 validation, the `registerAtomWriter` prod-throw decision, and the
 `rules/state-machines.md` rewrite pointing rules at the new primitives
 (alternatively, fold each rules-doc line into the PR that lands its

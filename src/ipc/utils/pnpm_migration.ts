@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import log from "electron-log";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { gitAdd, gitCommit } from "@/ipc/utils/git_utils";
 import {
   ensurePnpmAllowBuildsConfigured,
@@ -88,7 +88,7 @@ function readPnpmLockfileVersion(appPath: string): number | null {
  * state the app's legacy pnpm cannot read: a pre-9.0 lockfile (which the
  * managed pnpm rewrites incompatibly on install) or a `packageManager` pin at
  * or below pnpm 8 (whose corepack/CI installs cannot read the 9.0 lockfile
- * Dyad produces).
+ * KapAble produces).
  */
 export function isPnpmVersionMigrationNeeded(appPath: string): boolean {
   const signal = getPackageManagerSignal(appPath);
@@ -138,8 +138,8 @@ async function restorePackageJson(
 }
 
 /**
- * Migrates the app to the Dyad-managed pnpm in one visible step: updates the
- * `packageManager` pin to the version Dyad actually runs, reinstalls so the
+ * Migrates the app to the KapAble-managed pnpm in one visible step: updates the
+ * `packageManager` pin to the version KapAble actually runs, reinstalls so the
  * lockfile is rewritten to the matching format, and commits both together so
  * the repo's self-description, lockfile, and CI/deploy behavior agree.
  */
@@ -150,9 +150,9 @@ export async function applyPnpmVersionMigration({
 }): Promise<void> {
   const pnpmSupport = await getPnpmMinimumReleaseAgeSupport();
   if (!pnpmSupport.available || !pnpmSupport.version) {
-    throw new DyadError(
-      "pnpm is not available, so the project cannot be migrated. Restart Dyad and try again.",
-      DyadErrorKind.External,
+    throw new KapableError(
+      "pnpm is not available, so the project cannot be migrated. Restart KapAble and try again.",
+      KapableErrorKind.External,
     );
   }
   // If PATH fell back to an old system pnpm (e.g. the managed install is
@@ -164,9 +164,9 @@ export async function applyPnpmVersionMigration({
       `${COMPATIBLE_PNPM_LOCKFILE_MAJOR}.0.0`,
     )
   ) {
-    throw new DyadError(
-      `The available pnpm (${pnpmSupport.version}) is older than pnpm ${COMPATIBLE_PNPM_LOCKFILE_MAJOR}, so the project cannot be migrated. Restart Dyad and try again.`,
-      DyadErrorKind.External,
+    throw new KapableError(
+      `The available pnpm (${pnpmSupport.version}) is older than pnpm ${COMPATIBLE_PNPM_LOCKFILE_MAJOR}, so the project cannot be migrated. Restart KapAble and try again.`,
+      KapableErrorKind.External,
     );
   }
 
@@ -174,7 +174,7 @@ export async function applyPnpmVersionMigration({
   const allowBuildsResult = await ensurePnpmAllowBuildsConfigured({ appPath });
 
   // Update the pin before reinstalling so pnpm writes a lockfile that matches
-  // the package metadata Dyad will commit. If the install fails, restore the
+  // the package metadata KapAble will commit. If the install fails, restore the
   // original package.json so the failed migration does not hide future prompts.
   let originalPackageJsonContent: string;
   try {
@@ -184,9 +184,9 @@ export async function applyPnpmVersionMigration({
     );
   } catch (error) {
     logger.warn("Failed to update packageManager pin:", error);
-    throw new DyadError(
+    throw new KapableError(
       "The packageManager pin could not be updated. Please update package.json manually.",
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 
@@ -194,7 +194,7 @@ export async function applyPnpmVersionMigration({
     await simpleSpawnWithDeniedPnpmBuildSelfHeal({
       command: `pnpm ${PNPM_INSTALL_POLICY_ARGS.join(" ")} install`,
       cwd: appPath,
-      successMessage: "Reinstalled dependencies with the Dyad-managed pnpm",
+      successMessage: "Reinstalled dependencies with the KapAble-managed pnpm",
       errorPrefix: "Failed to reinstall dependencies with pnpm",
     });
   } catch (error) {
@@ -211,7 +211,7 @@ export async function applyPnpmVersionMigration({
 
   // Old-lockfile apps commonly carry unlisted build-script deps; record any
   // builds this install skipped so plain `pnpm install` stays green outside
-  // Dyad (this also commits pnpm-workspace.yaml when it changes).
+  // KapAble (this also commits pnpm-workspace.yaml when it changes).
   const ignoredBuilds = await resolvePnpmIgnoredBuilds(appPath);
   const { deniedBuilds } = await recordAndReportDeniedPnpmBuilds({
     appPath,
@@ -232,9 +232,9 @@ export async function applyPnpmVersionMigration({
     });
   } catch (error) {
     logger.warn("Failed to commit pnpm migration changes:", error);
-    throw new DyadError(
+    throw new KapableError(
       "The migration ran but the changes could not be committed. Please commit package.json and pnpm-lock.yaml manually.",
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 

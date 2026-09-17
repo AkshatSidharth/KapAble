@@ -6,7 +6,7 @@ import {
   type InvocationRef,
   type InvocationClaim,
 } from "../../state_machines/invocation_ref";
-import { DyadError, DyadErrorKind, isDyadError } from "../../errors/dyad_error";
+import { KapableError, KapableErrorKind, isKapableError } from "../../errors/kapable_error";
 import type { QueryInvalidationScope } from "../../window_infrastructure/types";
 
 // =============================================================================
@@ -186,31 +186,31 @@ export type EventChannel<T> = T extends EventContract<infer C, any> ? C : never;
 // Client Generators
 // =============================================================================
 
-const IPC_ENVELOPE_MARKER = "dyad-ipc-envelope-v1";
+const IPC_ENVELOPE_MARKER = "kapable-ipc-envelope-v1";
 
 export interface SerializedIpcError {
   name?: string;
   message: string;
-  kind?: DyadErrorKind;
+  kind?: KapableErrorKind;
   code?: string;
   stack?: string;
 }
 
 export type IpcInvokeEnvelope<T = unknown> =
   | {
-      __dyadIpcEnvelope: typeof IPC_ENVELOPE_MARKER;
+      __kapableIpcEnvelope: typeof IPC_ENVELOPE_MARKER;
       ok: true;
       value: T;
     }
   | {
-      __dyadIpcEnvelope: typeof IPC_ENVELOPE_MARKER;
+      __kapableIpcEnvelope: typeof IPC_ENVELOPE_MARKER;
       ok: false;
       error: SerializedIpcError;
     };
 
 export function createIpcSuccessEnvelope<T>(value: T): IpcInvokeEnvelope<T> {
   return {
-    __dyadIpcEnvelope: IPC_ENVELOPE_MARKER,
+    __kapableIpcEnvelope: IPC_ENVELOPE_MARKER,
     ok: true,
     value,
   };
@@ -218,7 +218,7 @@ export function createIpcSuccessEnvelope<T>(value: T): IpcInvokeEnvelope<T> {
 
 export function createIpcErrorEnvelope(error: unknown): IpcInvokeEnvelope {
   return {
-    __dyadIpcEnvelope: IPC_ENVELOPE_MARKER,
+    __kapableIpcEnvelope: IPC_ENVELOPE_MARKER,
     ok: false,
     error: serializeIpcError(error),
   };
@@ -230,7 +230,7 @@ export function isIpcInvokeEnvelope(
   return (
     typeof value === "object" &&
     value !== null &&
-    (value as { __dyadIpcEnvelope?: unknown }).__dyadIpcEnvelope ===
+    (value as { __kapableIpcEnvelope?: unknown }).__kapableIpcEnvelope ===
       IPC_ENVELOPE_MARKER &&
     typeof (value as { ok?: unknown }).ok === "boolean"
   );
@@ -244,7 +244,7 @@ export function serializeIpcError(error: unknown): SerializedIpcError {
       ? (error as { code: string }).code
       : undefined;
 
-  if (isDyadError(error)) {
+  if (isKapableError(error)) {
     return {
       name: error.name,
       message: error.message,
@@ -266,22 +266,22 @@ export function serializeIpcError(error: unknown): SerializedIpcError {
   return { message: String(error), code };
 }
 
-function isDyadErrorKind(value: unknown): value is DyadErrorKind {
+function isKapableErrorKind(value: unknown): value is KapableErrorKind {
   return (
     typeof value === "string" &&
-    Object.values(DyadErrorKind).includes(value as DyadErrorKind)
+    Object.values(KapableErrorKind).includes(value as KapableErrorKind)
   );
 }
 
 export function deserializeIpcError(error: SerializedIpcError): Error {
-  if (isDyadErrorKind(error.kind)) {
-    const dyadError = new DyadError(error.message, error.kind);
-    dyadError.name = error.name ?? dyadError.name;
+  if (isKapableErrorKind(error.kind)) {
+    const kapableError = new KapableError(error.message, error.kind);
+    kapableError.name = error.name ?? kapableError.name;
     if (error.code !== undefined) {
-      (dyadError as DyadError & { code: string }).code = error.code;
+      (kapableError as KapableError & { code: string }).code = error.code;
     }
-    dyadError.stack = error.stack;
-    return dyadError;
+    kapableError.stack = error.stack;
+    return kapableError;
   }
 
   const genericError = new Error(error.message);

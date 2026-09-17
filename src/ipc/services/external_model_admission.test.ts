@@ -3,15 +3,15 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { Response as NodeResponse } from "node-fetch";
 import type { LanguageModelV3 } from "@ai-sdk/provider";
 import type { UserSettings } from "@/lib/schemas";
-import { DyadErrorKind } from "@/errors/dyad_error";
-const mocks = vi.hoisted(() => ({ credits: vi.fn(), key: "checked-dyad-key" }));
+import { KapableErrorKind } from "@/errors/kapable_error";
+const mocks = vi.hoisted(() => ({ credits: vi.fn(), key: "checked-kapable-key" }));
 vi.mock("node-fetch", async (importOriginal) => ({
   ...(await importOriginal<typeof import("node-fetch")>()),
   default: mocks.credits,
 }));
 vi.mock("@/main/settings", () => ({
   readSettings: () => ({
-    enableDyadPro: true,
+    enableKapablePro: true,
     providerSettings: { auto: { apiKey: { value: mocks.key } } },
   }),
 }));
@@ -37,13 +37,13 @@ vi.mock("../shared/language_model_helpers", () => ({
       type: id === "custom" ? "custom" : "local",
       apiBaseUrl: "http://localhost:1234/v1",
     })),
-    { id: "auto", name: "Dyad", type: "cloud", gatewayPrefix: "dyad/" },
+    { id: "auto", name: "KapAble", type: "cloud", gatewayPrefix: "kapable/" },
     { id: "openai", name: "OpenAI", type: "cloud", gatewayPrefix: "" },
   ],
 }));
 vi.mock("../shared/remote_language_model_catalog", () => ({
   resolveBuiltinModelAlias: async (alias: string) =>
-    alias === "dyad/auto/openai"
+    alias === "kapable/auto/openai"
       ? { providerId: "openai", apiName: "test-model" }
       : null,
 }));
@@ -86,7 +86,7 @@ const denied = () => new NodeResponse("out of credits", { status: 402 });
 const billing = { connection: "local" as const, modelProvider: "ollama" };
 const settings = () =>
   ({
-    enableDyadPro: true,
+    enableKapablePro: true,
     proModelUsage: "subscription",
     selectedChatMode: "local-agent",
     providerSettings: {
@@ -95,7 +95,7 @@ const settings = () =>
     },
   }) as unknown as UserSettings;
 beforeEach(() => {
-  mocks.key = "checked-dyad-key";
+  mocks.key = "checked-kapable-key";
   mocks.credits.mockReset().mockImplementation(async () => balance());
 });
 afterEach(() => {
@@ -146,7 +146,7 @@ it.each(["openai", "ollama", "lmstudio", "custom", "auto"])(
     // Rebuilding the client must not recreate the admission for the next agent step.
     await expect(
       (await createClient()).doStream({ prompt: [], abortSignal: turnSignal }),
-    ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+    ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
     expect(mocks.credits).toHaveBeenCalledTimes(2);
     expect(inference).toHaveBeenCalledTimes(1);
   },
@@ -188,7 +188,7 @@ it.each(["outage", "timeout", "malformed"])(
         mocks.key,
         admitted.externalModelAdmission,
       ),
-    ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+    ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
   },
 );
 
@@ -196,7 +196,7 @@ it("does not mint admission after confirmed denial", async () => {
   mocks.credits.mockResolvedValueOnce(denied());
   await expect(
     checkExternalModelAdmission(mocks.key, signal()),
-  ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+  ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
 });
 
 it("requires a fresh check for another account and retires the mismatched admission", async () => {
@@ -210,7 +210,7 @@ it("requires a fresh check for another account and retires the mismatched admiss
       "different-key",
       admission,
     ),
-  ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+  ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
   expect(mocks.credits.mock.calls[1][1].headers.Authorization).toBe(
     "Bearer different-key",
   );
@@ -222,7 +222,7 @@ it("requires a fresh check for another account and retires the mismatched admiss
       mocks.key,
       admission,
     ),
-  ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+  ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
   expect(mocks.credits).toHaveBeenCalledTimes(3);
 });
 
@@ -261,7 +261,7 @@ it.each([undefined, {} as ExternalModelAdmission])(
         mocks.key,
         admission,
       ),
-    ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+    ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
     expect(mocks.credits).toHaveBeenCalledTimes(1);
   },
 );
@@ -281,7 +281,7 @@ it("does not honor admission after its turn is cancelled", async () => {
       mocks.key,
       admission,
     ),
-  ).rejects.toMatchObject({ kind: DyadErrorKind.UserCancelled });
+  ).rejects.toMatchObject({ kind: KapableErrorKind.UserCancelled });
   mocks.credits.mockImplementation(async () => denied());
   await expect(
     startExternalModelUsage(
@@ -291,7 +291,7 @@ it("does not honor admission after its turn is cancelled", async () => {
       mocks.key,
       admission,
     ),
-  ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+  ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
 });
 
 it("subscription nonstreaming requests consume admission through their stream adapter", async () => {
@@ -345,7 +345,7 @@ it("subscription nonstreaming requests consume admission through their stream ad
   expect(inference).toHaveBeenCalledTimes(1);
   expect(mocks.credits).toHaveBeenCalledTimes(1);
   await expect(model.doGenerate({ prompt: [] })).rejects.toMatchObject({
-    kind: DyadErrorKind.Precondition,
+    kind: KapableErrorKind.Precondition,
   });
   expect(inference).toHaveBeenCalledTimes(1);
 });
@@ -368,7 +368,7 @@ it("subscription requests cannot spend another account's admission after a setti
   );
   await expect(
     (modelClient.model as LanguageModelV3).doStream({ prompt: [] }),
-  ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+  ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
   expect(mocks.credits.mock.calls[1][1].headers.Authorization).toBe(
     "Bearer changed-account-key",
   );
@@ -378,16 +378,16 @@ it("subscription requests cannot spend another account's admission after a setti
 it.each(
   (["build", "ask", "plan", "local-agent"] as const).flatMap(
     (selectedChatMode) =>
-      [true, false].map((enableDyadPro) => ({
+      [true, false].map((enableKapablePro) => ({
         selectedChatMode,
-        enableDyadPro,
+        enableKapablePro,
       })),
   ),
 )(
-  "reports subscription usage only for Pro Agent ($selectedChatMode, Pro=$enableDyadPro)",
-  async ({ selectedChatMode, enableDyadPro }) => {
-    const billed = enableDyadPro && selectedChatMode === "local-agent";
-    const turnSettings = { ...settings(), selectedChatMode, enableDyadPro };
+  "reports subscription usage only for Pro Agent ($selectedChatMode, Pro=$enableKapablePro)",
+  async ({ selectedChatMode, enableKapablePro }) => {
+    const billed = enableKapablePro && selectedChatMode === "local-agent";
+    const turnSettings = { ...settings(), selectedChatMode, enableKapablePro };
     if (!billed) mocks.credits.mockImplementation(async () => denied());
     const requests = vi.fn(async (url: string) => {
       if (url.endsWith("/track-usage"))

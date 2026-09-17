@@ -38,7 +38,7 @@ export const MODEL_OPTIONS: Record<string, ModelOption[]> = {
       name: GPT_5_6_LUNA_MODEL_NAME,
       displayName: "GPT 5.6 Luna",
       description:
-        "Fast agentic coding model used by Dyad Explorer and Implementer",
+        "Fast agentic coding model used by KapAble Explorer and Implementer",
       contextWindow: 372_000,
       temperature: 1,
       dollarSigns: 6,
@@ -46,7 +46,7 @@ export const MODEL_OPTIONS: Record<string, ModelOption[]> = {
     {
       name: GPT_5_6_SOL_MODEL_NAME,
       displayName: "GPT 5.6 Sol",
-      description: "Frontier agentic coding model used by Dyad Reviewer",
+      description: "Frontier agentic coding model used by KapAble Reviewer",
       contextWindow: 372_000,
       temperature: 1,
       dollarSigns: 6,
@@ -396,7 +396,7 @@ export const MODEL_OPTIONS: Record<string, ModelOption[]> = {
       name: "free-pro",
       displayName: "Free (Daily)",
       description:
-        "5 free messages per day for Dyad Pro users (note: your data may be used for training models)",
+        "5 free messages per day for KapAble Pro users (note: your data may be used for training models)",
       tag: "Free",
       tagColor: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
       maxOutputTokens: 32_000,
@@ -620,7 +620,7 @@ export const CLOUD_PROVIDERS: Record<
     displayName: "Google Vertex AI",
     hasFreeTier: false,
     websiteUrl: "https://console.cloud.google.com/vertex-ai",
-    // Use the same gateway prefix as Google Gemini for Dyad Pro compatibility.
+    // Use the same gateway prefix as Google Gemini for KapAble Pro compatibility.
     gatewayPrefix: "gemini/",
     secondary: true,
   },
@@ -631,9 +631,9 @@ export const CLOUD_PROVIDERS: Record<
     gatewayPrefix: "openrouter/",
   },
   auto: {
-    displayName: "Dyad",
-    websiteUrl: "https://academy.dyad.sh/subscription",
-    gatewayPrefix: "dyad/",
+    displayName: "KapAble",
+    websiteUrl: "https://academy.kapable.sh/subscription",
+    gatewayPrefix: "kapable/",
   },
   azure: {
     displayName: "Azure OpenAI",

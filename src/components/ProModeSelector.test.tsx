@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/hooks/useSettings", () => ({
   useSettings: () => ({
     settings: {
-      enableDyadPro: true,
+      enableKapablePro: true,
       proModelUsage: mocks.usage,
       providerSettings: { auto: { apiKey: { value: "test-pro" } } },
     },

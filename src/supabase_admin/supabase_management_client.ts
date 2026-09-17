@@ -17,7 +17,7 @@ import {
   RateLimitError,
   retryWithRateLimit,
 } from "../ipc/utils/retryWithRateLimit";
-import { DyadError, DyadErrorKind, isDyadError } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
 import { enqueueSupabaseDeploy } from "./supabase_deploy_queue";
 
 const fsPromises = fs.promises;
@@ -166,16 +166,16 @@ async function refreshSupabaseTokenOnce(): Promise<void> {
   }
 
   if (!refreshToken) {
-    throw new DyadError(
+    throw new KapableError(
       "Supabase refresh token not found. Please authenticate first.",
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   }
 
   try {
     // Make request to Supabase refresh endpoint
     const response = await fetch(
-      "https://supabase-oauth.dyad.sh/api/connect-supabase/refresh",
+      "https://supabase-oauth.kapable.sh/api/connect-supabase/refresh",
       {
         method: "POST",
         headers: {
@@ -186,9 +186,9 @@ async function refreshSupabaseTokenOnce(): Promise<void> {
     );
 
     if (!response.ok) {
-      throw new DyadError(
+      throw new KapableError(
         `Supabase token refresh failed. Try going to Settings to disconnect Supabase and then reconnect to Supabase. Error status: ${response.statusText}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
@@ -246,9 +246,9 @@ export async function getSupabaseClient({
   const expiresIn = settings.supabase?.expiresIn;
 
   if (!supabaseAccessToken) {
-    throw new DyadError(
+    throw new KapableError(
       "Supabase access token not found. Please authenticate first.",
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   }
 
@@ -260,9 +260,9 @@ export async function getSupabaseClient({
     const newAccessToken = updatedSettings.supabase?.accessToken?.value;
 
     if (!newAccessToken) {
-      throw new DyadError(
+      throw new KapableError(
         "Failed to refresh Supabase access token",
-        DyadErrorKind.Auth,
+        KapableErrorKind.Auth,
       );
     }
 
@@ -303,9 +303,9 @@ async function refreshSupabaseTokenForOrganization(
   const org = settings.supabase?.organizations?.[organizationSlug];
 
   if (!org) {
-    throw new DyadError(
+    throw new KapableError(
       `Supabase organization ${organizationSlug} not found. Please authenticate first.`,
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   }
 
@@ -315,15 +315,15 @@ async function refreshSupabaseTokenForOrganization(
 
   const refreshToken = org.refreshToken?.value;
   if (!refreshToken) {
-    throw new DyadError(
+    throw new KapableError(
       "Supabase refresh token not found. Please authenticate first.",
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   }
 
   try {
     const response = await fetch(
-      "https://supabase-oauth.dyad.sh/api/connect-supabase/refresh",
+      "https://supabase-oauth.kapable.sh/api/connect-supabase/refresh",
       {
         method: "POST",
         headers: {
@@ -334,9 +334,9 @@ async function refreshSupabaseTokenForOrganization(
     );
 
     if (!response.ok) {
-      throw new DyadError(
+      throw new KapableError(
         `Supabase token refresh failed. Try going to Settings to disconnect Supabase and then reconnect. Error status: ${response.statusText}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
@@ -389,17 +389,17 @@ export async function getSupabaseClientForOrganization(
   const org = settings.supabase?.organizations?.[organizationSlug];
 
   if (!org) {
-    throw new DyadError(
+    throw new KapableError(
       `Supabase organization ${organizationSlug} not found. Please authenticate first.`,
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   }
 
   const accessToken = org.accessToken?.value;
   if (!accessToken) {
-    throw new DyadError(
+    throw new KapableError(
       `Supabase access token not found for organization ${organizationSlug}. Please authenticate first.`,
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   }
 
@@ -415,9 +415,9 @@ export async function getSupabaseClientForOrganization(
     const newAccessToken = updatedOrg?.accessToken?.value;
 
     if (!newAccessToken) {
-      throw new DyadError(
+      throw new KapableError(
         `Failed to refresh Supabase access token for organization ${organizationSlug}`,
-        DyadErrorKind.Auth,
+        KapableErrorKind.Auth,
       );
     }
 
@@ -693,9 +693,9 @@ export async function getProjectApiKeys({
 
   const parsed = SupabaseApiKeysSchema.safeParse(await response.json());
   if (!parsed.success) {
-    throw new DyadError(
+    throw new KapableError(
       `Supabase returned an unexpected API-keys response for project ${projectId}: ${parsed.error.message}`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
   return parsed.data as SupabaseApiKey[];
@@ -760,18 +760,18 @@ LIMIT 1000`;
     await response.json(),
   );
   if (!parsed.success) {
-    throw new DyadError(
+    throw new KapableError(
       `Supabase returned an unexpected logs response for project ${projectId}: ${parsed.error.message}`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 
   const result = (parsed.data.result ?? []).map((logEntry) => {
     const timestamp = parseSupabaseLogTimestamp(logEntry.timestamp);
     if (!Number.isFinite(timestamp)) {
-      throw new DyadError(
+      throw new KapableError(
         `Supabase returned an invalid log timestamp for project ${projectId}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
@@ -875,7 +875,7 @@ export interface CreatedSupabaseProjectResponse {
 }
 
 /**
- * Generated and deliberately never surfaced or stored: Dyad reaches projects
+ * Generated and deliberately never surfaced or stored: KapAble reaches projects
  * through the Management API and their API keys, so nothing needs it, and
  * holding a Postgres superuser password would be a liability. Users reset it
  * from the Supabase dashboard for direct access.
@@ -958,11 +958,11 @@ export async function createSupabaseProject({
     logger.error("Supabase returned an unreadable create response", error);
   }
   if (!project?.id) {
-    const unnamed = new DyadError(
+    const unnamed = new KapableError(
       `Supabase created a project but returned no project ref: ${JSON.stringify(project)}`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
-    (unnamed as DyadError & { code: string }).code =
+    (unnamed as KapableError & { code: string }).code =
       SUPABASE_PROJECT_CREATED_BUT_UNLINKED;
     throw unnamed;
   }
@@ -1026,9 +1026,9 @@ export async function listSupabaseBranches({
     logger.info(
       `Branches not available for project ${supabaseProjectId} (403 Forbidden - likely free tier)`,
     );
-    throw new DyadError(
+    throw new KapableError(
       "Branches are only supported for Supabase paid customers",
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
     );
   }
 
@@ -1274,9 +1274,9 @@ async function collectFunctionFiles({
   }
 
   if (!functionDirectory) {
-    throw new DyadError(
+    throw new KapableError(
       `Unable to locate directory for Supabase function ${functionName}`,
-      DyadErrorKind.NotFound,
+      KapableErrorKind.NotFound,
     );
   }
 
@@ -1285,9 +1285,9 @@ async function collectFunctionFiles({
   try {
     await fsPromises.access(indexPath);
   } catch {
-    throw new DyadError(
+    throw new KapableError(
       `Supabase function ${functionName} is missing an index.ts entrypoint`,
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
 
@@ -1459,17 +1459,17 @@ function guessMimeType(filePath: string): string {
 /**
  * Classify a Management API failure before it crosses the IPC boundary.
  *
- * Existing `DyadError`s pass through with their kind intact. A 401/403 means the
+ * Existing `KapableError`s pass through with their kind intact. A 401/403 means the
  * organization's token was revoked or no longer has access to the project — an
  * auth/setup problem the user fixes by reconnecting, so it must reach the
  * renderer as `Auth` rather than as an unclassified product exception (see
- * `rules/dyad-errors.md`).
+ * `rules/kapable-errors.md`).
  */
 export function classifyManagementApiError(
   error: unknown,
   action: string,
 ): unknown {
-  if (isDyadError(error)) {
+  if (isKapableError(error)) {
     return error;
   }
   const message = error instanceof Error ? error.message : String(error);
@@ -1477,9 +1477,9 @@ export function classifyManagementApiError(
     error instanceof SupabaseManagementAPIError &&
     (error.response.status === 401 || error.response.status === 403)
   ) {
-    return new DyadError(
-      `Supabase would not authorize Dyad to ${action}. Reconnect your Supabase account in Settings, or check that this organization still has access to the project. Original error: ${message}`,
-      DyadErrorKind.Auth,
+    return new KapableError(
+      `Supabase would not authorize KapAble to ${action}. Reconnect your Supabase account in Settings, or check that this organization still has access to the project. Original error: ${message}`,
+      KapableErrorKind.Auth,
     );
   }
   return error;

@@ -100,7 +100,7 @@ const ignore = (file: string) => {
   if (file.startsWith("/node_modules/better-sqlite3")) {
     return false;
   }
-  if (file.startsWith("/node_modules/dyad-keychain-reader")) {
+  if (file.startsWith("/node_modules/kapable-keychain-reader")) {
     return false;
   }
   if (file.startsWith("/node_modules/node-pty")) {
@@ -148,12 +148,12 @@ const ignore = (file: string) => {
 
 const isEndToEndTestBuild = process.env.E2E_TEST_BUILD === "true";
 const isWindowsSigningEnabled = process.env.WINDOWS_SIGN === "true";
-const shouldSkipNativeRebuild = process.env.DYAD_SKIP_NATIVE_REBUILD === "true";
+const shouldSkipNativeRebuild = process.env.KAPABLE_SKIP_NATIVE_REBUILD === "true";
 const nativeRebuildModules = [
   "better-sqlite3",
   "node-pty",
   "mustardscript",
-  ...(process.platform === "darwin" ? ["dyad-keychain-reader"] : []),
+  ...(process.platform === "darwin" ? ["kapable-keychain-reader"] : []),
 ];
 
 if (isWindowsSigningEnabled && !process.env.AZURE_CODE_SIGNING_DLIB) {
@@ -189,8 +189,8 @@ const config: ForgeConfig = {
     ],
     protocols: [
       {
-        name: "Dyad",
-        schemes: ["dyad"],
+        name: "KapAble",
+        schemes: ["kapable"],
       },
     ],
     icon: "./assets/icon/logo",
@@ -216,7 +216,7 @@ const config: ForgeConfig = {
     asar: {
       // Native modules and node-pty helper binaries must be loadable from disk.
       unpackDir:
-        "{node_modules/dyad-keychain-reader,node_modules/node-pty,node_modules/mustardscript,node_modules/@mustardscript}",
+        "{node_modules/kapable-keychain-reader,node_modules/node-pty,node_modules/mustardscript,node_modules/@mustardscript}",
     },
     ignore,
     extraResource: ["node_modules/dugite/git", "node_modules/@vscode"],
@@ -235,25 +235,25 @@ const config: ForgeConfig = {
         ? {
             windowsSign,
             iconUrl:
-              "https://raw.githubusercontent.com/dyad-sh/dyad/main/assets/icon/logo.ico",
+              "https://raw.githubusercontent.com/AkshatSidharth/KapAble/main/assets/icon/logo.ico",
             setupIcon: "./assets/icon/logo.ico",
           }
         : {
             iconUrl:
-              "https://raw.githubusercontent.com/dyad-sh/dyad/main/assets/icon/logo.ico",
+              "https://raw.githubusercontent.com/AkshatSidharth/KapAble/main/assets/icon/logo.ico",
             setupIcon: "./assets/icon/logo.ico",
           },
     ),
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({
       options: {
-        mimeType: ["x-scheme-handler/dyad"],
+        mimeType: ["x-scheme-handler/kapable"],
         icon: "./assets/icon/logo.png",
       },
     }),
     new MakerDeb({
       options: {
-        mimeType: ["x-scheme-handler/dyad"],
+        mimeType: ["x-scheme-handler/kapable"],
         icon: "./assets/icon/logo.png",
       },
     }),
@@ -266,8 +266,8 @@ const config: ForgeConfig = {
       name: "@electron-forge/publisher-github",
       config: {
         repository: {
-          owner: "dyad-sh",
-          name: "dyad",
+          owner: "AkshatSidharth",
+          name: "KapAble",
         },
         draft: true,
         force: true,

@@ -1,6 +1,6 @@
 # Model effort and catalog limits on the engine path
 
-Learned while running the app-builder benchmark (`dyad:run-benchmark`) across
+Learned while running the app-builder benchmark (`kapable:run-benchmark`) across
 15 models. Each item was a silent wrong result before it was understood.
 
 - **The remote catalog's `maxOutputTokens` is sent verbatim as the request's

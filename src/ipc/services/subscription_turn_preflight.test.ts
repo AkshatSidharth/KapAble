@@ -3,7 +3,7 @@ vi.mock("../shared/language_model_helpers", () => ({
 }));
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ModelSelection, UserSettings } from "@/lib/schemas";
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 const mocks = vi.hoisted(() => ({
   account: vi.fn(),
   credentials: vi.fn(),
@@ -40,7 +40,7 @@ const model = {
   connection: "api-key",
 } as ModelSelection;
 const settings = {
-  enableDyadPro: true,
+  enableKapablePro: true,
   providerSettings: { auto: { apiKey: { value: "test-key" } } },
 } as unknown as UserSettings;
 const signal = new AbortController().signal;
@@ -53,7 +53,7 @@ beforeEach(() => {
 });
 describe("global subscription turn routing", () => {
   it.each(["build", "ask", "plan"] as const)(
-    "allows %s subscription turns with no Dyad credits",
+    "allows %s subscription turns with no KapAble credits",
     async (selectedChatMode) => {
       mocks.credits.mockRejectedValue(new Error("Out of credits"));
       const result = await preflightWithAdmission(
@@ -146,7 +146,7 @@ describe("global subscription turn routing", () => {
           signal,
         ),
       ).rejects.toMatchObject({
-        kind: DyadErrorKind.Auth,
+        kind: KapableErrorKind.Auth,
         message: expect.stringContaining(
           "Reconnect your ChatGPT subscription or select Pro credits",
         ),
@@ -221,11 +221,11 @@ describe("global subscription turn routing", () => {
     await expect(
       preflightSubscriptionTurn(
         model,
-        { ...settings, enableDyadPro: false },
+        { ...settings, enableKapablePro: false },
         signal,
       ),
     ).rejects.toMatchObject({
-      kind: DyadErrorKind.Auth,
+      kind: KapableErrorKind.Auth,
       message: expect.stringContaining(
         "Reconnect ChatGPT, or disconnect it in the model picker to use your OpenAI API key",
       ),
@@ -247,7 +247,7 @@ describe("global subscription turn routing", () => {
       });
       const result = await preflightSubscriptionTurn(
         { provider: "auto", name: "auto", effortLevel: "medium" },
-        { ...settings, enableDyadPro: false, selectedModel: model },
+        { ...settings, enableKapablePro: false, selectedModel: model },
         signal,
       );
       expect(result).toMatchObject({
@@ -263,7 +263,7 @@ describe("global subscription turn routing", () => {
   it("falls back to the first subscription model for Auto when Luna is unavailable", async () => {
     const result = await preflightSubscriptionTurn(
       { provider: "auto", name: "auto", effortLevel: "medium" },
-      { ...settings, enableDyadPro: false },
+      { ...settings, enableKapablePro: false },
       signal,
     );
     expect(result).toMatchObject({
@@ -278,7 +278,7 @@ describe("global subscription turn routing", () => {
     expect(
       await preflightSubscriptionTurn(
         { provider: "auto", name: "auto", effortLevel: "medium" },
-        { ...settings, enableDyadPro: false },
+        { ...settings, enableKapablePro: false },
         signal,
       ),
     ).toEqual({ provider: "auto", name: "auto", effortLevel: "medium" });
@@ -290,7 +290,7 @@ describe("global subscription turn routing", () => {
     expect(
       await preflightSubscriptionTurn(
         model,
-        { ...settings, enableDyadPro: false },
+        { ...settings, enableKapablePro: false },
         signal,
       ),
     ).not.toHaveProperty("connection");
@@ -298,11 +298,11 @@ describe("global subscription turn routing", () => {
     expect(mocks.credits).not.toHaveBeenCalled();
   });
   it.each([{}, settings.providerSettings])(
-    "allows free subscription turns without Dyad credit checks (%j)",
+    "allows free subscription turns without KapAble credit checks (%j)",
     async (providerSettings) => {
       const freeSettings = {
         ...settings,
-        enableDyadPro: false,
+        enableKapablePro: false,
         providerSettings,
       };
       const result = await preflightWithAdmission(model, freeSettings, signal);

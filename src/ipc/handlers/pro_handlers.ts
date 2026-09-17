@@ -19,9 +19,9 @@ import {
   MAX_AUDIO_REQUEST_ID_LENGTH,
 } from "../types/audio";
 import type { TranscribeAudioParams } from "../types/audio";
-import { transcribeWithDyadEngine } from "../utils/llm_engine_provider";
-import { getDyadEngineBaseUrl } from "../utils/dyad_engine_url";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { transcribeWithKapableEngine } from "../utils/llm_engine_provider";
+import { getKapableEngineBaseUrl } from "../utils/kapable_engine_url";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 import { fetchUserInfo } from "../services/user_budget_service";
 export {
@@ -38,9 +38,9 @@ function validateAudioTranscriptionRequest(input: TranscribeAudioParams) {
     input.audioData.byteLength === 0 ||
     input.audioData.byteLength > MAX_AUDIO_RECORDING_BYTES
   ) {
-    throw new DyadError(
+    throw new KapableError(
       `Audio data must be between 1 and ${MAX_AUDIO_RECORDING_BYTES} bytes`,
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
 
@@ -53,7 +53,7 @@ function validateAudioTranscriptionRequest(input: TranscribeAudioParams) {
     trimmedFilename === "." ||
     trimmedFilename === ".."
   ) {
-    throw new DyadError("Invalid audio filename", DyadErrorKind.Validation);
+    throw new KapableError("Invalid audio filename", KapableErrorKind.Validation);
   }
 
   if (
@@ -61,23 +61,23 @@ function validateAudioTranscriptionRequest(input: TranscribeAudioParams) {
     input.requestId.length > MAX_AUDIO_REQUEST_ID_LENGTH ||
     !AUDIO_REQUEST_ID_PATTERN.test(input.requestId)
   ) {
-    throw new DyadError(
+    throw new KapableError(
       "Invalid transcription request ID",
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
 }
 
 function getSubscriptionStatusUrl() {
   return (
-    process.env.DYAD_SUBSCRIPTION_STATUS_URL ??
-    "https://academy.dyad.sh/api/desktop/subscription-status"
+    process.env.KAPABLE_SUBSCRIPTION_STATUS_URL ??
+    "https://academy.kapable.sh/api/desktop/subscription-status"
   );
 }
 
 function getSubscriptionStatusApiKey() {
   const url = getSubscriptionStatusUrl();
-  const fixtureApiKey = process.env.DYAD_SUBSCRIPTION_STATUS_FIXTURE_API_KEY;
+  const fixtureApiKey = process.env.KAPABLE_SUBSCRIPTION_STATUS_FIXTURE_API_KEY;
   if (fixtureApiKey) {
     try {
       const hostname = new URL(url).hostname;
@@ -100,16 +100,16 @@ export function parseBillingActionUrl(value: string) {
   try {
     url = new URL(value);
   } catch {
-    throw new DyadError("Invalid billing action URL", DyadErrorKind.Validation);
+    throw new KapableError("Invalid billing action URL", KapableErrorKind.Validation);
   }
   if (
     url.protocol !== "https:" ||
-    url.hostname !== "academy.dyad.sh" ||
+    url.hostname !== "academy.kapable.sh" ||
     url.username !== "" ||
     url.password !== "" ||
     url.port !== ""
   ) {
-    throw new DyadError("Invalid billing action URL", DyadErrorKind.Validation);
+    throw new KapableError("Invalid billing action URL", KapableErrorKind.Validation);
   }
   return url.toString();
 }
@@ -138,7 +138,7 @@ export function registerProHandlers() {
 
     if (!apiKey) {
       // Expected state for non-Pro users; not an error.
-      logger.debug("LLM Gateway API key (Dyad Pro) is not configured.");
+      logger.debug("LLM Gateway API key (KapAble Pro) is not configured.");
       return null;
     }
 
@@ -174,7 +174,7 @@ export function registerProHandlers() {
     if (!apiKey) {
       return null;
     }
-    if (IS_TEST_BUILD && !process.env.DYAD_SUBSCRIPTION_STATUS_URL) {
+    if (IS_TEST_BUILD && !process.env.KAPABLE_SUBSCRIPTION_STATUS_URL) {
       return null;
     }
 
@@ -213,10 +213,10 @@ export function registerProHandlers() {
       const settings = readSettings();
       const apiKey = settings.providerSettings?.auto?.apiKey?.value;
 
-      if (!apiKey || !settings.enableDyadPro) {
-        throw new DyadError(
-          "Dyad Pro is not enabled. Voice-to-text requires a Pro subscription.",
-          DyadErrorKind.Auth,
+      if (!apiKey || !settings.enableKapablePro) {
+        throw new KapableError(
+          "KapAble Pro is not enabled. Voice-to-text requires a Pro subscription.",
+          KapableErrorKind.Auth,
         );
       }
 
@@ -228,14 +228,14 @@ export function registerProHandlers() {
         input.audioData.byteLength,
       );
 
-      const text = await transcribeWithDyadEngine(
+      const text = await transcribeWithKapableEngine(
         audioBuffer,
         input.filename,
         input.requestId,
         {
           apiKey,
-          baseURL: getDyadEngineBaseUrl(),
-          dyadOptions: {},
+          baseURL: getKapableEngineBaseUrl(),
+          kapableOptions: {},
           settings,
         },
       );

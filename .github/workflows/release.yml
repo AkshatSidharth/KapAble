@@ -137,8 +137,8 @@ jobs:
           @'
           {
             "Endpoint": "https://eus.codesigning.azure.net/",
-            "CodeSigningAccountName": "dyad",
-            "CertificateProfileName": "dyad-tech"
+            "CodeSigningAccountName": "kapable",
+            "CertificateProfileName": "kapable-tech"
           }
           '@ | Out-File -Encoding utf8 signing-metadata.json
 

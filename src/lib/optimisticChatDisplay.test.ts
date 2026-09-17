@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildOptimisticChatDisplay } from "./optimisticChatDisplay";
-import { buildDyadAttachmentTag } from "../../shared/dyadAttachment";
+import { buildKapableAttachmentTag } from "../../shared/kapableAttachment";
 
 describe("optimistic media display", () => {
   it("renders selected and generated media as attachments without exposing wire tokens", () => {
@@ -15,7 +15,7 @@ describe("optimistic media display", () => {
     expect(display).not.toContain("@media:");
     expect(display).toContain('name="my image.png"');
     expect(display).toContain(
-      'url="dyad-media://media/my%20app/.dyad/media/generated.png"',
+      'url="kapable-media://media/my%20app/.kapable/media/generated.png"',
     );
     expect(display).toContain('type="image/png"');
   });
@@ -31,7 +31,7 @@ describe("optimistic media display", () => {
 
   it("uses one escaped display-tag format for local and persisted attachments", () => {
     expect(
-      buildDyadAttachmentTag({
+      buildKapableAttachmentTag({
         name: 'a"<&.png',
         type: "image/png",
         url: "blob:preview",
@@ -39,7 +39,7 @@ describe("optimistic media display", () => {
         attachmentType: "chat-context",
       }),
     ).toBe(
-      '\n<dyad-attachment name="a&quot;&lt;&amp;.png" type="image/png" url="blob:preview" path="" attachment-type="chat-context"></dyad-attachment>\n',
+      '\n<kapable-attachment name="a&quot;&lt;&amp;.png" type="image/png" url="blob:preview" path="" attachment-type="chat-context"></kapable-attachment>\n',
     );
   });
 });

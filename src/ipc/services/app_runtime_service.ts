@@ -25,9 +25,9 @@ import {
   invocationRegistryKey,
   sameInvocationRef,
 } from "@/state_machines/invocation_ref";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { addLog, clearLogs } from "@/lib/log_store";
-import { getDyadAppPath } from "@/paths/paths";
+import { getKapableAppPath } from "@/paths/paths";
 import { startProxy } from "@/ipc/utils/start_proxy_server";
 import {
   buildCloudSandboxFileMap,
@@ -101,11 +101,11 @@ export function formatCloudSandboxError(error: unknown) {
 
   switch (error.code) {
     case "sandbox_pro_required":
-      return "Dyad Pro is required to use cloud sandboxes.";
+      return "KapAble Pro is required to use cloud sandboxes.";
     case "sandbox_insufficient_credits":
       return "You need at least 1 credit available to start a cloud sandbox.";
     case "sandbox_billing_unavailable":
-      return "Dyad couldn’t verify sandbox billing right now. Please try again.";
+      return "KapAble couldn’t verify sandbox billing right now. Please try again.";
     case "sandbox_credits_exhausted":
       return "This cloud sandbox stopped because your credits ran out.";
     default:
@@ -113,13 +113,13 @@ export function formatCloudSandboxError(error: unknown) {
         return "This cloud sandbox is no longer available.";
       }
       if (error.status === 401 || error.status === 403) {
-        return "Dyad couldn’t authorize the cloud sandbox request. Please try again.";
+        return "KapAble couldn’t authorize the cloud sandbox request. Please try again.";
       }
       if (error.status === 429) {
-        return "Dyad is rate limiting cloud sandbox requests right now. Please try again.";
+        return "KapAble is rate limiting cloud sandbox requests right now. Please try again.";
       }
       if (typeof error.status === "number" && error.status >= 500) {
-        return "Dyad’s cloud sandbox service is temporarily unavailable. Please try again.";
+        return "KapAble’s cloud sandbox service is temporarily unavailable. Please try again.";
       }
       return error.message;
   }
@@ -328,7 +328,7 @@ export async function executeApp({
 
 // Discovery nudge for the consented "Migrate to pnpm N" app upgrade: the
 // contradiction (old pin/lockfile vs the managed pnpm) only bites outside
-// Dyad (CI, deploys, teammates), so surface it in the console the user is
+// KapAble (CI, deploys, teammates), so surface it in the console the user is
 // already watching instead of failing or silently rewriting the pin.
 function notifyPnpmVersionMigrationAvailable({
   appPath,
@@ -347,7 +347,7 @@ function notifyPnpmVersionMigrationAvailable({
     if (!pnpmVersionMigrationNotifiedAppIds.has(appId)) {
       output.send({
         type: "stdout",
-        message: `This pnpm app needs a pnpm ${managedMajor} migration (pre-9 lockfile or pnpm <= 8 pin). Dyad already runs pnpm ${managedMajor}, so deploys, CI, and teammates' installs can drift without the matching project pin. Open App Details -> App Upgrades and apply "Migrate to pnpm ${managedMajor}".`,
+        message: `This pnpm app needs a pnpm ${managedMajor} migration (pre-9 lockfile or pnpm <= 8 pin). KapAble already runs pnpm ${managedMajor}, so deploys, CI, and teammates' installs can drift without the matching project pin. Open App Details -> App Upgrades and apply "Migrate to pnpm ${managedMajor}".`,
         appId,
       });
       pnpmVersionMigrationNotifiedAppIds.add(appId);
@@ -355,7 +355,7 @@ function notifyPnpmVersionMigrationAvailable({
     output.send({
       type: "package-manager-warning",
       warningKind: "pnpm-migration",
-      message: `This app pins an older pnpm that can't read the lockfile Dyad writes. Migrate to pnpm ${managedMajor} so CI, deploys, and teammates can install it reliably.`,
+      message: `This app pins an older pnpm that can't read the lockfile KapAble writes. Migrate to pnpm ${managedMajor} so CI, deploys, and teammates can install it reliably.`,
       appId,
     });
   } catch (error) {
@@ -380,7 +380,7 @@ export function emitProxyServerStarted({
 }) {
   output.send({
     type: "stdout",
-    message: `[dyad-proxy-server]started=[${proxyUrl}] original=[${originalUrl}] mode=[${mode}]`,
+    message: `[kapable-proxy-server]started=[${proxyUrl}] original=[${originalUrl}] mode=[${mode}]`,
     appId,
     invocationRef,
   });
@@ -442,7 +442,7 @@ export async function ensureProxyForRunningApp({
   // Prefer the deterministic port so the iframe origin stays stable across
   // restarts — otherwise origin-scoped browser state (auth sessions,
   // localStorage) gets orphaned and users appear logged out. If that port is
-  // already taken (by a foreign service, or another Dyad app in the rare 10k
+  // already taken (by a foreign service, or another KapAble app in the rare 10k
   // overlap), the proxy worker scans the fallback band upward rather than
   // killing whatever holds the port.
   const proxyPort = getAppProxyPort(appId);
@@ -481,7 +481,7 @@ export async function ensureProxyForRunningApp({
       logger.error(`Failed to start proxy for app ${appId}:`, error);
       output.send({
         type: "stderr",
-        message: `[dyad-proxy-server] ${error.message}`,
+        message: `[kapable-proxy-server] ${error.message}`,
         appId,
       });
     },
@@ -626,7 +626,7 @@ Details: ${details || "n/a"}
             output.send({
               type: "stdout",
               message:
-                "pnpm blocked dependency build scripts. Dyad recorded the decision in pnpm-workspace.yaml and is reinstalling...",
+                "pnpm blocked dependency build scripts. KapAble recorded the decision in pnpm-workspace.yaml and is reinstalling...",
               appId,
             });
 
@@ -962,7 +962,7 @@ async function executeAppInDocker({
   invocationRef?: AppRunInvocationRef;
   ignoredBuildsSelfHealAttempted?: boolean;
 }): Promise<void> {
-  const containerName = `dyad-app-${appId}`;
+  const containerName = `kapable-app-${appId}`;
 
   try {
     await new Promise<void>((resolve, reject) => {
@@ -1004,7 +1004,7 @@ async function executeAppInDocker({
     );
   }
 
-  const dockerfilePath = path.join(appPath, "Dockerfile.dyad");
+  const dockerfilePath = path.join(appPath, "Dockerfile.kapable");
   if (!fs.existsSync(dockerfilePath)) {
     const dockerfileContent = `FROM node:22-alpine
 
@@ -1016,16 +1016,16 @@ RUN npm install -g pnpm
       await fs.promises.writeFile(dockerfilePath, dockerfileContent, "utf-8");
     } catch (error) {
       logger.error(`Failed to create Dockerfile for app ${appId}:`, error);
-      throw new DyadError(
+      throw new KapableError(
         `Failed to create Dockerfile: ${error}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
   }
 
   const buildProcess = spawn(
     "docker",
-    ["build", "-f", "Dockerfile.dyad", "-t", `dyad-app-${appId}`, "."],
+    ["build", "-f", "Dockerfile.kapable", "-t", `kapable-app-${appId}`, "."],
     {
       cwd: appPath,
       stdio: "pipe",
@@ -1063,12 +1063,12 @@ RUN npm install -g pnpm
       "-v",
       `${appPath}:/app`,
       "-v",
-      `dyad-pnpm-${appId}:/app/.pnpm-store`,
+      `kapable-pnpm-${appId}:/app/.pnpm-store`,
       "-e",
       "PNPM_STORE_PATH=/app/.pnpm-store",
       "-w",
       "/app",
-      `dyad-app-${appId}`,
+      `kapable-app-${appId}`,
       "sh",
       "-c",
       (
@@ -1166,7 +1166,7 @@ ${errorOutput || "(empty)"}`,
             output.send({
               type: "stdout",
               message:
-                "pnpm blocked dependency build scripts. Dyad recorded the decision in pnpm-workspace.yaml and is reinstalling...",
+                "pnpm blocked dependency build scripts. KapAble recorded the decision in pnpm-workspace.yaml and is reinstalling...",
               appId,
             });
 
@@ -1626,9 +1626,9 @@ export class AppRuntimeService {
             this.dependencies.deleteRunningApp(appId);
           }
         }
-        throw new DyadError(
+        throw new KapableError(
           `Failed to run app ${appId}: ${errorMessage(error)}`,
-          DyadErrorKind.External,
+          KapableErrorKind.External,
         );
       }
     });
@@ -1727,9 +1727,9 @@ export class AppRuntimeService {
         } else if (appInfo.mode !== "cloud") {
           this.dependencies.deleteRunningApp(appId);
         }
-        throw new DyadError(
+        throw new KapableError(
           `Failed to stop app ${appId}: ${errorMessage(error)}`,
-          DyadErrorKind.External,
+          KapableErrorKind.External,
         );
       }
     });
@@ -1785,7 +1785,7 @@ export class AppRuntimeService {
       type: "server",
       level: "info",
       message,
-      sourceName: "Dyad",
+      sourceName: "KapAble",
       appId: options.appId,
       timestamp,
       runtimeBoundary: options.operation,
@@ -1817,9 +1817,9 @@ export class AppRuntimeService {
       options.invocationRef ?? this.createExternalLifecycleRef(options.appId);
     if (options.abortSignal?.aborted) {
       this.cancelExternalLifecycle(invocationRef);
-      throw new DyadError(
+      throw new KapableError(
         "The app lifecycle operation was cancelled before it started",
-        DyadErrorKind.UserCancelled,
+        KapableErrorKind.UserCancelled,
       );
     }
     const claim = this.claimExternalLifecycle({
@@ -1827,9 +1827,9 @@ export class AppRuntimeService {
       invocationRef,
     });
     if (!claim) {
-      throw new DyadError(
+      throw new KapableError(
         "The app lifecycle operation was cancelled before it started",
-        DyadErrorKind.UserCancelled,
+        KapableErrorKind.UserCancelled,
       );
     }
     try {
@@ -1873,7 +1873,7 @@ export class AppRuntimeService {
   private async requireApp(appId: number): Promise<RuntimeAppRecord> {
     const app = await this.dependencies.findApp(appId);
     if (!app) {
-      throw new DyadError("App not found", DyadErrorKind.NotFound);
+      throw new KapableError("App not found", KapableErrorKind.NotFound);
     }
     return app;
   }
@@ -1974,9 +1974,9 @@ async function waitForAppReady(
   while (Date.now() - startedAt < timeoutMs) {
     const appInfo = runningApps.get(appId);
     if (!appInfo) {
-      throw new DyadError(
+      throw new KapableError(
         "The app process exited before the preview became ready",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
     if (appInfo.proxyUrl) {
@@ -1986,9 +1986,9 @@ async function waitForAppReady(
       setTimeout(resolve, APP_READY_POLL_MS);
     });
   }
-  throw new DyadError(
+  throw new KapableError(
     "Timed out waiting for the app preview to become ready",
-    DyadErrorKind.External,
+    KapableErrorKind.External,
   );
 }
 
@@ -2006,7 +2006,7 @@ export const appRuntimeService = new AppRuntimeService({
     db.query.apps.findFirst({
       where: eq(apps.id, appId),
     }),
-  resolveAppPath: getDyadAppPath,
+  resolveAppPath: getKapableAppPath,
   getRunningApp: (appId) => runningApps.get(appId),
   deleteRunningApp: (appId) => {
     runningApps.delete(appId);

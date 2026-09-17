@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { ipc } from "@/ipc/types";
 import { queryKeys } from "@/lib/queryKeys";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 export function useSecurityReview(appId: number | null) {
   return useQuery({
     queryKey: queryKeys.securityReview.byApp({ appId }),
     queryFn: async () => {
       if (!appId) {
-        throw new DyadError("App ID is required", DyadErrorKind.Validation);
+        throw new KapableError("App ID is required", KapableErrorKind.Validation);
       }
       return ipc.security.getLatestSecurityReview(appId);
     },

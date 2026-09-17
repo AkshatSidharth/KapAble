@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   resolveCodeExplorerCompiler,
   type CodeExplorerCompilerLoaders,
@@ -34,9 +34,9 @@ describe("Code Explorer compiler error classification", () => {
       "bundled package missing",
     );
     const classifiedError = toCodeExplorerError(resolutionError);
-    expect(classifiedError).toBeInstanceOf(DyadError);
-    expect((classifiedError as DyadError).kind).toBe(
-      DyadErrorKind.Precondition,
+    expect(classifiedError).toBeInstanceOf(KapableError);
+    expect((classifiedError as KapableError).kind).toBe(
+      KapableErrorKind.Precondition,
     );
   });
 });

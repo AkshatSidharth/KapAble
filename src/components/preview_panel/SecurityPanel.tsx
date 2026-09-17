@@ -37,7 +37,7 @@ import type {
   SecurityReviewResult,
 } from "@/ipc/types/security";
 import { useState, useEffect, useRef } from "react";
-import { VanillaMarkdownParser } from "@/components/chat/DyadMarkdownParser";
+import { VanillaMarkdownParser } from "@/components/chat/KapableMarkdownParser";
 import { showSuccess, showWarning, toast } from "@/lib/toast";
 import { useLoadAppFile } from "@/hooks/useLoadAppFile";
 import { useQueryClient } from "@tanstack/react-query";
@@ -280,7 +280,7 @@ function SecurityHeader({
                   aria-label="Open Security Review documentation"
                   onClick={() =>
                     ipc.system.openExternalUrl(
-                      "https://www.dyad.sh/docs/guides/security-review",
+                      "https://www.kapable.sh/docs/guides/security-review",
                     )
                   }
                 />

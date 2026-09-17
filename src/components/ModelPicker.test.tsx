@@ -100,11 +100,11 @@ const mocks = vi.hoisted(() => ({
   },
   settings: {
     proModelUsage: "subscription" as "subscription" | "pro",
-    enableDyadPro: true,
+    enableKapablePro: true,
     providerSettings: {
       auto: {
         apiKey: {
-          value: "dyad-pro-key",
+          value: "kapable-pro-key",
         },
       },
       openrouter: {
@@ -245,7 +245,7 @@ vi.mock("@/hooks/useLanguageModelsByProviders", () => ({
             },
             {
               apiName: "free-pro",
-              displayName: "Dyad Free",
+              displayName: "KapAble Free",
               description: "Free Pro model",
               type: "cloud",
               tag: "Free",
@@ -358,7 +358,7 @@ vi.mock("@/hooks/useLanguageModelProviders", () => ({
     data: [
       {
         id: "auto",
-        name: "Dyad",
+        name: "KapAble",
         type: "cloud",
       },
       {
@@ -562,8 +562,8 @@ describe("ModelPicker", () => {
     mocks.ollamaError = null;
     mocks.lmStudioModels = [];
     mocks.lmStudioError = null;
-    mocks.settings.enableDyadPro = true;
-    mocks.settings.providerSettings.auto.apiKey.value = "dyad-pro-key";
+    mocks.settings.enableKapablePro = true;
+    mocks.settings.providerSettings.auto.apiKey.value = "kapable-pro-key";
     mocks.settings.providerSettings.openrouter.apiKey.value = "";
     mocks.settings.selectedModel = { name: "auto", provider: "auto" };
     mocks.settings.recentModels = [];
@@ -594,12 +594,12 @@ describe("ModelPicker", () => {
     expect(screen.queryByText("Premium")).toBeNull();
     expect(screen.queryByText("Local models")).toBeNull();
     expect(screen.queryByText("Free (OpenRouter)")).toBeNull();
-    expect(screen.getByText("Dyad Free")).toBeTruthy();
+    expect(screen.getByText("KapAble Free")).toBeTruthy();
     expect(screen.getByText("2/5 left")).toBeTruthy();
     expect(screen.getByText("Data sharing")).toBeTruthy();
     expect(
       screen
-        .getByText("Dyad Free")
+        .getByText("KapAble Free")
         .closest("button")
         ?.getAttribute("aria-label"),
     ).toContain("2/5 left. Data sharing");
@@ -1317,8 +1317,8 @@ describe("ModelPicker", () => {
     ]);
   });
 
-  it("keeps the non-Pro root compact while preserving its Dyad choices", () => {
-    mocks.settings.enableDyadPro = false;
+  it("keeps the non-Pro root compact while preserving its KapAble choices", () => {
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
 
     render(<ModelPicker />);
@@ -1328,11 +1328,11 @@ describe("ModelPicker", () => {
     expect(screen.queryByText("GPT 5")).toBeNull();
     expect(screen.getByText("All models")).toBeTruthy();
     expect(screen.queryByText("Other AI providers")).toBeNull();
-    expect(screen.queryByText("Dyad Free")).toBeNull();
+    expect(screen.queryByText("KapAble Free")).toBeNull();
     expect(screen.getByText("Free (OpenRouter)")).toBeTruthy();
   });
 
-  it("shows Auto (balanced) to Dyad Pro users", () => {
+  it("shows Auto (balanced) to KapAble Pro users", () => {
     render(<ModelPicker />);
 
     expect(screen.getByText("Auto (balanced)")).toBeTruthy();
@@ -1343,7 +1343,7 @@ describe("ModelPicker", () => {
     (loading) => {
       mocks.subscriptionLoading = loading;
       mocks.subscriptionUnavailable = true;
-      mocks.settings.enableDyadPro = false;
+      mocks.settings.enableKapablePro = false;
       mocks.settings.providerSettings.auto.apiKey.value = "";
       mocks.renderSubContent = true;
       render(<ModelPicker />);
@@ -1355,7 +1355,7 @@ describe("ModelPicker", () => {
   );
 
   it("unlocks only subscription-supported models for free users", async () => {
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.renderSubContent = true;
     render(<ModelPicker />);
@@ -1380,7 +1380,7 @@ describe("ModelPicker", () => {
 
   it("marks models without a provider key as locked for non-Pro users", () => {
     mocks.subscriptionConnected = false;
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.settings.providerSettings.openrouter.apiKey.value = "openrouter-key";
     mocks.renderSubContent = true;
@@ -1408,7 +1408,7 @@ describe("ModelPicker", () => {
 
   it("opens the unlock dialog instead of selecting a locked model", () => {
     mocks.subscriptionConnected = false;
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.renderSubContent = true;
 
@@ -1421,19 +1421,19 @@ describe("ModelPicker", () => {
       "model-picker:locked-model-click",
       { provider: "openai", model: "gpt-5" },
     );
-    expect(screen.getByText("Unlock GPT 5 with Dyad Pro")).toBeTruthy();
+    expect(screen.getByText("Unlock GPT 5 with KapAble Pro")).toBeTruthy();
   });
 
   it("opens the Pro upgrade page from the unlock dialog", () => {
     mocks.subscriptionConnected = false;
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.renderSubContent = true;
 
     render(<ModelPicker />);
 
     fireEvent.click(screen.getByText("GPT 5").closest("button")!);
-    fireEvent.click(screen.getByText("Get Dyad Pro"));
+    fireEvent.click(screen.getByText("Get KapAble Pro"));
 
     expect(mocks.openExternalUrl).toHaveBeenCalledWith(
       expect.stringContaining("utm_campaign=model-picker-locked-model"),
@@ -1446,12 +1446,12 @@ describe("ModelPicker", () => {
         model: "gpt-5",
       },
     );
-    expect(screen.queryByText("Get Dyad Pro")).toBeNull();
+    expect(screen.queryByText("Get KapAble Pro")).toBeNull();
   });
 
   it("navigates to provider settings from the unlock dialog own-key link", () => {
     mocks.subscriptionConnected = false;
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.renderSubContent = true;
 
@@ -1468,7 +1468,7 @@ describe("ModelPicker", () => {
   });
 
   it("lets non-Pro users select models from providers with their own key", () => {
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.settings.providerSettings.openrouter.apiKey.value = "openrouter-key";
     mocks.renderSubContent = true;
@@ -1494,7 +1494,7 @@ describe("ModelPicker", () => {
   });
 
   it("does not lock models while settings and env vars are still loading", () => {
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.settingsLoading = true;
     mocks.renderSubContent = true;
@@ -1506,7 +1506,7 @@ describe("ModelPicker", () => {
 
   it("labels locked models for assistive tech", () => {
     mocks.subscriptionConnected = false;
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.renderSubContent = true;
 
@@ -1514,11 +1514,11 @@ describe("ModelPicker", () => {
 
     expect(
       screen.getByText("GPT 5").closest("button")?.getAttribute("aria-label"),
-    ).toBe("GPT 5 — requires Dyad Pro or an API key from OpenAI");
+    ).toBe("GPT 5 — requires KapAble Pro or an API key from OpenAI");
   });
 
   it("points locked free models at an OpenRouter key instead of Pro", () => {
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.renderSubContent = true;
 
@@ -1534,7 +1534,7 @@ describe("ModelPicker", () => {
       "model-picker:locked-model-click",
       { provider: "openrouter", model: "openrouter/free" },
     );
-    expect(screen.queryByText("Get Dyad Pro")).toBeNull();
+    expect(screen.queryByText("Get KapAble Pro")).toBeNull();
 
     fireEvent.click(screen.getByText("Add OpenRouter API key"));
 
@@ -1546,13 +1546,13 @@ describe("ModelPicker", () => {
   });
 
   it("shows the unlock-all footer only for non-Pro users", () => {
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
 
     render(<ModelPicker />);
 
     fireEvent.click(
-      screen.getByText("Unlock all models with Dyad Pro").closest("button")!,
+      screen.getByText("Unlock all models with KapAble Pro").closest("button")!,
     );
 
     expect(mocks.openExternalUrl).toHaveBeenCalledWith(
@@ -1567,12 +1567,12 @@ describe("ModelPicker", () => {
   it("hides the unlock-all footer for Pro users", () => {
     render(<ModelPicker />);
 
-    expect(screen.queryByText("Unlock all models with Dyad Pro")).toBeNull();
+    expect(screen.queryByText("Unlock all models with KapAble Pro")).toBeNull();
     expect(document.querySelector("[data-locked]")).toBeNull();
   });
 
   it("shows data sharing disclosure on Auto for non-Pro users with an OpenRouter key", () => {
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.settings.providerSettings.openrouter.apiKey.value = "openrouter-key";
 
@@ -1586,7 +1586,7 @@ describe("ModelPicker", () => {
   });
 
   it("shows data sharing disclosure on Auto for non-Pro users with OPENROUTER_API_KEY", () => {
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
     mocks.envVars.OPENROUTER_API_KEY = "openrouter-env-key";
 
@@ -1600,7 +1600,7 @@ describe("ModelPicker", () => {
   });
 
   it("does not show data sharing disclosure on Auto without an OpenRouter key", () => {
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
 
     render(<ModelPicker />);
@@ -1613,7 +1613,7 @@ describe("ModelPicker", () => {
   });
 
   it("shows data sharing disclosure on the top-level Free OpenRouter model", () => {
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
 
     render(<ModelPicker />);
@@ -1626,7 +1626,7 @@ describe("ModelPicker", () => {
 
   it("shows data sharing disclosure on explicit free OpenRouter provider models", () => {
     mocks.renderSubContent = true;
-    mocks.settings.enableDyadPro = false;
+    mocks.settings.enableKapablePro = false;
     mocks.settings.providerSettings.auto.apiKey.value = "";
 
     render(<ModelPicker />);
@@ -1655,14 +1655,14 @@ describe("ModelPicker", () => {
     });
   });
 
-  it("hides Dyad Free for Dyad Pro trial users", () => {
+  it("hides KapAble Free for KapAble Pro trial users", () => {
     mocks.isTrial = true;
 
     render(<ModelPicker />);
 
-    expect(screen.queryByText("Dyad Free")).toBeNull();
+    expect(screen.queryByText("KapAble Free")).toBeNull();
     expect(
-      screen.getByText("Upgrade from Dyad Pro trial to unlock more models."),
+      screen.getByText("Upgrade from KapAble Pro trial to unlock more models."),
     ).toBeTruthy();
     const autoRow = document.querySelector<HTMLElement>(
       '[data-model-provider="auto"][data-model-name="auto"]',
@@ -1673,7 +1673,7 @@ describe("ModelPicker", () => {
     ).toBe("Med");
   });
 
-  it("does not select Dyad Free when quota is exhausted", () => {
+  it("does not select KapAble Free when quota is exhausted", () => {
     mocks.freeModelQuota.isQuotaExceeded = true;
     mocks.freeModelQuota.messagesRemaining = 0;
     mocks.freeModelQuota.quotaStatus = {
@@ -1686,15 +1686,15 @@ describe("ModelPicker", () => {
 
     render(<ModelPicker />);
 
-    fireEvent.click(screen.getByText("Dyad Free").closest("button")!);
+    fireEvent.click(screen.getByText("KapAble Free").closest("button")!);
 
     expect(mocks.updateSettings).not.toHaveBeenCalled();
   });
 
-  it("moves Build mode to Agent when selecting Dyad Free", async () => {
+  it("moves Build mode to Agent when selecting KapAble Free", async () => {
     render(<ModelPicker />);
 
-    fireEvent.click(screen.getByText("Dyad Free").closest("button")!);
+    fireEvent.click(screen.getByText("KapAble Free").closest("button")!);
 
     await waitFor(() => {
       expect(mocks.updateSettings).toHaveBeenCalledWith({
@@ -1722,7 +1722,7 @@ describe("ModelPicker", () => {
     };
 
     render(<ModelPicker />);
-    fireEvent.click(screen.getByText("Dyad Free").closest("button")!);
+    fireEvent.click(screen.getByText("KapAble Free").closest("button")!);
 
     await waitFor(() => {
       expect(mocks.setChatSelection).toHaveBeenCalledWith({
@@ -1737,7 +1737,7 @@ describe("ModelPicker", () => {
     expect(mocks.setChatModelSelection).not.toHaveBeenCalled();
   });
 
-  it("shows Dyad Free quota as unavailable when the quota fetch fails", () => {
+  it("shows KapAble Free quota as unavailable when the quota fetch fails", () => {
     mocks.freeModelQuota.error = new Error("quota unavailable");
     mocks.freeModelQuota.quotaStatus = null;
 

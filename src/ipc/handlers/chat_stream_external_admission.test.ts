@@ -2,7 +2,7 @@
 import { afterAll, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { chats, messages } from "@/db/schema";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   setupChatFlowHarness,
   type ChatFlowHarness,
@@ -24,7 +24,7 @@ beforeAll(async () => {
     electronMock: h,
     engine: true,
     settings: {
-      enableDyadPro: true,
+      enableKapablePro: true,
       providerSettings: { auto: { apiKey: { value: "admitted-key" } } },
     },
   });
@@ -34,9 +34,9 @@ beforeEach(async () => {
     .mockReset()
     .mockResolvedValueOnce(undefined)
     .mockRejectedValue(
-      new DyadError(
+      new KapableError(
         "Duplicate credit check rejected",
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       ),
     );
   await harness.db.delete(messages);

@@ -61,10 +61,10 @@ import {
   parsePinnedPnpmMajorVersion,
   parsePnpmLockfileVersion,
 } from "./pnpm_migration";
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 
 async function createTempAppDir(): Promise<string> {
-  return mkdtemp(path.join(os.tmpdir(), "dyad-pnpm-migration-"));
+  return mkdtemp(path.join(os.tmpdir(), "kapable-pnpm-migration-"));
 }
 
 async function writeAppFiles(
@@ -346,7 +346,7 @@ describe("applyPnpmVersionMigration", () => {
       await expect(
         applyPnpmVersionMigration({ appPath }),
       ).rejects.toMatchObject({
-        kind: DyadErrorKind.External,
+        kind: KapableErrorKind.External,
         message:
           "The packageManager pin could not be updated. Please update package.json manually.",
       });

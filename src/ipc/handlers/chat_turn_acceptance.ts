@@ -9,7 +9,7 @@ import {
   markIntentAccepted,
   persistAcceptedChatTurn,
 } from "@/chat_stream/persistence";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import type { ChatMode, ModelSelection, StoredChatMode } from "@/lib/schemas";
 import type { SerializableChatTurnIntent } from "@/chat_stream/transport";
 
@@ -139,9 +139,9 @@ export function acceptChatTurn(
             .get()?.id
         : undefined);
     if (acceptedMessageId === undefined) {
-      throw new DyadError(
+      throw new KapableError(
         `Chat turn acceptance could not resolve its user message for chat ${input.chatId}`,
-        DyadErrorKind.Internal,
+        KapableErrorKind.Internal,
       );
     }
     persistAcceptedChatTurn(
@@ -187,15 +187,15 @@ export function acceptChatTurn(
       .where(eq(chats.id, input.chatId))
       .get();
     if (!winningChat) {
-      throw new DyadError(
+      throw new KapableError(
         `Chat not found: ${input.chatId}`,
-        DyadErrorKind.NotFound,
+        KapableErrorKind.NotFound,
       );
     }
     if (!winningChat.chatMode || !winningChat.modelSelection) {
-      throw new DyadError(
+      throw new KapableError(
         `Chat turn acceptance failed to latch mode and model selection for chat ${input.chatId}`,
-        DyadErrorKind.Internal,
+        KapableErrorKind.Internal,
       );
     }
     if (input.redoMessageIds?.length) {

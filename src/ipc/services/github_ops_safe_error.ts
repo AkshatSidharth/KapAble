@@ -100,7 +100,7 @@ function redactSensitiveGitOutput(message: string): string {
     PUBLIC_GIT_DOCUMENTATION_URL,
     (url) => {
       const index = publicDocumentationUrls.push(url) - 1;
-      return `DYAD_PUBLIC_GIT_DOCUMENTATION_URL_${index}`;
+      return `KAPABLE_PUBLIC_GIT_DOCUMENTATION_URL_${index}`;
     },
   );
 
@@ -192,7 +192,7 @@ function redactSensitiveGitOutput(message: string): string {
     );
 
   return redacted.replaceAll(
-    /DYAD_PUBLIC_GIT_DOCUMENTATION_URL_(\d+)/g,
+    /KAPABLE_PUBLIC_GIT_DOCUMENTATION_URL_(\d+)/g,
     (match, index: string) => publicDocumentationUrls[Number(index)] ?? match,
   );
 }

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { Worker } from "node:worker_threads";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import type { SandboxHostCallObserver } from "./capabilities";
 import {
   executeSandboxScriptInProcess,
@@ -41,9 +41,9 @@ function resolveSandboxWorkerPath(): string | undefined {
   if (isTestRuntime()) {
     return undefined;
   }
-  throw new DyadError(
+  throw new KapableError(
     "Sandbox worker script is missing from the application build.",
-    DyadErrorKind.Internal,
+    KapableErrorKind.Internal,
   );
 }
 
@@ -74,9 +74,9 @@ function runSandboxScriptInWorker(params: {
       settle(
         () =>
           reject(
-            new DyadError(
+            new KapableError(
               `Sandbox host execution timed out after ${SANDBOX_WALL_CLOCK_TIMEOUT_MS}ms.`,
-              DyadErrorKind.External,
+              KapableErrorKind.External,
             ),
           ),
         true,
@@ -105,9 +105,9 @@ function runSandboxScriptInWorker(params: {
         settle(
           () =>
             reject(
-              new DyadError(
+              new KapableError(
                 `Sandbox script timed out after ${params.timeoutMs}ms of VM execution.`,
-                DyadErrorKind.External,
+                KapableErrorKind.External,
               ),
             ),
           true,
@@ -215,9 +215,9 @@ function runSandboxScriptInWorker(params: {
       settle(
         () =>
           reject(
-            new DyadError(
+            new KapableError(
               "Sandbox worker sent an unknown message.",
-              DyadErrorKind.Internal,
+              KapableErrorKind.Internal,
             ),
           ),
         true,
@@ -232,11 +232,11 @@ function runSandboxScriptInWorker(params: {
       settle(
         () =>
           reject(
-            new DyadError(
+            new KapableError(
               code === 0
                 ? "Sandbox worker exited without returning a result."
                 : `Sandbox worker exited with code ${code}.`,
-              DyadErrorKind.Internal,
+              KapableErrorKind.Internal,
             ),
           ),
         false,
@@ -255,9 +255,9 @@ export async function runSandboxScript(params: {
   if (
     Buffer.byteLength(params.script, "utf8") > SANDBOX_SCRIPT_SOURCE_LIMIT_BYTES
   ) {
-    throw new DyadError(
+    throw new KapableError(
       "Sandbox script is too large.",
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
 

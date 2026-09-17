@@ -51,8 +51,8 @@ import {
   getNeonEmailVerificationEnabled,
 } from "../../neon_admin/neon_prompt_context";
 import { NEON_DISCONNECTED_SYSTEM_PROMPT } from "../../prompts/neon_prompt";
-import { getDyadAppPath } from "../../paths/paths";
-import { buildDyadMediaUrl } from "../../lib/dyadMediaUrl";
+import { getKapableAppPath } from "../../paths/paths";
+import { buildKapableMediaUrl } from "../../lib/kapableMediaUrl";
 import type { ChatStreamParams } from "@/ipc/types";
 import type { ChatStreamInvocationRef } from "@/chat_stream/invocation";
 import { resolveRootDatabasePromptState } from "@/shared/database_provider";
@@ -64,7 +64,7 @@ import type {
   ChatStreamStartPayload,
   ChatStreamTransportEndPayload,
 } from "@/chat_stream/protocol";
-import { DyadError, DyadErrorKind, isDyadError } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
 import {
   CodebaseFile,
   extractCodebase,
@@ -74,7 +74,7 @@ import {
   dryRunSearchReplace,
   processFullResponseActions,
 } from "../processors/response_processor";
-import { getDyadExecuteSqlTags } from "../utils/dyad_tag_parser";
+import { getKapableExecuteSqlTags } from "../utils/kapable_tag_parser";
 import { doesSqlDeleteData } from "@/lib/sqlSchemaMutation";
 import {
   streamTestResponse,
@@ -121,7 +121,7 @@ import { queryInvalidationBus } from "@/window_infrastructure/main/query_invalid
 import { cancelOrphanedBaseStream } from "../utils/stream_text_utils";
 import { cleanFullResponse } from "../utils/cleanFullResponse";
 import { escapeXmlAttr, escapeXmlContent } from "../../../shared/xmlEscape";
-import { buildDyadAttachmentTag } from "../../../shared/dyadAttachment";
+import { buildKapableAttachmentTag } from "../../../shared/kapableAttachment";
 import { appendCancelledResponseNotice } from "@/shared/chatCancellation";
 import {
   isModelRefusal,
@@ -145,16 +145,16 @@ import { replacePromptReference } from "../utils/replacePromptReference";
 import { replaceSlashSkillReference } from "../utils/replaceSlashSkillReference";
 import { resolveMediaMentions } from "../utils/resolve_media_mentions";
 import { parsePlanFile, validatePlanId } from "./planUtils";
-import { ensureDyadGitignored } from "./gitignoreUtils";
+import { ensureKapableGitignored } from "./gitignoreUtils";
 import {
   appendAttachmentManifestEntriesWithLogicalNames,
   createUniqueAttachmentLogicalName,
-  DYAD_MEDIA_DIR_NAME,
+  KAPABLE_MEDIA_DIR_NAME,
   type AttachmentManifestEntryInput,
 } from "../utils/media_path_utils";
 import {
   isBasicAgentMode,
-  isDyadProEnabled,
+  isKapableProEnabled,
   isLocalAgentBackedMode,
   isTurboEditsV2Enabled,
 } from "@/lib/schemas";
@@ -906,15 +906,15 @@ export async function processStreamChunks({
         inThinkingBlock = true;
       }
 
-      chunk += escapeDyadTags(part.text);
+      chunk += escapeKapableTags(part.text);
     } else if (part.type === "tool-call") {
       const { serverName, toolName } = parseMcpToolKey(part.toolName);
-      const content = escapeDyadTags(JSON.stringify(part.input));
-      chunk = `<dyad-mcp-tool-call server="${escapeXmlAttr(serverName)}" tool="${escapeXmlAttr(toolName)}" call-id="${escapeXmlAttr(part.toolCallId)}">\n${content}\n</dyad-mcp-tool-call>\n`;
+      const content = escapeKapableTags(JSON.stringify(part.input));
+      chunk = `<kapable-mcp-tool-call server="${escapeXmlAttr(serverName)}" tool="${escapeXmlAttr(toolName)}" call-id="${escapeXmlAttr(part.toolCallId)}">\n${content}\n</kapable-mcp-tool-call>\n`;
     } else if (part.type === "tool-result") {
       const { serverName, toolName } = parseMcpToolKey(part.toolName);
       const content = escapeXmlContent(part.output);
-      chunk = `<dyad-mcp-tool-result server="${escapeXmlAttr(serverName)}" tool="${escapeXmlAttr(toolName)}" call-id="${escapeXmlAttr(part.toolCallId)}">\n${content}\n</dyad-mcp-tool-result>\n`;
+      chunk = `<kapable-mcp-tool-result server="${escapeXmlAttr(serverName)}" tool="${escapeXmlAttr(toolName)}" call-id="${escapeXmlAttr(part.toolCallId)}">\n${content}\n</kapable-mcp-tool-result>\n`;
     } else if (part.type === "tool-error") {
       // Emit an errored result so the merged card terminates in an error
       // state instead of staying on "Running".
@@ -924,7 +924,7 @@ export async function processStreamChunks({
       const content = escapeXmlContent(
         sanitizeMcpToolResult(message).serialized,
       );
-      chunk = `<dyad-mcp-tool-result server="${escapeXmlAttr(serverName)}" tool="${escapeXmlAttr(toolName)}" call-id="${escapeXmlAttr(part.toolCallId)}" is-error="true">\n${content}\n</dyad-mcp-tool-result>\n`;
+      chunk = `<kapable-mcp-tool-result server="${escapeXmlAttr(serverName)}" tool="${escapeXmlAttr(toolName)}" call-id="${escapeXmlAttr(part.toolCallId)}" is-error="true">\n${content}\n</kapable-mcp-tool-result>\n`;
     }
 
     if (!chunk) {
@@ -1007,14 +1007,14 @@ export function registerChatStreamHandlers() {
       // contract explicitly before any attachment string is decoded.
       const parsedRequest = ChatStreamParamsSchema.safeParse(req);
       if (!parsedRequest.success) {
-        throw new DyadError(
+        throw new KapableError(
           parsedRequest.error.issues[0]?.message ?? "Invalid chat request.",
-          DyadErrorKind.Validation,
+          KapableErrorKind.Validation,
         );
       }
       req = parsedRequest.data;
 
-      let dyadRequestId: string | undefined;
+      let kapableRequestId: string | undefined;
       trackedStream = {
         abortController,
         sender: event.sender,
@@ -1049,9 +1049,9 @@ export function registerChatStreamHandlers() {
       }
 
       if (!chat) {
-        throw new DyadError(
+        throw new KapableError(
           `Chat not found: ${req.chatId}`,
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
 
@@ -1076,9 +1076,9 @@ export function registerChatStreamHandlers() {
         }
 
         if (!chat) {
-          throw new DyadError(
+          throw new KapableError(
             `Chat not found: ${req.chatId}`,
-            DyadErrorKind.NotFound,
+            KapableErrorKind.NotFound,
           );
         }
 
@@ -1215,13 +1215,13 @@ export function registerChatStreamHandlers() {
 
       // Process attachments if any
       let attachmentInfo = "";
-      // Display-only attachment info uses <dyad-attachment> tags for inline rendering
+      // Display-only attachment info uses <kapable-attachment> tags for inline rendering
       let displayAttachmentInfo = "";
       let storedAttachments: StoredChatAttachment[] = [];
       const pendingStoredAttachments: PendingStoredChatAttachment[] = [];
       const manifestEntries: AttachmentManifestEntryInput[] = [];
       const usedLogicalNames = new Set<string>();
-      const appPath = getDyadAppPath(chat.app.path);
+      const appPath = getKapableAppPath(chat.app.path);
 
       // Detach the serialized payloads from the long-lived stream request as
       // soon as they are persisted. Otherwise every base64 string remains
@@ -1231,19 +1231,19 @@ export function registerChatStreamHandlers() {
       if (incomingAttachments && incomingAttachments.length > 0) {
         attachmentInfo = "\n\nAttachments:\n";
 
-        // Create persistent .dyad/media directory for this app
-        const mediaDir = path.join(appPath, DYAD_MEDIA_DIR_NAME);
+        // Create persistent .kapable/media directory for this app
+        const mediaDir = path.join(appPath, KAPABLE_MEDIA_DIR_NAME);
         if (!fs.existsSync(mediaDir)) {
           fs.mkdirSync(mediaDir, { recursive: true });
         }
-        await ensureDyadGitignored(appPath);
+        await ensureKapableGitignored(appPath);
 
         for (const attachment of incomingAttachments) {
           const inspection = inspectBase64DataUrl(attachment.data);
           if (!inspection.ok) {
-            throw new DyadError(
+            throw new KapableError(
               `"${attachment.name}" is not a valid base64 attachment.`,
-              DyadErrorKind.Validation,
+              KapableErrorKind.Validation,
             );
           }
           const base64Data = attachment.data.slice(inspection.payloadStart);
@@ -1259,7 +1259,7 @@ export function registerChatStreamHandlers() {
             usedLogicalNames,
           );
 
-          // Save to .dyad/media dir
+          // Save to .kapable/media dir
           const persistentPath = path.join(mediaDir, filename);
           await writeFile(persistentPath, fileBuffer);
           attachmentPaths.push(persistentPath);
@@ -1283,14 +1283,14 @@ export function registerChatStreamHandlers() {
             sizeBytes: fileBuffer.byteLength,
           });
 
-          // Build dyad-media:// URL for display
+          // Build kapable-media:// URL for display
           // Use a fixed hostname to avoid URL hostname normalization (lowercasing)
           // Encode path segments so special characters (spaces, #, ?, %) don't
           // break URL parsing. The protocol handler already decodeURIComponent's.
-          const mediaUrl = `dyad-media://media/${encodeURIComponent(chat.app.path)}/.dyad/media/${encodeURIComponent(filename)}`;
+          const mediaUrl = `kapable-media://media/${encodeURIComponent(chat.app.path)}/.kapable/media/${encodeURIComponent(filename)}`;
 
           // Build display tag for inline rendering (escape attribute values)
-          displayAttachmentInfo += buildDyadAttachmentTag({
+          displayAttachmentInfo += buildKapableAttachmentTag({
             name: attachment.name,
             type: attachment.type,
             url: mediaUrl,
@@ -1299,16 +1299,16 @@ export function registerChatStreamHandlers() {
           });
 
           if (attachment.attachmentType === "upload-to-codebase") {
-            // Provide the .dyad/media path so the AI can copy it into the codebase
-            attachmentInfo += `\n\nFile to upload to codebase: "${attachment.name}" (path: ${persistentPath})\nUse the copy_file tool when tools are available, or emit a <dyad-copy> tag otherwise, to copy this file into the codebase at the appropriate location.\n`;
+            // Provide the .kapable/media path so the AI can copy it into the codebase
+            attachmentInfo += `\n\nFile to upload to codebase: "${attachment.name}" (path: ${persistentPath})\nUse the copy_file tool when tools are available, or emit a <kapable-copy> tag otherwise, to copy this file into the codebase at the appropriate location.\n`;
           } else {
             // For chat-context, provide file info for reference (no path to avoid auto-copying)
             attachmentInfo += `- ${attachment.name} (${attachment.type})\n`;
             // If it's a text-based file, try to include the content
             if (await isTextFile(persistentPath)) {
               try {
-                attachmentInfo += `<dyad-text-attachment filename="${escapeXmlAttr(attachment.name)}" type="${escapeXmlAttr(attachment.type)}" path="${escapeXmlAttr(persistentPath)}">
-                </dyad-text-attachment>
+                attachmentInfo += `<kapable-text-attachment filename="${escapeXmlAttr(attachment.name)}" type="${escapeXmlAttr(attachment.type)}" path="${escapeXmlAttr(persistentPath)}">
+                </kapable-text-attachment>
                 \n\n`;
               } catch (err) {
                 logger.error(`Error reading file content: ${err}`);
@@ -1322,7 +1322,7 @@ export function registerChatStreamHandlers() {
       // Build the full AI prompt. Attachment-specific instructions are added
       // to the user message, never the system prompt.
       let userPrompt = req.prompt;
-      // Build the display prompt (with <dyad-attachment> tags for inline rendering)
+      // Build the display prompt (with <kapable-attachment> tags for inline rendering)
       // This separates what the user sees from what the AI receives.
       let displayUserPrompt: string | undefined;
       if (displayAttachmentInfo) {
@@ -1398,8 +1398,8 @@ export function registerChatStreamHandlers() {
               sizeBytes: stat.size,
               createdAt: new Date().toISOString(),
             });
-            const mediaUrl = buildDyadMediaUrl(chat.app.path, media.fileName);
-            mediaDisplayInfo += buildDyadAttachmentTag({
+            const mediaUrl = buildKapableMediaUrl(chat.app.path, media.fileName);
+            mediaDisplayInfo += buildKapableAttachmentTag({
               name: media.fileName,
               type: media.mimeType,
               url: mediaUrl,
@@ -1448,17 +1448,17 @@ export function registerChatStreamHandlers() {
           implementPlanDisplayPrompt = userPrompt;
           const planSlug = implementPlanMatch[1];
           validatePlanId(planSlug);
-          const appPath = getDyadAppPath(chat.app.path);
+          const appPath = getKapableAppPath(chat.app.path);
           const planFilePath = path.join(
             appPath,
-            ".dyad",
+            ".kapable",
             "plans",
             `${planSlug}.md`,
           );
           const raw = await fs.promises.readFile(planFilePath, "utf-8");
           const { meta, content } = parsePlanFile(raw);
 
-          const planPath = `.dyad/plans/${planSlug}.md`;
+          const planPath = `.kapable/plans/${planSlug}.md`;
 
           userPrompt = `Please implement the following plan:
 
@@ -1483,7 +1483,7 @@ You may update the plan at \`${planPath}\` to mark your progress.`;
           let componentSnippet = "[component snippet not available]";
           try {
             const componentFileContent = await readFile(
-              path.join(getDyadAppPath(chat.app.path), component.relativePath),
+              path.join(getKapableAppPath(chat.app.path), component.relativePath),
               "utf8",
             );
             const lines = componentFileContent.split(/\r?\n/);
@@ -1533,9 +1533,9 @@ ${componentSnippet}
           .where(eq(chats.id, req.chatId))
           .get();
         if (!latestChat) {
-          throw new DyadError(
+          throw new KapableError(
             `Chat not found: ${req.chatId}`,
-            DyadErrorKind.NotFound,
+            KapableErrorKind.NotFound,
           );
         }
 
@@ -1544,7 +1544,7 @@ ${componentSnippet}
       const readAdmissionSettings = () => {
         const current = readSettings();
         return {
-          enableDyadPro: current.enableDyadPro,
+          enableKapablePro: current.enableKapablePro,
           proModelUsage: current.proModelUsage,
           providerSettings: current.providerSettings,
           selectedModel: current.selectedModel,
@@ -1793,16 +1793,16 @@ ${componentSnippet}
         streamId: req.streamId,
         effectiveChatMode: selectedChatMode,
       } satisfies ChatStreamChunkPayload);
-      // Only Dyad Pro requests have request ids.
-      if (settings.enableDyadPro) {
+      // Only KapAble Pro requests have request ids.
+      if (settings.enableKapablePro) {
         // Generate requestId early so it can be saved with the message
-        dyadRequestId = uuidv4();
+        kapableRequestId = uuidv4();
       }
       const willUseLocalAgentStream = isLocalAgentBackedMode(selectedChatMode);
       if (!willUseLocalAgentStream) {
-        throw new DyadError(
+        throw new KapableError(
           `Chat mode ${selectedChatMode} is not backed by the local agent stream`,
-          DyadErrorKind.Internal,
+          KapableErrorKind.Internal,
         );
       }
 
@@ -1817,13 +1817,13 @@ ${componentSnippet}
           // messages as already handled so legacy proposal actions cannot
           // replay tool XML after an error or cancellation.
           approvalState: willUseLocalAgentStream ? "approved" : null,
-          requestId: dyadRequestId,
+          requestId: kapableRequestId,
           model:
             selectedModel.connection === "subscription"
               ? `ChatGPT subscription (${selectedModel.name})`
               : selectedModel.name,
           sourceCommitHash: await getCurrentCommitHash({
-            path: getDyadAppPath(chat.app.path),
+            path: getKapableAppPath(chat.app.path),
           }),
         })
         .returning();
@@ -1843,9 +1843,9 @@ ${componentSnippet}
       });
 
       if (!updatedChat) {
-        throw new DyadError(
+        throw new KapableError(
           `Chat not found: ${req.chatId}`,
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
 
@@ -1888,7 +1888,7 @@ ${componentSnippet}
         const isLocalAgentMode = selectedChatMode === "local-agent";
         const isAskMode = selectedChatMode === "ask";
         const isPlanMode = selectedChatMode === "plan";
-        const appPath = getDyadAppPath(updatedChat.app.path);
+        const appPath = getKapableAppPath(updatedChat.app.path);
         // When we don't have smart context enabled, we
         // only include the selected components' files for codebase context.
         //
@@ -1945,7 +1945,7 @@ ${componentSnippet}
 
         // For smart context and selected components, we will mark the selected components' files as focused.
         // This means that we don't do the regular smart context handling, but we'll allow fetching
-        // additional files through <dyad-read> as needed.
+        // additional files through <kapable-read> as needed.
         if (
           isSmartContextEnabled &&
           req.selectedComponents &&
@@ -2050,7 +2050,7 @@ ${componentSnippet}
         }));
 
         // The DB stores display-friendly versions (short /implement-plan= form
-        // or clean <dyad-attachment> tags). Replace the last user message with the
+        // or clean <kapable-attachment> tags). Replace the last user message with the
         // full AI prompt so the model receives expanded plan content or attachment paths.
         if (implementPlanDisplayPrompt || displayUserPrompt) {
           for (let i = messageHistory.length - 1; i >= 0; i--) {
@@ -2064,7 +2064,7 @@ ${componentSnippet}
           }
         }
 
-        // For Dyad Pro + Deep Context, we set to 200 chat turns (+1)
+        // For KapAble Pro + Deep Context, we set to 200 chat turns (+1)
         // this is to enable more cache hits. Practically, users should
         // rarely go over this limit because they will hit the model's
         // context window limit.
@@ -2108,7 +2108,7 @@ ${componentSnippet}
           );
         }
 
-        const aiRules = await readAiRules(getDyadAppPath(updatedChat.app.path));
+        const aiRules = await readAiRules(getKapableAppPath(updatedChat.app.path));
 
         // Get theme prompt for the app (null themeId means "no theme")
         const themePrompt = await getThemePromptById(updatedChat.app.themeId);
@@ -2122,7 +2122,7 @@ ${componentSnippet}
         // persona is disabled. Code-index readiness is independent now that
         // spawn_agent replaces the old explore_code tool.
         const codeExplorerAvailable =
-          isDyadProEnabled(settings) &&
+          isKapableProEnabled(settings) &&
           settings.enableExplorerSubagent !== false &&
           settings.agentToolConsents?.["spawn_agent"] !== "never";
         // Mirrors explore_chat_history's toolset inclusion (Pro, and not
@@ -2130,11 +2130,11 @@ ${componentSnippet}
         // that isn't in the toolset. Consent is read from settings directly
         // because this module must not import the pro tool registry.
         const historyExplorerAvailable =
-          isDyadProEnabled(settings) &&
+          isKapableProEnabled(settings) &&
           settings.agentToolConsents?.["explore_chat_history"] !== "never";
         const implementerAvailable =
           selectedChatMode === "local-agent" &&
-          isDyadProEnabled(settings) &&
+          isKapableProEnabled(settings) &&
           isImplementerSubagentEnabled(settings);
         const restartAppToolAvailable =
           settings.agentToolConsents?.["restart_app"] !== "never";
@@ -2209,7 +2209,7 @@ ${componentSnippet}
             readGuideAvailable,
           } = capabilityState;
           const refreshedFrameworkType = detectFrameworkType(
-            getDyadAppPath(refreshedApp.path),
+            getKapableAppPath(refreshedApp.path),
           );
           const neonEmailVerificationEnabled =
             provider === "neon" &&
@@ -2294,7 +2294,7 @@ ${componentSnippet}
         if (isSecurityReviewIntent) {
           systemPrompt = SECURITY_REVIEW_SYSTEM_PROMPT;
           try {
-            const appPath = getDyadAppPath(updatedChat.app.path);
+            const appPath = getKapableAppPath(updatedChat.app.path);
             const rulesPath = path.join(appPath, "SECURITY_RULES.md");
             let securityRules = "";
 
@@ -2370,7 +2370,7 @@ ${componentSnippet}
 
 When files are attached to this conversation for upload to the codebase, copy them into the project using this exact format:
 
-<dyad-copy from="/absolute/path/to/.dyad/media/source.ext" to="path/to/destination/filename.ext" description="Upload file to codebase"></dyad-copy>
+<kapable-copy from="/absolute/path/to/.kapable/media/source.ext" to="path/to/destination/filename.ext" description="Upload file to codebase"></kapable-copy>
 
 Use the attached file path from the user's message as the \`from\` value. Choose an appropriate project-relative \`to\` path.
 
@@ -2427,10 +2427,10 @@ This conversation includes one or more image attachments. When the user uploads 
           // and eats up extra tokens.
           content:
             selectedChatMode === "ask"
-              ? removeDyadTags(removeNonEssentialTags(msg.content))
+              ? removeKapableTags(removeNonEssentialTags(msg.content))
               : removeNonEssentialTags(msg.content),
           providerOptions: {
-            "dyad-engine": {
+            "kapable-engine": {
               sourceCommitHash: msg.sourceCommitHash,
               commitHash: msg.commitHash,
             },
@@ -2510,7 +2510,7 @@ This conversation includes one or more image attachments. When the user uploads 
           modelClient,
           tools,
           systemPromptOverride = systemPrompt,
-          dyadDisableFiles = false,
+          kapableDisableFiles = false,
           files,
         }: {
           chatMessages: ModelMessage[];
@@ -2518,12 +2518,12 @@ This conversation includes one or more image attachments. When the user uploads 
           files: CodebaseFile[];
           tools?: ToolSet;
           systemPromptOverride?: string;
-          dyadDisableFiles?: boolean;
+          kapableDisableFiles?: boolean;
         }) => {
           if (isEngineEnabled) {
             logger.log(
               "sending AI request to engine with request id:",
-              dyadRequestId,
+              kapableRequestId,
             );
           } else {
             logger.log("sending AI request");
@@ -2540,9 +2540,9 @@ This conversation includes one or more image attachments. When the user uploads 
             ? "deep"
             : "balanced";
           const providerOptions = getProviderOptions({
-            dyadAppId: updatedChat.app.id,
-            dyadRequestId,
-            dyadDisableFiles,
+            kapableAppId: updatedChat.app.id,
+            kapableRequestId,
+            kapableDisableFiles,
             smartContextMode,
             files,
             versionedFiles,
@@ -2555,7 +2555,7 @@ This conversation includes one or more image attachments. When the user uploads 
           const streamResult = streamText({
             headers: getAiHeaders({
               builtinProviderId: modelClient.builtinProviderId,
-              dyadRequestId,
+              kapableRequestId,
             }),
             maxOutputTokens: await getMaxTokens(settings.selectedModel),
             temperature: await getTemperature(settings.selectedModel),
@@ -2605,7 +2605,7 @@ This conversation includes one or more image attachments. When the user uploads 
               }
               const message = errorMessage || JSON.stringify(error);
               const requestIdPrefix = isEngineEnabled
-                ? `[Request ID: ${dyadRequestId}] `
+                ? `[Request ID: ${kapableRequestId}] `
                 : "";
               logger.error(
                 `AI stream text error for request: ${requestIdPrefix} errorMessage=${errorMessage} error=`,
@@ -2644,7 +2644,7 @@ This conversation includes one or more image attachments. When the user uploads 
         let lastDbSaveAt = 0;
         // Tracks what was last sent to the renderer so we can emit only the
         // tail diff. `cleanFullResponse` may retroactively rewrite earlier
-        // bytes inside an in-progress dyad-tag's attribute values, so we
+        // bytes inside an in-progress kapable-tag's attribute values, so we
         // compute the longest common prefix on each send rather than
         // assuming pure appends.
         let lastSentContent = "";
@@ -2720,7 +2720,7 @@ This conversation includes one or more image attachments. When the user uploads 
               // This is OK because those intents should always happen in a new chat
               // and new chats will default to non-ask modes.
               systemPrompt: readOnlySystemPrompt,
-              dyadRequestId: dyadRequestId ?? "[no-request-id]",
+              kapableRequestId: kapableRequestId ?? "[no-request-id]",
               readOnly: true,
               messageOverride: isSummarizeIntent ? chatMessages : undefined,
               settingsOverride: settings,
@@ -2770,7 +2770,7 @@ This conversation includes one or more image attachments. When the user uploads 
             {
               placeholderMessageId: placeholderAssistantMessage.id,
               systemPrompt: planModeSystemPrompt,
-              dyadRequestId: dyadRequestId ?? "[no-request-id]",
+              kapableRequestId: kapableRequestId ?? "[no-request-id]",
               planModeOnly: true,
               messageOverride: isSummarizeIntent ? chatMessages : undefined,
               settingsOverride: settings,
@@ -2800,7 +2800,7 @@ This conversation includes one or more image attachments. When the user uploads 
             {
               placeholderMessageId: placeholderAssistantMessage.id,
               systemPrompt,
-              dyadRequestId: dyadRequestId ?? "[no-request-id]",
+              kapableRequestId: kapableRequestId ?? "[no-request-id]",
               readOnly: readOnlyBuildTurn,
               toolProfile: "build",
               messageOverride: isSummarizeIntent ? chatMessages : undefined,
@@ -2834,7 +2834,7 @@ This conversation includes one or more image attachments. When the user uploads 
             {
               placeholderMessageId: placeholderAssistantMessage.id,
               systemPrompt,
-              dyadRequestId: dyadRequestId ?? "[no-request-id]",
+              kapableRequestId: kapableRequestId ?? "[no-request-id]",
               messageOverride: isSummarizeIntent ? chatMessages : undefined,
               settingsOverride: settings,
               modelSelectionOverride: selectedModel,
@@ -2890,7 +2890,7 @@ This conversation includes one or more image attachments. When the user uploads 
           if (!modelRefused && isTurboEditsV2Enabled(settings)) {
             let issues = await dryRunSearchReplace({
               fullResponse,
-              appPath: getDyadAppPath(updatedChat.app.path),
+              appPath: getKapableAppPath(updatedChat.app.path),
             });
             sendTelemetryEvent("search_replace:fix", {
               attemptNumber: 0,
@@ -2919,7 +2919,7 @@ This conversation includes one or more image attachments. When the user uploads 
                 })
                 .join("\n\n");
 
-              fullResponse += `<dyad-output type="warning" message="Could not apply Turbo Edits properly for some of the files; re-generating code...">${formattedSearchReplaceIssues}</dyad-output>`;
+              fullResponse += `<kapable-output type="warning" message="Could not apply Turbo Edits properly for some of the files; re-generating code...">${formattedSearchReplaceIssues}</kapable-output>`;
               await processResponseChunkUpdate({
                 fullResponse,
               });
@@ -2930,8 +2930,8 @@ This conversation includes one or more image attachments. When the user uploads 
 
               const fixSearchReplacePrompt =
                 searchReplaceFixAttempts === 0
-                  ? `There was an issue with the following \`dyad-search-replace\` tags. Make sure you use \`dyad-read\` to read the latest version of the file and then trying to do search & replace again.`
-                  : `There was an issue with the following \`dyad-search-replace\` tags. Please fix the errors by generating the code changes using \`dyad-write\` tags instead.`;
+                  ? `There was an issue with the following \`kapable-search-replace\` tags. Make sure you use \`kapable-read\` to read the latest version of the file and then trying to do search & replace again.`
+                  : `There was an issue with the following \`kapable-search-replace\` tags. Please fix the errors by generating the code changes using \`kapable-write\` tags instead.`;
               searchReplaceFixAttempts++;
               const userPrompt = {
                 role: "user",
@@ -2971,7 +2971,7 @@ This conversation includes one or more image attachments. When the user uploads 
               // Re-check for issues after the fix attempt
               issues = await dryRunSearchReplace({
                 fullResponse: result.incrementalResponse,
-                appPath: getDyadAppPath(updatedChat.app.path),
+                appPath: getKapableAppPath(updatedChat.app.path),
               });
 
               sendTelemetryEvent("search_replace:fix", {
@@ -2989,16 +2989,16 @@ This conversation includes one or more image attachments. When the user uploads 
           if (
             !modelRefused &&
             !abortController.signal.aborted &&
-            hasUnclosedDyadWrite(fullResponse)
+            hasUnclosedKapableWrite(fullResponse)
           ) {
             let continuationAttempts = 0;
             while (
-              hasUnclosedDyadWrite(fullResponse) &&
+              hasUnclosedKapableWrite(fullResponse) &&
               continuationAttempts < 2 &&
               !abortController.signal.aborted
             ) {
               logger.warn(
-                `Received unclosed dyad-write tag, attempting to continue, attempt #${continuationAttempts + 1}`,
+                `Received unclosed kapable-write tag, attempting to continue, attempt #${continuationAttempts + 1}`,
               );
               continuationAttempts++;
 
@@ -3090,9 +3090,9 @@ This conversation includes one or more image attachments. When the user uploads 
       // src/chat_stream/host_transition.ts.
       // Only save the response and process it if we weren't aborted
       if (!abortController.signal.aborted && fullResponse) {
-        // Scrape from: <dyad-chat-summary>Renaming profile file</dyad-chat-title>
+        // Scrape from: <kapable-chat-summary>Renaming profile file</kapable-chat-title>
         const chatTitle = fullResponse.match(
-          /<dyad-chat-summary>(.*?)<\/dyad-chat-summary>/,
+          /<kapable-chat-summary>(.*?)<\/kapable-chat-summary>/,
         );
         if (chatTitle) {
           await db
@@ -3114,7 +3114,7 @@ This conversation includes one or more image attachments. When the user uploads 
           latestSettings.autoApproveChanges && selectedChatMode !== "ask";
         const hasDestructiveSql =
           shouldAutoApply &&
-          getDyadExecuteSqlTags(fullResponse).some((query) =>
+          getKapableExecuteSqlTags(fullResponse).some((query) =>
             doesSqlDeleteData(query.content),
           );
         if (shouldAutoApply && !hasDestructiveSql) {
@@ -3185,7 +3185,7 @@ This conversation includes one or more image attachments. When the user uploads 
       return req.chatId;
     } catch (error) {
       logger.error("Error calling LLM:", error);
-      const errorMessage = isDyadError(error) ? error.message : String(error);
+      const errorMessage = isKapableError(error) ? error.message : String(error);
       const rendererError =
         error instanceof SubscriptionBillingError
           ? error.serialize()
@@ -3325,7 +3325,7 @@ async function replaceTextAttachmentWithContent(
       const xmlEscapedPath = escapeXmlAttr(filePath);
       const escapedPath = xmlEscapedPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const tagPattern = new RegExp(
-        `<dyad-text-attachment filename="[^"]*" type="[^"]*" path="${escapedPath}">\\s*<\\/dyad-text-attachment>`,
+        `<kapable-text-attachment filename="[^"]*" type="[^"]*" path="${escapedPath}">\\s*<\\/kapable-text-attachment>`,
         "g",
       );
 
@@ -3433,18 +3433,18 @@ function removeThinkingTags(text: string): string {
 
 export function removeProblemReportTags(text: string): string {
   const problemReportRegex =
-    /<dyad-problem-report[^>]*>[\s\S]*?<\/dyad-problem-report>/g;
+    /<kapable-problem-report[^>]*>[\s\S]*?<\/kapable-problem-report>/g;
   return text.replace(problemReportRegex, "").trim();
 }
 
-export function removeDyadTags(text: string): string {
-  const dyadRegex = /<dyad-[^>]*>[\s\S]*?<\/dyad-[^>]*>/g;
-  return text.replace(dyadRegex, "").trim();
+export function removeKapableTags(text: string): string {
+  const kapableRegex = /<kapable-[^>]*>[\s\S]*?<\/kapable-[^>]*>/g;
+  return text.replace(kapableRegex, "").trim();
 }
 
-export function hasUnclosedDyadWrite(text: string): boolean {
-  // Find the last opening dyad-write tag
-  const openRegex = /<dyad-write[^>]*>/g;
+export function hasUnclosedKapableWrite(text: string): boolean {
+  // Find the last opening kapable-write tag
+  const openRegex = /<kapable-write[^>]*>/g;
   let lastOpenIndex = -1;
   let match;
 
@@ -3459,19 +3459,19 @@ export function hasUnclosedDyadWrite(text: string): boolean {
 
   // Look for a closing tag after the last opening tag
   const textAfterLastOpen = text.substring(lastOpenIndex);
-  const hasClosingTag = /<\/dyad-write>/.test(textAfterLastOpen);
+  const hasClosingTag = /<\/kapable-write>/.test(textAfterLastOpen);
 
   return !hasClosingTag;
 }
 
-function escapeDyadTags(text: string): string {
-  // Escape dyad tags in reasoning content
+function escapeKapableTags(text: string): string {
+  // Escape kapable tags in reasoning content
   // We are replacing the opening tag with a look-alike character
-  // to avoid issues where thinking content includes dyad tags
+  // to avoid issues where thinking content includes kapable tags
   // and are mishandled by:
   // 1. FE markdown parser
   // 2. Main process response processor
-  return text.replace(/<dyad/g, "＜dyad").replace(/<\/dyad/g, "＜/dyad");
+  return text.replace(/<kapable/g, "＜kapable").replace(/<\/kapable/g, "＜/kapable");
 }
 
 const CODEBASE_PROMPT_PREFIX = "This is my codebase.";

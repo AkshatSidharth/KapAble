@@ -21,9 +21,9 @@ testSkipIfWindows(
       "lib",
     );
     const typeScriptEntryPath = path.join(typeScriptLibPath, "tsc.js");
-    const originalEntryName = "tsc-dyad-e2e-original.js";
+    const originalEntryName = "tsc-kapable-e2e-original.js";
     const originalEntryPath = path.join(typeScriptLibPath, originalEntryName);
-    const invocationLogName = ".dyad-tsc-cli-invocations";
+    const invocationLogName = ".kapable-tsc-cli-invocations";
     const invocationLogPath = path.join(typeScriptLibPath, invocationLogName);
     const badFilePath = path.join(appPath, "src", "tsc-cli-error.ts");
     let entryMoved = false;

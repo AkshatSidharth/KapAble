@@ -1,30 +1,30 @@
-import { DyadError, DyadErrorKind } from "../errors/dyad_error";
+import { KapableError, KapableErrorKind } from "../errors/kapable_error";
 
 export const SUBSCRIPTION_BILLING_ERRORS = {
   OUT_OF_CREDITS: {
     title: "You’re out of AI credits",
     description: "Add credits to continue using your subscription.",
     message:
-      "You're out of Dyad credits. Add credits to continue using your subscription.",
+      "You're out of KapAble credits. Add credits to continue using your subscription.",
     action: "Get more credits",
-    url: "https://academy.dyad.sh/subscription",
+    url: "https://academy.kapable.sh/subscription",
   },
   KEY_REJECTED: {
-    title: "Your Dyad Pro key was rejected",
+    title: "Your KapAble Pro key was rejected",
     description: "Get your current Pro key.",
-    message: "Your Dyad Pro key was rejected. Get your current Pro key.",
+    message: "Your KapAble Pro key was rejected. Get your current Pro key.",
     action: "Open membership portal",
-    url: "https://academy.dyad.sh",
+    url: "https://academy.kapable.sh",
   },
 } as const;
 
 type SubscriptionBillingErrorCode = keyof typeof SUBSCRIPTION_BILLING_ERRORS;
 
-export class SubscriptionBillingError extends DyadError {
+export class SubscriptionBillingError extends KapableError {
   constructor(readonly code: SubscriptionBillingErrorCode) {
     super(
       SUBSCRIPTION_BILLING_ERRORS[code].message,
-      code === "KEY_REJECTED" ? DyadErrorKind.Auth : DyadErrorKind.Precondition,
+      code === "KEY_REJECTED" ? KapableErrorKind.Auth : KapableErrorKind.Precondition,
     );
   }
 

@@ -1,10 +1,10 @@
 Deleting a file
 
-<dyad-delete path="to-be-deleted.txt"></dyad-delete>
-<dyad-write path="new-file.js" description="new file">
+<kapable-delete path="to-be-deleted.txt"></kapable-delete>
+<kapable-write path="new-file.js" description="new file">
 new-file
 end of new-file
-</dyad-write>
-<dyad-write path="to-be-edited.txt" description="editing file">
+</kapable-write>
+<kapable-write path="to-be-edited.txt" description="editing file">
 after-edit
-</dyad-write>
+</kapable-write>

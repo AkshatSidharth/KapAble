@@ -112,7 +112,7 @@ import { useRouter } from "@tanstack/react-router";
 import { showError as showErrorToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { useVoiceToText } from "@/hooks/useVoiceToText";
-import { isDyadProEnabled, isLocalAgentBackedMode } from "@/lib/schemas";
+import { isKapableProEnabled, isLocalAgentBackedMode } from "@/lib/schemas";
 import { isFreeProModel } from "@/lib/freeProModel";
 import { ReferencedAppsBar } from "./ReferencedAppsBar";
 import { useChatMode } from "@/hooks/useChatMode";
@@ -324,7 +324,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
   }, [messages]);
 
   const { userBudget } = useUserBudgetInfo();
-  const isProEnabled = settings ? isDyadProEnabled(settings) : false;
+  const isProEnabled = settings ? isKapableProEnabled(settings) : false;
 
   const handleTranscription = useCallback(
     (text: string) => {
@@ -388,7 +388,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
     // Clear overlays in the preview iframe
     if (previewIframeRef?.contentWindow) {
       previewIframeRef.contentWindow.postMessage(
-        { type: "clear-dyad-component-overlays" },
+        { type: "clear-kapable-component-overlays" },
         "*",
       );
     }
@@ -694,7 +694,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
         setVisualEditingSelectedComponent(null);
         if (previewIframeRef?.contentWindow) {
           previewIframeRef.contentWindow.postMessage(
-            { type: "clear-dyad-component-overlays" },
+            { type: "clear-kapable-component-overlays" },
             "*",
           );
         }
@@ -868,7 +868,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
         <ChatErrorBox
           onDismiss={dismissError}
           error={error}
-          isDyadProEnabled={isProEnabled}
+          isKapableProEnabled={isProEnabled}
           onStartNewChat={handleNewChat}
           onSwitchToBuildMode={
             isFreeProModel(selectedModel)
@@ -1018,7 +1018,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
                     render={
                       <button
                         onClick={() => {
-                          ipc.system.openExternalUrl("https://dyad.sh/pro");
+                          ipc.system.openExternalUrl("https://kapable.sh/pro");
                         }}
                         className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                       />
@@ -1071,7 +1071,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
               onChange={setInputValue}
               onSubmit={handleSubmit}
               onPaste={handlePaste}
-              placeholder={t("askDyadToBuild")}
+              placeholder={t("askKapableToBuild")}
               excludeCurrentApp={true}
               disableSendButton={disableSendButton}
               messageHistory={userMessageHistory}
@@ -1123,7 +1123,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
                   render={
                     <button
                       onClick={() =>
-                        ipc.system.openExternalUrl("https://dyad.sh/pro")
+                        ipc.system.openExternalUrl("https://kapable.sh/pro")
                       }
                       aria-label={t("voiceToTextPro", "Voice to text (Pro)")}
                       className="px-2 py-2 mb-0.5 text-muted-foreground hover:text-primary rounded-lg transition-colors duration-150 cursor-pointer relative"
@@ -1306,7 +1306,7 @@ function WriteCodeProperlyButton() {
       return;
     }
     streamMessage({
-      prompt: `Write the code in the previous message in the correct format using \`<dyad-write>\` tags!`,
+      prompt: `Write the code in the previous message in the correct format using \`<kapable-write>\` tags!`,
       chatId,
       redo: false,
     });

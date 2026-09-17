@@ -4,7 +4,7 @@ import type {
   LanguageModelV3StreamPart,
   LanguageModelV3StreamResult,
 } from "@ai-sdk/provider";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 /** Adapt a streaming-only provider for auxiliary generateText/generateObject calls. */
 export async function collectModelStream(
@@ -79,9 +79,9 @@ export async function collectModelStream(
       }
     }
     if (!finish)
-      throw new DyadError(
+      throw new KapableError(
         "Model stream ended without a completion result.",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     return {
       content,

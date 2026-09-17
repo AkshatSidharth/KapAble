@@ -4,10 +4,10 @@
 //
 // Exercises the local-agent code_search tool end-to-end: the fixture streams a
 // code_search tool call, the real tool extracts the codebase and POSTs it to
-// the (fake) Dyad Engine /tools/code-search endpoint, and the resulting
-// <dyad-code-search> XML with the relevant files lands in the assistant
+// the (fake) KapAble Engine /tools/code-search endpoint, and the resulting
+// <kapable-code-search> XML with the relevant files lands in the assistant
 // message — now also asserted as the rendered Code Search tool card in the
-// DOM. code_search requires Dyad Pro and uses the harness fake server via
+// DOM. code_search requires KapAble Pro and uses the harness fake server via
 // `engine: true`.
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -29,8 +29,8 @@ describe("local-agent code_search (integration)", () => {
       chatMode: "local-agent",
       settings: {
         isTestMode: true,
-        enableDyadPro: true,
-        providerSettings: { auto: { apiKey: { value: "testdyadkey" } } },
+        enableKapablePro: true,
+        providerSettings: { auto: { apiKey: { value: "testkapablekey" } } },
         // Exercise the direct fallback when Explorer delegation is disabled.
         enableExplorerSubagent: false,
         enableCodeExplorer: false,
@@ -97,7 +97,7 @@ describe("local-agent code_search (integration)", () => {
     // The completed tool XML holds the fake engine's result: the first three
     // codebase files echoed back as relevant paths.
     const xmlMatch = content.match(
-      /<dyad-code-search query="React component rendering">([\s\S]*?)<\/dyad-code-search>/,
+      /<kapable-code-search query="React component rendering">([\s\S]*?)<\/kapable-code-search>/,
     );
     expect(xmlMatch).not.toBeNull();
     const resultText = xmlMatch![1];

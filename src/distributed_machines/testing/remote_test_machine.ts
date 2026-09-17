@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import type { InvocationRef } from "@/state_machines/invocation_ref";
 import { sameInvocationRef } from "@/state_machines/invocation_ref";
 import { change, ignore, stay } from "@/state_machines/types";
@@ -200,14 +200,14 @@ export function createRemoteTestMachine(
       authorizeSubscribe({ key }) {
         return key === "forbidden"
           ? denyRemoteAuthorization(
-              new DyadError("forbidden key", DyadErrorKind.Auth),
+              new KapableError("forbidden key", KapableErrorKind.Auth),
             )
           : allowRemoteAuthorization();
       },
       authorizeDispatch({ key }) {
         return key === "forbidden"
           ? denyRemoteAuthorization(
-              new DyadError("forbidden key", DyadErrorKind.Auth),
+              new KapableError("forbidden key", KapableErrorKind.Auth),
             )
           : allowRemoteAuthorization();
       },
@@ -297,20 +297,20 @@ export function createRemoteTestMachine(
         event.type === "SET" ? "reject-stale" : "allow-stale",
       authorizeSubscribe({ key }) {
         if (key === "forbidden") {
-          throw new DyadError("forbidden key", DyadErrorKind.Auth);
+          throw new KapableError("forbidden key", KapableErrorKind.Auth);
         }
       },
       authorizeDispatch({ key, event }) {
         if (key === "forbidden") {
-          throw new DyadError("forbidden key", DyadErrorKind.Auth);
+          throw new KapableError("forbidden key", KapableErrorKind.Auth);
         }
         if (
           (event.type === "START" || event.type === "CANCEL") &&
           event.invocationRef.entityKey !== key
         ) {
-          throw new DyadError(
+          throw new KapableError(
             "invocation ref belongs to another actor",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         }
       },

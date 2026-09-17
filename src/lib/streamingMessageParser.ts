@@ -1,7 +1,7 @@
 import { unescapeXmlAttr, unescapeXmlContent } from "../../shared/xmlEscape";
 
 /**
- * Incremental dyad-tag parser.
+ * Incremental kapable-tag parser.
  *
  * Feed the message content as it grows; emit a list of stable Block
  * objects for the renderer. Committed Block objects keep referential
@@ -20,70 +20,70 @@ import { unescapeXmlAttr, unescapeXmlContent } from "../../shared/xmlEscape";
  * only mark blocks as `complete` (closing tag seen) vs not.
  */
 
-// Recognised dyad custom-tag names. Anything outside this set with a
+// Recognised kapable custom-tag names. Anything outside this set with a
 // leading "<NAME" is treated as markdown text, matching the rendering
-// behavior in DyadMarkdownParser.
-const DYAD_CUSTOM_TAG_NAMES = [
-  "dyad-write",
-  "dyad-rename",
-  "dyad-delete",
-  "dyad-add-dependency",
-  "dyad-execute-sql",
-  "dyad-read-logs",
-  "dyad-add-integration",
-  "dyad-enable-nitro",
-  "dyad-output",
-  "dyad-problem-report",
-  "dyad-chat-summary",
-  "dyad-edit",
-  "dyad-grep",
-  "dyad-explore-code",
-  "dyad-search-replace",
-  "dyad-codebase-context",
-  "dyad-web-search-result",
-  "dyad-web-search",
-  "dyad-web-crawl",
-  "dyad-web-fetch",
-  "dyad-code-search-result",
-  "dyad-code-search",
-  "dyad-read",
-  "dyad-git",
+// behavior in KapableMarkdownParser.
+const KAPABLE_CUSTOM_TAG_NAMES = [
+  "kapable-write",
+  "kapable-rename",
+  "kapable-delete",
+  "kapable-add-dependency",
+  "kapable-execute-sql",
+  "kapable-read-logs",
+  "kapable-add-integration",
+  "kapable-enable-nitro",
+  "kapable-output",
+  "kapable-problem-report",
+  "kapable-chat-summary",
+  "kapable-edit",
+  "kapable-grep",
+  "kapable-explore-code",
+  "kapable-search-replace",
+  "kapable-codebase-context",
+  "kapable-web-search-result",
+  "kapable-web-search",
+  "kapable-web-crawl",
+  "kapable-web-fetch",
+  "kapable-code-search-result",
+  "kapable-code-search",
+  "kapable-read",
+  "kapable-git",
   "think",
-  "dyad-command",
-  "dyad-mcp-tool-call",
-  "dyad-mcp-tool-result",
-  "dyad-mcp-tool-search",
-  "dyad-mcp-tool-schema",
-  "dyad-list-files",
-  "dyad-database-schema",
-  "dyad-db-table-schema",
-  "dyad-supabase-table-schema",
-  "dyad-supabase-project-info",
-  "dyad-neon-project-info",
-  "dyad-neon-table-schema",
-  "dyad-read-guide",
-  "dyad-status",
-  "dyad-compaction",
-  "dyad-copy",
-  "dyad-image-generation",
-  "dyad-write-plan",
-  "dyad-exit-plan",
-  "dyad-questionnaire",
-  "dyad-step-limit",
-  "dyad-script",
-  "dyad-app-blueprint",
-  "dyad-security-finding",
-  "dyad-test-assertions",
+  "kapable-command",
+  "kapable-mcp-tool-call",
+  "kapable-mcp-tool-result",
+  "kapable-mcp-tool-search",
+  "kapable-mcp-tool-schema",
+  "kapable-list-files",
+  "kapable-database-schema",
+  "kapable-db-table-schema",
+  "kapable-supabase-table-schema",
+  "kapable-supabase-project-info",
+  "kapable-neon-project-info",
+  "kapable-neon-table-schema",
+  "kapable-read-guide",
+  "kapable-status",
+  "kapable-compaction",
+  "kapable-copy",
+  "kapable-image-generation",
+  "kapable-write-plan",
+  "kapable-exit-plan",
+  "kapable-questionnaire",
+  "kapable-step-limit",
+  "kapable-script",
+  "kapable-app-blueprint",
+  "kapable-security-finding",
+  "kapable-test-assertions",
   // Legacy: no longer emitted (test writing moved to the agent's write_file /
   // run_tests tools), but historical chats still contain it and must render as
   // a file-write card rather than raw markup.
-  "dyad-generate-test",
-  "dyad-search-chats",
-  "dyad-read-chat",
-  "dyad-explore-chat-history",
-  "dyad-subagent",
+  "kapable-generate-test",
+  "kapable-search-chats",
+  "kapable-read-chat",
+  "kapable-explore-chat-history",
+  "kapable-subagent",
 ];
-const DYAD_CUSTOM_TAG_SET = new Set(DYAD_CUSTOM_TAG_NAMES);
+const KAPABLE_CUSTOM_TAG_SET = new Set(KAPABLE_CUSTOM_TAG_NAMES);
 
 export type Block =
   | {
@@ -124,7 +124,7 @@ export interface ParserState {
   /** Bytes from `content` already consumed. */
   cursor: number;
   mode: Mode;
-  /** Bytes seen but not yet committed (e.g. partial "<dyad-..."). */
+  /** Bytes seen but not yet committed (e.g. partial "<kapable-..."). */
   pending: string;
   /** While in tag-attrs, the tag name. */
   pendingTagName: string;
@@ -277,7 +277,7 @@ export function advanceParser(prev: ParserState, content: string): ParserState {
       // tag, NAME must be in the set AND the next char must be ws or '>'.
       const name = state.pending.slice(1);
       if (
-        DYAD_CUSTOM_TAG_SET.has(name) &&
+        KAPABLE_CUSTOM_TAG_SET.has(name) &&
         (ch === " " || ch === "\t" || ch === "\n" || ch === "\r" || ch === ">")
       ) {
         state.pendingTagName = name;

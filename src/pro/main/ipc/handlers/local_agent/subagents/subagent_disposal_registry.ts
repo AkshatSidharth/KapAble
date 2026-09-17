@@ -1,4 +1,4 @@
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { withLock } from "@/ipc/utils/lock_utils";
 
 interface SubagentChatDisposal {
@@ -33,9 +33,9 @@ export class SubagentDisposalRegistry {
 
   assertAdmissionOpen(chatId: number): void {
     if (!this.isDisposing(chatId) && this.resetCount === 0) return;
-    throw new DyadError(
+    throw new KapableError(
       "Chat is temporarily unavailable",
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
     );
   }
 

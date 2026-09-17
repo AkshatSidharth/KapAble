@@ -27,7 +27,7 @@ import {
   getRemoteDesktopConfig,
   type RemoteDesktopConfig,
 } from "@/ipc/shared/remote_desktop_config";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { ZodError } from "zod";
 import {
   getRecoveryStats,
@@ -90,7 +90,7 @@ const CRASH_SENTINEL_FILE = "session.lock";
 const RENDERER_CRASH_FILE = "renderer-crash.json";
 const SETTINGS_FILE = "user-settings.json";
 const RESTORE_SETTINGS_DOCS_URL =
-  "https://www.dyad.sh/docs/guides/migrate-restore#restoring-settings-from-backup";
+  "https://www.kapable.sh/docs/guides/migrate-restore#restoring-settings-from-backup";
 let initialLoadIsFirstSession = false;
 
 export function setInitialLoadIsFirstSession(value: boolean): void {
@@ -513,16 +513,16 @@ export function tryWriteSettings(
   }
 }
 
-function toSettingsWriteError(error: unknown): DyadError {
-  if (error instanceof DyadError) {
+function toSettingsWriteError(error: unknown): KapableError {
+  if (error instanceof KapableError) {
     return error;
   }
   const message = error instanceof Error ? error.message : String(error);
   const kind =
     error instanceof ZodError
-      ? DyadErrorKind.Validation
-      : DyadErrorKind.External;
-  return new DyadError(`Failed to write settings: ${message}`, kind, {
+      ? KapableErrorKind.Validation
+      : KapableErrorKind.External;
+  return new KapableError(`Failed to write settings: ${message}`, kind, {
     cause: error,
   });
 }
@@ -695,7 +695,7 @@ function readExistingSettingsFile(
       };
     } else {
       // The address is not a secret and survives a token that will not
-      // decrypt, so the user is not asked to retype what Dyad still knows.
+      // decrypt, so the user is not asked to retype what KapAble still knows.
       const { accessToken: _dropped, ...rest } = combinedSettings.coolify;
       combinedSettings.coolify = rest;
     }
@@ -1032,7 +1032,7 @@ function readSettingsForWrite(filePath: string): {
     logger.error("Existing settings file is unreadable:", error);
     notifyRendererError({
       message:
-        "Dyad could not read your existing settings file, so it fell back to default settings.",
+        "KapAble could not read your existing settings file, so it fell back to default settings.",
       action: {
         label: "Read restore docs",
         url: RESTORE_SETTINGS_DOCS_URL,

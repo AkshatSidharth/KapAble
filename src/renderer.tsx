@@ -7,7 +7,7 @@ import posthog from "posthog-js";
 import {
   getTelemetryUserId,
   isTelemetryOptedIn,
-  isDyadProUser,
+  isKapableProUser,
 } from "./hooks/useSettings";
 
 // Initialize i18next before any rendering
@@ -140,7 +140,7 @@ const posthogClient = posthog.init(
         event.properties["$ip"] = null;
       }
 
-      const isPro = isDyadProUser();
+      const isPro = isKapableProUser();
       const dedupedEvent = postHogErrorDeduper.process(event, isPro);
       if (!dedupedEvent) {
         console.debug("Deduplicating PostHog error event", event?.event);

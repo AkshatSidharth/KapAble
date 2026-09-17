@@ -1,29 +1,29 @@
-# Dyad Pro Free Model
+# KapAble Pro Free Model
 
 ## Goal
 
-Add a new Dyad-hosted "free" model for Dyad Pro users with a hard limit of 10 successful user messages per day. The limit is enforced by `../dyad-llm-engine`, while the desktop app shows the user how many free-model messages remain.
+Add a new KapAble-hosted "free" model for KapAble Pro users with a hard limit of 10 successful user messages per day. The limit is enforced by `../kapable-llm-engine`, while the desktop app shows the user how many free-model messages remain.
 
 This is distinct from the existing Basic Agent quota:
 
-- Basic Agent today is for non-Pro users and is counted locally in the Dyad app.
+- Basic Agent today is for non-Pro users and is counted locally in the KapAble app.
 - The new free model is for Pro users, selected like a model, and counted by the engine so users cannot bypass it by changing local state.
 
 ## Product Behavior
 
-1. Pro users see a new model option in the model picker, tentatively named `Dyad Free`.
-   - Dyad Pro trial users must not see this model in the picker.
-2. Selecting `Dyad Free` keeps the normal chat mode selector available, but in local-agent-backed modes it uses a restricted tool set similar to Basic Agent.
-   - Ask and Plan mode are allowed with `Dyad Free`.
+1. Pro users see a new model option in the model picker, tentatively named `KapAble Free`.
+   - KapAble Pro trial users must not see this model in the picker.
+2. Selecting `KapAble Free` keeps the normal chat mode selector available, but in local-agent-backed modes it uses a restricted tool set similar to Basic Agent.
+   - Ask and Plan mode are allowed with `KapAble Free`.
 3. The UI shows `N/10 remaining today` near the model option and/or the Pro credit chip.
 4. When quota reaches 0:
-   - `Dyad Free` is disabled or clearly marked unavailable in the picker.
-   - Existing chats using `Dyad Free` should prompt the user to switch to another model.
+   - `KapAble Free` is disabled or clearly marked unavailable in the picker.
+   - Existing chats using `KapAble Free` should prompt the user to switch to another model.
    - The engine still remains the source of truth and returns a quota error if a request slips through.
 5. The daily reset is based on server time using a UTC calendar day. Quota resets at `00:00 UTC`.
 6. The UI should display the reset time converted to the user's local timezone, e.g. `Resets at 5:00 PM local time`.
 
-## Engine Scope (`../dyad-llm-engine`)
+## Engine Scope (`../kapable-llm-engine`)
 
 ### Model Identity
 
@@ -38,20 +38,20 @@ The engine should not expose this primarily as another generic model id on `/v1/
 
 ### Quota Data Model
 
-Scope engine-owned Postgres tables to a dedicated schema named `dyad_engine`.
-Use lowercase snake_case rather than `dyadengine` or `dyadEngine`; this matches
+Scope engine-owned Postgres tables to a dedicated schema named `kapable_engine`.
+Use lowercase snake_case rather than `kapableengine` or `kapableEngine`; this matches
 normal Postgres naming conventions and avoids quoted identifiers.
 
-In Drizzle, define the schema with `pgSchema("dyad_engine")` and declare engine
+In Drizzle, define the schema with `pgSchema("kapable_engine")` and declare engine
 tables from that schema. Existing engine tables should move into this schema as
 part of the cutover to the main DB, since existing engine data does not need to
 be preserved.
 
-Add a persisted quota ledger table in the `dyad_engine` schema, keyed by authenticated gateway user identity:
+Add a persisted quota ledger table in the `kapable_engine` schema, keyed by authenticated gateway user identity:
 
 - `id`
 - `user_id`
-- `quota_kind` = `dyad_free_model_daily`
+- `quota_kind` = `kapable_free_model_daily`
 - `quota_date` = UTC date string, e.g. `2026-06-25`
 - `used_count`
 - `created_at`
@@ -67,7 +67,7 @@ Quota windows are UTC calendar days. Compute `quota_date` and `resetAt` from eng
 
 The engine already calls the gateway `/user/info` flow in sandbox/ranker code. Reuse that pattern in a narrow helper:
 
-- Validate the Dyad Pro API key through the gateway.
+- Validate the KapAble Pro API key through the gateway.
 - Derive a stable `userId`.
 - Confirm the user is eligible by checking `user_info.max_budget > 10`.
 
@@ -78,7 +78,7 @@ Avoid heuristic entitlement parsing based on fields like `is_pro`, `subscription
 Leave a code comment beside the eligibility check:
 
 ```ts
-// The lowest paid Dyad Pro tier has $13.33 in monthly budget, so max_budget > 10
+// The lowest paid KapAble Pro tier has $13.33 in monthly budget, so max_budget > 10
 // includes paid Pro users while filtering out trial users.
 ```
 
@@ -92,18 +92,18 @@ The request body can stay OpenAI chat-completions compatible, but the route shou
 
 Do not wire `free-pro` through `/v1/responses` or `/v1/messages` for v1 unless the app has a hard dependency on Responses/Anthropic-specific behavior. Keeping v1 chat-completions-only reduces quota/accounting surface area.
 
-The upstream model sent from the engine to the LLM gateway is `dyad/free`.
+The upstream model sent from the engine to the LLM gateway is `kapable/free`.
 This gateway model id is engine-side configuration; the desktop app only knows
 about the app-facing `free-pro` model.
 
-The engine must not use the end user's Dyad Pro API key for the upstream
-`dyad/free` gateway call. For this code path:
+The engine must not use the end user's KapAble Pro API key for the upstream
+`kapable/free` gateway call. For this code path:
 
 - Use the end user's `Authorization` header only to authenticate them, fetch
   `/user/info`, derive quota identity, and check `max_budget > 10`.
-- Use the engine environment variable `DYAD_PRO_SHARED_FREE_API_KEY` as the
-  `Authorization` key when calling the LLM gateway for `dyad/free`.
-- Fail closed with a server configuration error if `DYAD_PRO_SHARED_FREE_API_KEY`
+- Use the engine environment variable `KAPABLE_PRO_SHARED_FREE_API_KEY` as the
+  `Authorization` key when calling the LLM gateway for `kapable/free`.
+- Fail closed with a server configuration error if `KAPABLE_PRO_SHARED_FREE_API_KEY`
   is missing.
 
 Quota counts one user-visible submitted message. Internal follow-up passes,
@@ -115,8 +115,8 @@ Quota error response should be machine-readable and consistent across routes:
 ```json
 {
   "error": {
-    "type": "dyad_free_model_quota_exceeded",
-    "message": "Dyad Free has reached its daily limit.",
+    "type": "kapable_free_model_quota_exceeded",
+    "message": "KapAble Free has reached its daily limit.",
     "limit": 10,
     "remaining": 0,
     "resetAt": "2026-06-26T00:00:00.000Z"
@@ -156,15 +156,15 @@ Add tests for:
 - Failed pre-stream upstream calls refund quota.
 - Status endpoint returns the expected `remaining` and `resetAt`.
 
-## Dyad App Scope
+## KapAble App Scope
 
 ### Model Catalog
 
-Add a new catalog model under the `auto` provider or another Dyad-owned provider row:
+Add a new catalog model under the `auto` provider or another KapAble-owned provider row:
 
 - `apiName`: `free-pro`
-- `displayName`: `Dyad Free`
-- `description`: `5 messages/day included with Dyad Pro`
+- `displayName`: `KapAble Free`
+- `description`: `5 messages/day included with KapAble Pro`
 - `dollarSigns`: `0`
 - `tag`: `Free`
 
@@ -175,7 +175,7 @@ Update both:
 
 The current picker hides `auto/free` for Pro users. Keep that behavior for the old free model, but allow the new Pro free model.
 
-Do not show `free-pro` to Dyad Pro trial users. The app can use the existing `useTrialModelRestriction()` / `useUserBudgetInfo()` signal (`userBudget.isTrial`) to filter the model before rendering. The engine-side `max_budget > 10` eligibility check remains the source-of-truth backstop if a trial client still sends a request.
+Do not show `free-pro` to KapAble Pro trial users. The app can use the existing `useTrialModelRestriction()` / `useUserBudgetInfo()` signal (`userBudget.isTrial`) to filter the model before rendering. The engine-side `max_budget > 10` eligibility check remains the source-of-truth backstop if a trial client still sends a request.
 
 ### Engine Model Routing
 
@@ -183,8 +183,8 @@ Update `src/ipc/utils/get_model_client.ts` / `src/ipc/utils/llm_engine_provider.
 
 Important details:
 
-- Continue requiring `enableDyadPro` and the Dyad Pro API key.
-- Keep the model on the Dyad engine, not BYO OpenRouter fallback.
+- Continue requiring `enableKapablePro` and the KapAble Pro API key.
+- Keep the model on the KapAble engine, not BYO OpenRouter fallback.
 - Do not send free-pro turns through generic `/v1/chat/completions`, `/v1/responses`, or `/v1/messages` in v1.
 - Return a recognizable `builtinProviderId` or add an explicit flag so downstream local-agent code can detect "this turn uses the free model."
 
@@ -197,7 +197,7 @@ Add a new IPC contract rather than overloading `free_agent_quota`:
 - hook: `src/hooks/useFreeModelQuota.ts`
 - query key: `queryKeys.freeModelQuota.status`
 
-The handler calls the engine status endpoint with the Dyad Pro API key and returns:
+The handler calls the engine status endpoint with the KapAble Pro API key and returns:
 
 - `messagesUsed`
 - `messagesLimit`
@@ -211,8 +211,8 @@ Keep the existing `free_agent_quota` name for Basic Agent only.
 
 Model picker:
 
-- Show `Dyad Free` to Pro users.
-- Do not show `Dyad Free` to Dyad Pro trial users.
+- Show `KapAble Free` to Pro users.
+- Do not show `KapAble Free` to KapAble Pro trial users.
 - Show `2/5 remaining today` in the row.
 - Show a visible `Data sharing` chip directly in the row, not only in the description or tooltip.
 - The `Data sharing` chip should have a tooltip: `Data may be shared with the AI provider and used for training models.`
@@ -220,16 +220,16 @@ Model picker:
 
 Title bar / Pro credit display:
 
-- Consider adding the free-model quota to the existing Pro tooltip rather than making another persistent chip. Example: `Dyad Free: 2 of 5 messages remaining today`.
+- Consider adding the free-model quota to the existing Pro tooltip rather than making another persistent chip. Example: `KapAble Free: 2 of 5 messages remaining today`.
 
 Chat errors:
 
-- Extend `ChatErrorBox` to recognize `dyad_free_model_quota_exceeded`.
+- Extend `ChatErrorBox` to recognize `kapable_free_model_quota_exceeded`.
 - Message should say the daily free-model limit is reached and suggest switching models, not upgrading to Pro, because the user is already Pro.
 
 React Query:
 
-- Invalidate `freeModelQuota.status` after a successful `Dyad Free` stream.
+- Invalidate `freeModelQuota.status` after a successful `KapAble Free` stream.
 - Refetch on app focus and every 5-30 minutes so reset state updates.
 
 ### Tool Restrictions
@@ -263,13 +263,13 @@ Do not reuse `basicAgentMode` for this. Basic Agent means non-Pro plus quota; fr
 
 ### Prompts
 
-Update local-agent prompt generation to avoid advertising unavailable tools when the selected model is `Dyad Free`.
+Update local-agent prompt generation to avoid advertising unavailable tools when the selected model is `KapAble Free`.
 
 If no prompt text changes are needed because tool descriptions are derived only from the registered tool set, still add/adjust tests proving engine-backed tools are absent from the request snapshot.
 
 ### Streaming and Quota Invalidation
 
-On successful completion of a `Dyad Free` request:
+On successful completion of a `KapAble Free` request:
 
 - Invalidate `queryKeys.freeModelQuota.status`.
 - Also invalidate when the engine returns a quota error, so the UI catches up.
@@ -282,12 +282,12 @@ Do not decrement quota optimistically in the app. The engine is the source of tr
 2. App: add quota IPC/hook/query key, model catalog entry, model picker UI, and engine routing.
 3. App: add `freeModelMode` tool filtering and request/prompt snapshot coverage.
 4. App: add quota error handling and query invalidation after streams.
-5. E2E: cover Pro user selecting `Dyad Free`, seeing remaining count, sending a successful agent message with allowed local tools, and seeing quota-exceeded behavior at 0 remaining.
+5. E2E: cover Pro user selecting `KapAble Free`, seeing remaining count, sending a successful agent message with allowed local tools, and seeing quota-exceeded behavior at 0 remaining.
 6. Release behind a remote catalog flag or engine feature flag first, then expose broadly once quota accounting is verified in production logs.
 
 ## Files Likely Touched
 
-Dyad app:
+KapAble app:
 
 - `src/components/ModelPicker.tsx`
 - `src/ipc/utils/get_model_client.ts`
@@ -304,10 +304,10 @@ Dyad app:
 
 Engine:
 
-- new `../dyad-llm-engine/src/api/free/chatCompletionsRouter.ts` or similar
-- add `DYAD_PRO_SHARED_FREE_API_KEY` to engine env config and deployment secrets
-- `../dyad-llm-engine/src/db/schema.ts`
-- update existing engine table declarations to use `pgSchema("dyad_engine")`
-- new quota service/helper under `../dyad-llm-engine/src/api/freeModelQuota/` or similar
+- new `../kapable-llm-engine/src/api/free/chatCompletionsRouter.ts` or similar
+- add `KAPABLE_PRO_SHARED_FREE_API_KEY` to engine env config and deployment secrets
+- `../kapable-llm-engine/src/db/schema.ts`
+- update existing engine table declarations to use `pgSchema("kapable_engine")`
+- new quota service/helper under `../kapable-llm-engine/src/api/freeModelQuota/` or similar
 - new Drizzle migration
-- route registration in `../dyad-llm-engine/src/server.ts`
+- route registration in `../kapable-llm-engine/src/server.ts`

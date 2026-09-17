@@ -4,7 +4,7 @@ import path from "node:path";
 import os from "node:os";
 import { listFilesTool } from "./list_files";
 import type { AgentContext } from "./types";
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 
 vi.mock("electron-log", () => ({
   default: {
@@ -51,9 +51,9 @@ describe("listFilesTool", () => {
       path.join(testDir, "node_modules", "pkg", "index.js"),
       "dependency",
     );
-    await fs.promises.mkdir(path.join(testDir, ".dyad"), { recursive: true });
+    await fs.promises.mkdir(path.join(testDir, ".kapable"), { recursive: true });
     await fs.promises.writeFile(
-      path.join(testDir, ".dyad", "snapshot.json"),
+      path.join(testDir, ".kapable", "snapshot.json"),
       "{}",
     );
     await fs.promises.mkdir(path.join(testDir, ".git"), { recursive: true });
@@ -72,10 +72,10 @@ describe("listFilesTool", () => {
       "export const inside = 2;",
     );
 
-    // Hidden .dyad directory in the referenced app for include_ignored tests
-    await fs.promises.mkdir(path.join(otherAppDir, ".dyad"));
+    // Hidden .kapable directory in the referenced app for include_ignored tests
+    await fs.promises.mkdir(path.join(otherAppDir, ".kapable"));
     await fs.promises.writeFile(
-      path.join(otherAppDir, ".dyad", "rules.md"),
+      path.join(otherAppDir, ".kapable", "rules.md"),
       "# rules",
     );
 
@@ -94,9 +94,9 @@ describe("listFilesTool", () => {
       isSharedModulesChanged: false,
       sharedServerModulePaths: [],
       pendingFunctionDeploys: [],
-      isDyadPro: false,
+      isKapablePro: false,
       todos: [],
-      dyadRequestId: "test-request",
+      kapableRequestId: "test-request",
       fileEditTracker: {},
       testingEnabled: true,
       testRunAttempts: new Map(),
@@ -163,7 +163,7 @@ describe("listFilesTool", () => {
         mockContext,
       ),
     ).rejects.toMatchObject({
-      kind: DyadErrorKind.Validation,
+      kind: KapableErrorKind.Validation,
       message:
         "include_ignored=true with recursive=true requires a non-root directory to avoid listing too many files.",
     });
@@ -176,7 +176,7 @@ describe("listFilesTool", () => {
         mockContext,
       ),
     ).rejects.toMatchObject({
-      kind: DyadErrorKind.Validation,
+      kind: KapableErrorKind.Validation,
       message:
         "include_ignored=true with recursive=true requires a non-root directory to avoid listing too many files.",
     });
@@ -304,27 +304,27 @@ describe("listFilesTool", () => {
       ).rejects.toThrow(/Unknown app_name 'does-not-exist'/);
     });
 
-    it("excludes .dyad files from referenced apps even when include_ignored is true", async () => {
+    it("excludes .kapable files from referenced apps even when include_ignored is true", async () => {
       mockContext.referencedApps.set("other-app", otherAppDir);
       const result = await listFilesTool.execute(
         {
           app_name: "other-app",
-          directory: ".dyad",
+          directory: ".kapable",
           include_ignored: true,
           recursive: true,
         },
         mockContext,
       );
-      expect(result).not.toContain(".dyad/rules.md");
+      expect(result).not.toContain(".kapable/rules.md");
     });
 
-    it("excludes .dyad files from referenced apps in the default (non-include_ignored) listing", async () => {
+    it("excludes .kapable files from referenced apps in the default (non-include_ignored) listing", async () => {
       mockContext.referencedApps.set("other-app", otherAppDir);
       const result = await listFilesTool.execute(
         { app_name: "other-app", recursive: true },
         mockContext,
       );
-      expect(result).not.toContain(".dyad/rules.md");
+      expect(result).not.toContain(".kapable/rules.md");
       expect(result).toContain("other-a.ts");
     });
 

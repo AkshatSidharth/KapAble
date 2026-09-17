@@ -258,7 +258,7 @@
   },
   "aliases": [
     {
-      "id": "dyad/theme-generator/google",
+      "id": "kapable/theme-generator/google",
       "resolvedModel": {
         "providerId": "google",
         "apiName": "gemini-3.1-pro-preview"
@@ -267,7 +267,7 @@
       "purpose": "theme-generation"
     },
     {
-      "id": "dyad/theme-generator/anthropic",
+      "id": "kapable/theme-generator/anthropic",
       "resolvedModel": {
         "providerId": "anthropic",
         "apiName": "claude-opus-4-6"
@@ -276,7 +276,7 @@
       "purpose": "theme-generation"
     },
     {
-      "id": "dyad/theme-generator/openai",
+      "id": "kapable/theme-generator/openai",
       "resolvedModel": {
         "providerId": "openai",
         "apiName": "gpt-5.4"
@@ -285,7 +285,7 @@
       "purpose": "theme-generation"
     },
     {
-      "id": "dyad/auto/openai",
+      "id": "kapable/auto/openai",
       "resolvedModel": {
         "providerId": "openai",
         "apiName": "gpt-5.6-sol"
@@ -294,7 +294,7 @@
       "purpose": "auto-mode"
     },
     {
-      "id": "dyad/auto/anthropic",
+      "id": "kapable/auto/anthropic",
       "resolvedModel": {
         "providerId": "anthropic",
         "apiName": "claude-opus-4-8"
@@ -303,7 +303,7 @@
       "purpose": "auto-mode"
     },
     {
-      "id": "dyad/auto/google",
+      "id": "kapable/auto/google",
       "resolvedModel": {
         "providerId": "google",
         "apiName": "gemini-3.6-flash"
@@ -312,7 +312,7 @@
       "purpose": "auto-mode"
     },
     {
-      "id": "dyad/auto/openrouter",
+      "id": "kapable/auto/openrouter",
       "resolvedModel": {
         "providerId": "openrouter",
         "apiName": "nvidia/nemotron-3-super-120b-a12b:free"
@@ -321,7 +321,7 @@
       "purpose": "auto-mode"
     },
     {
-      "id": "dyad/help-bot/default",
+      "id": "kapable/help-bot/default",
       "resolvedModel": {
         "providerId": "openai",
         "apiName": "gpt-5-nano"
@@ -333,15 +333,15 @@
   "curatedSelections": {
     "themeGenerationOptions": [
       {
-        "id": "dyad/theme-generator/google",
+        "id": "kapable/theme-generator/google",
         "label": "Google"
       },
       {
-        "id": "dyad/theme-generator/anthropic",
+        "id": "kapable/theme-generator/anthropic",
         "label": "Anthropic"
       },
       {
-        "id": "dyad/theme-generator/openai",
+        "id": "kapable/theme-generator/openai",
         "label": "OpenAI"
       }
     ]

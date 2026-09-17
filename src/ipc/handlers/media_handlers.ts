@@ -2,12 +2,12 @@ import { createTypedHandler } from "./base";
 import { mediaContracts } from "../types/media";
 import { db } from "../../db";
 import { apps } from "../../db/schema";
-import { getDyadAppPath } from "../../paths/paths";
+import { getKapableAppPath } from "../../paths/paths";
 import { safeJoin } from "../utils/path_utils";
 import { getMimeType, MIME_TYPE_MAP } from "../utils/mime_utils";
-import { DYAD_MEDIA_DIR_NAME } from "../utils/media_path_utils";
+import { KAPABLE_MEDIA_DIR_NAME } from "../utils/media_path_utils";
 import { INVALID_FILE_NAME_CHARS } from "../../shared/media_validation";
-import { ensureDyadGitignored } from "./gitignoreUtils";
+import { ensureKapableGitignored } from "./gitignoreUtils";
 import {
   appOperationCoordinator,
   readAppResource,
@@ -16,7 +16,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import log from "electron-log";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { app as electronApp, shell } from "electron";
 import {
   getMediaThumbnailCacheRoot,
@@ -32,7 +32,7 @@ async function getMediaFilesForApp(
   appName: string,
   appPath: string,
 ) {
-  const mediaDir = path.join(appPath, DYAD_MEDIA_DIR_NAME);
+  const mediaDir = path.join(appPath, KAPABLE_MEDIA_DIR_NAME);
   try {
     await fs.promises.access(mediaDir);
   } catch {
@@ -109,11 +109,11 @@ async function withMediaLock<T>(
 
 function assertSafeFileName(fileName: string): void {
   if (!fileName || fileName.trim().length === 0) {
-    throw new DyadError("File name is required", DyadErrorKind.Validation);
+    throw new KapableError("File name is required", KapableErrorKind.Validation);
   }
 
   if (fileName !== path.basename(fileName)) {
-    throw new DyadError("Invalid file name", DyadErrorKind.Validation);
+    throw new KapableError("Invalid file name", KapableErrorKind.Validation);
   }
 
   if (
@@ -123,7 +123,7 @@ function assertSafeFileName(fileName: string): void {
     fileName === ".." ||
     INVALID_FILE_NAME_CHARS.test(fileName)
   ) {
-    throw new DyadError("Invalid file name", DyadErrorKind.Validation);
+    throw new KapableError("Invalid file name", KapableErrorKind.Validation);
   }
 }
 
@@ -131,7 +131,7 @@ function assertSafeBaseName(baseName: string): string {
   const trimmed = baseName.trim();
 
   if (!trimmed) {
-    throw new DyadError("New image name is required", DyadErrorKind.Validation);
+    throw new KapableError("New image name is required", KapableErrorKind.Validation);
   }
 
   if (
@@ -141,7 +141,7 @@ function assertSafeBaseName(baseName: string): string {
     trimmed === ".." ||
     INVALID_FILE_NAME_CHARS.test(trimmed)
   ) {
-    throw new DyadError("Invalid image name", DyadErrorKind.Validation);
+    throw new KapableError("Invalid image name", KapableErrorKind.Validation);
   }
 
   return trimmed;
@@ -151,9 +151,9 @@ function assertSupportedMediaExtension(fileName: string): string {
   const extension = path.extname(fileName).toLowerCase();
 
   if (!SUPPORTED_MEDIA_EXTENSIONS.includes(extension)) {
-    throw new DyadError(
+    throw new KapableError(
       "Unsupported media file extension",
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
 
@@ -163,11 +163,11 @@ function assertSupportedMediaExtension(fileName: string): string {
 function getMediaFilePath(appPath: string, fileName: string): string {
   assertSafeFileName(fileName);
   assertSupportedMediaExtension(fileName);
-  return safeJoin(appPath, DYAD_MEDIA_DIR_NAME, fileName);
+  return safeJoin(appPath, KAPABLE_MEDIA_DIR_NAME, fileName);
 }
 
 function getMediaDirectoryPath(appPath: string): string {
-  return path.join(appPath, DYAD_MEDIA_DIR_NAME);
+  return path.join(appPath, KAPABLE_MEDIA_DIR_NAME);
 }
 
 async function invalidateThumbnail(filePath: string): Promise<void> {
@@ -189,7 +189,7 @@ async function getAppOrThrow(appId: number) {
   });
 
   if (!app) {
-    throw new DyadError("App not found", DyadErrorKind.NotFound);
+    throw new KapableError("App not found", KapableErrorKind.NotFound);
   }
 
   return app;
@@ -200,7 +200,7 @@ export function registerMediaHandlers() {
     const allApps = await db.select().from(apps);
     const appResults = await Promise.all(
       allApps.map(async (app) => {
-        const appPath = getDyadAppPath(app.path);
+        const appPath = getKapableAppPath(app.path);
         const files = await getMediaFilesForApp(app.id, app.name, appPath);
         if (files.length > 0) {
           return {
@@ -220,7 +220,7 @@ export function registerMediaHandlers() {
   createTypedHandler(mediaContracts.renameMediaFile, async (_, params) => {
     await withMediaLock([params.appId], async () => {
       const app = await getAppOrThrow(params.appId);
-      const appPath = getDyadAppPath(app.path);
+      const appPath = getKapableAppPath(app.path);
 
       const sourcePath = getMediaFilePath(appPath, params.fileName);
 
@@ -230,15 +230,15 @@ export function registerMediaHandlers() {
       assertSafeFileName(destinationFileName);
 
       if (destinationFileName === params.fileName) {
-        throw new DyadError(
+        throw new KapableError(
           "New image name must be different from current name",
-          DyadErrorKind.Validation,
+          KapableErrorKind.Validation,
         );
       }
 
       const destinationPath = safeJoin(
         appPath,
-        DYAD_MEDIA_DIR_NAME,
+        KAPABLE_MEDIA_DIR_NAME,
         destinationFileName,
       );
 
@@ -246,9 +246,9 @@ export function registerMediaHandlers() {
       const isCaseOnlyRename =
         destinationFileName.toLowerCase() === params.fileName.toLowerCase();
       if (!isCaseOnlyRename && fs.existsSync(destinationPath)) {
-        throw new DyadError(
+        throw new KapableError(
           "A media file with that name already exists",
-          DyadErrorKind.Conflict,
+          KapableErrorKind.Conflict,
         );
       }
 
@@ -270,7 +270,7 @@ export function registerMediaHandlers() {
   createTypedHandler(mediaContracts.deleteMediaFile, async (_, params) => {
     await withMediaLock([params.appId], async () => {
       const app = await getAppOrThrow(params.appId);
-      const appPath = getDyadAppPath(app.path);
+      const appPath = getKapableAppPath(app.path);
       const filePath = getMediaFilePath(appPath, params.fileName);
 
       try {
@@ -290,25 +290,25 @@ export function registerMediaHandlers() {
 
   createTypedHandler(mediaContracts.openMediaFile, async (_, params) => {
     const app = await getAppOrThrow(params.appId);
-    const appPath = getDyadAppPath(app.path);
+    const appPath = getKapableAppPath(app.path);
     const filePath = getMediaFilePath(appPath, params.fileName);
     if (!fs.existsSync(filePath)) {
-      throw new DyadError("Media file not found", DyadErrorKind.NotFound);
+      throw new KapableError("Media file not found", KapableErrorKind.NotFound);
     }
     const result = await shell.openPath(filePath);
     if (result) {
-      throw new DyadError(
+      throw new KapableError(
         `Failed to open file: ${result}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
   });
 
   createTypedHandler(mediaContracts.moveMediaFile, async (_, params) => {
     if (params.sourceAppId === params.targetAppId) {
-      throw new DyadError(
+      throw new KapableError(
         "Source and target apps must be different",
-        DyadErrorKind.Validation,
+        KapableErrorKind.Validation,
       );
     }
 
@@ -318,21 +318,21 @@ export function registerMediaHandlers() {
         const sourceApp = await getAppOrThrow(params.sourceAppId);
         const targetApp = await getAppOrThrow(params.targetAppId);
 
-        const sourceAppPath = getDyadAppPath(sourceApp.path);
-        const targetAppPath = getDyadAppPath(targetApp.path);
+        const sourceAppPath = getKapableAppPath(sourceApp.path);
+        const targetAppPath = getKapableAppPath(targetApp.path);
 
         const sourcePath = getMediaFilePath(sourceAppPath, params.fileName);
         if (!fs.existsSync(sourcePath)) {
-          throw new DyadError("Media file not found", DyadErrorKind.NotFound);
+          throw new KapableError("Media file not found", KapableErrorKind.NotFound);
         }
 
-        await ensureDyadGitignored(targetAppPath);
+        await ensureKapableGitignored(targetAppPath);
         const targetMediaDirectoryPath = getMediaDirectoryPath(targetAppPath);
         await fs.promises.mkdir(targetMediaDirectoryPath, { recursive: true });
 
         const destinationPath = safeJoin(
           targetAppPath,
-          DYAD_MEDIA_DIR_NAME,
+          KAPABLE_MEDIA_DIR_NAME,
           params.fileName,
         );
 

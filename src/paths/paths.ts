@@ -4,45 +4,45 @@ import fs from "node:fs";
 import { IS_TEST_BUILD } from "../ipc/utils/test_utils";
 import { readSettings } from "../main/settings";
 
-// Cached result of getDyadAppsBaseDirectory
+// Cached result of getKapableAppsBaseDirectory
 let cachedBaseDirectory: string | null = null;
 let cachedCustomFolderSetting: string | null | undefined;
-// Whether `dyad-apps` has been created
+// Whether `kapable-apps` has been created
 let defaultDirCreated = false;
 
 /**
- * Gets the default path of the base dyad-apps directory (without a specific app subdirectory)
+ * Gets the default path of the base kapable-apps directory (without a specific app subdirectory)
  */
-export function getDefaultDyadAppsDirectory(): string {
+export function getDefaultKapableAppsDirectory(): string {
   if (IS_TEST_BUILD) {
     const electron = getElectron();
-    return path.join(electron!.app.getPath("userData"), "dyad-apps");
+    return path.join(electron!.app.getPath("userData"), "kapable-apps");
   }
-  return path.join(os.homedir(), "dyad-apps");
+  return path.join(os.homedir(), "kapable-apps");
 }
 
 /**
- * Gets the default path of the base dyad-apps directory (without a specific app subdirectory),
+ * Gets the default path of the base kapable-apps directory (without a specific app subdirectory),
  * but creates the directory the first time that this function is called
  */
-function resolveDefaultDyadAppsDirectory(): string {
-  const defaultDir = getDefaultDyadAppsDirectory();
+function resolveDefaultKapableAppsDirectory(): string {
+  const defaultDir = getDefaultKapableAppsDirectory();
   if (!defaultDirCreated) {
     try {
       fs.mkdirSync(defaultDir, { recursive: true });
       defaultDirCreated = true;
     } catch {
       // Fall through; if it fails then the user will see error toasts
-      // when they try to do anything meaningful, but we don't want Dyad to crash
+      // when they try to do anything meaningful, but we don't want KapAble to crash
     }
   }
   return defaultDir;
 }
 
 /**
- * Clears base directory cache, so the next call to getDyadAppsBaseDirectory will re-read the settings
+ * Clears base directory cache, so the next call to getKapableAppsBaseDirectory will re-read the settings
  */
-export function invalidateDyadAppsBaseDirectoryCache(): void {
+export function invalidateKapableAppsBaseDirectoryCache(): void {
   cachedBaseDirectory = null;
   cachedCustomFolderSetting = undefined;
 }
@@ -57,11 +57,11 @@ export function getCustomFolderCache(): string | null | undefined {
 /**
  * Gets the user's preferred apps directory path (without a specific app subdirectory)
  */
-export function getDyadAppsBaseDirectory(): string {
+export function getKapableAppsBaseDirectory(): string {
   const appsPath =
     cachedBaseDirectory ??
     (cachedCustomFolderSetting = readSettings().customAppsFolder) ??
-    resolveDefaultDyadAppsDirectory();
+    resolveDefaultKapableAppsDirectory();
 
   cachedBaseDirectory = appsPath;
   return cachedBaseDirectory;
@@ -69,7 +69,7 @@ export function getDyadAppsBaseDirectory(): string {
 
 /**
  * Given a path, determines whether that path exists, is a directory, and is writable.
- * Can determine, for example, whether the output of `getDyadAppsBaseDirectory` is usable
+ * Can determine, for example, whether the output of `getKapableAppsBaseDirectory` is usable
  */
 export function isDirectoryAccessible(directoryPath: string): boolean {
   try {
@@ -82,18 +82,18 @@ export function isDirectoryAccessible(directoryPath: string): boolean {
   }
 }
 
-export function getDyadAppPath(appPath: string): string {
+export function getKapableAppPath(appPath: string): string {
   // If appPath is already absolute, use it as-is
   if (path.isAbsolute(appPath)) {
     return appPath;
   }
   // Otherwise, use the user's preferred base path
-  return path.join(getDyadAppsBaseDirectory(), appPath);
+  return path.join(getKapableAppsBaseDirectory(), appPath);
 }
 
 /**
  * Given an app path, determines whether that path is accessible within the filesystem.
- * The input to this function is assumed to be the result of `getDyadAppPath`.
+ * The input to this function is assumed to be the result of `getKapableAppPath`.
  */
 export function isAppLocationAccessible(resolvedPath: string): boolean {
   const containingFolder = path.dirname(resolvedPath);
@@ -118,7 +118,7 @@ export function getTypeScriptCachePath(): string {
 
 export function getUserDataPath(): string {
   const electron = getElectron();
-  const devUserDataDir = process.env.DYAD_DEV_USER_DATA_DIR?.trim();
+  const devUserDataDir = process.env.KAPABLE_DEV_USER_DATA_DIR?.trim();
 
   if (process.env.NODE_ENV === "development" && devUserDataDir) {
     return path.resolve(devUserDataDir);

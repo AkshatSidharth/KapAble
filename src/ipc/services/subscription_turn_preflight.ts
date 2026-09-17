@@ -1,5 +1,5 @@
 import {
-  isDyadProEnabled,
+  isKapableProEnabled,
   type ModelSelection,
   type UserSettings,
 } from "@/lib/schemas";
@@ -9,12 +9,12 @@ import {
   checkExternalModelAdmission,
   type ExternalModelAdmission,
 } from "./external_model_admission";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { getAutoSidekickRuntimeModel } from "@/lib/autoSidekick";
 import { shouldBillChatGPTSubscription } from "./subscription_billing";
 import {
   AUTO_BALANCED_ALIAS,
-  AUTO_DYAD_PRO_MODEL_ALIASES,
+  AUTO_KAPABLE_PRO_MODEL_ALIASES,
   resolveAutoModelCandidate,
   type AutoModelCandidates,
 } from "./auto_model_candidates";
@@ -38,7 +38,7 @@ export async function preflightSubscriptionTurn(
       runtimeModel.name === "balanced"
         ? [AUTO_BALANCED_ALIAS]
         : runtimeModel.name === "auto"
-          ? AUTO_DYAD_PRO_MODEL_ALIASES
+          ? AUTO_KAPABLE_PRO_MODEL_ALIASES
           : [];
     for (const alias of aliases) {
       const candidate = await resolveAutoModelCandidate(alias, settings);
@@ -52,7 +52,7 @@ export async function preflightSubscriptionTurn(
     await getCodexSubscriptionCredentials();
   let externalModelAdmission: ExternalModelAdmission | undefined;
   if (
-    isDyadProEnabled(settings) &&
+    isKapableProEnabled(settings) &&
     selections.some(
       (selection) =>
         (selection.connection === "subscription" &&
@@ -62,9 +62,9 @@ export async function preflightSubscriptionTurn(
   ) {
     const apiKey = settings.providerSettings?.auto?.apiKey?.value;
     if (!apiKey)
-      throw new DyadError(
-        "Connect Dyad Pro before using an external model.",
-        DyadErrorKind.Auth,
+      throw new KapableError(
+        "Connect KapAble Pro before using an external model.",
+        KapableErrorKind.Auth,
       );
     externalModelAdmission = await checkExternalModelAdmission(apiKey, signal);
   }

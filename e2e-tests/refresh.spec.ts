@@ -4,7 +4,7 @@ import { expect } from "@playwright/test";
 testSkipIfWindows(
   "reload shortcuts stay scoped to the focused preview",
   async ({ electronApp, po }) => {
-    await po.setUpDyadPro();
+    await po.setUpKapablePro();
     await po.sendPrompt("tc=basic");
     await po.previewPanel.expectPreviewIframeIsVisible();
 
@@ -15,7 +15,7 @@ testSkipIfWindows(
       return (
         viewMenu?.submenu?.items
           .filter((item) =>
-            ["Reload Dyad", "Force Reload Dyad"].includes(item.label),
+            ["Reload KapAble", "Force Reload KapAble"].includes(item.label),
           )
           .map((item) => ({
             label: item.label,
@@ -24,8 +24,8 @@ testSkipIfWindows(
       );
     });
     expect(reloadItems).toEqual([
-      { label: "Reload Dyad", accelerator: null },
-      { label: "Force Reload Dyad", accelerator: null },
+      { label: "Reload KapAble", accelerator: null },
+      { label: "Force Reload KapAble", accelerator: null },
     ]);
 
     await po.page.evaluate(() => {
@@ -36,7 +36,7 @@ testSkipIfWindows(
       testWindow.reloadShortcutMarker = "outer-renderer-still-alive";
       testWindow.previewSelectorReadyCount = 0;
       window.addEventListener("message", (event) => {
-        if (event.data?.type === "dyad-component-selector-initialized") {
+        if (event.data?.type === "kapable-component-selector-initialized") {
           testWindow.previewSelectorReadyCount =
             (testWindow.previewSelectorReadyCount ?? 0) + 1;
         }
@@ -107,10 +107,10 @@ testSkipIfWindows(
       await frame.locator("body").evaluate((body) => {
         body.dataset.reloadShortcutMarker = "before-reload";
         body.tabIndex = -1;
-        sessionStorage.removeItem("dyad-app-key-handler");
+        sessionStorage.removeItem("kapable-app-key-handler");
         document.addEventListener(
           "keydown",
-          () => sessionStorage.setItem("dyad-app-key-handler", "observed"),
+          () => sessionStorage.setItem("kapable-app-key-handler", "observed"),
           { once: true },
         );
         body.focus();
@@ -139,7 +139,7 @@ testSkipIfWindows(
         .poll(() =>
           frame
             .locator("body")
-            .evaluate(() => sessionStorage.getItem("dyad-app-key-handler")),
+            .evaluate(() => sessionStorage.getItem("kapable-app-key-handler")),
         )
         .toBe("observed");
 
@@ -204,7 +204,7 @@ testSkipIfWindows(
       const untrustedFrame = document.createElement("iframe");
       untrustedFrame.dataset.testid = "untrusted-preview-frame";
       untrustedFrame.src = `data:text/html,${encodeURIComponent(
-        '<script>parent.postMessage({type:"dyad-preview-reload-shortcut"},"*");parent.postMessage({type:"untrusted-reload-attempted"},"*");</script>',
+        '<script>parent.postMessage({type:"kapable-preview-reload-shortcut"},"*");parent.postMessage({type:"untrusted-reload-attempted"},"*");</script>',
       )}`;
       body.appendChild(untrustedFrame);
     });

@@ -1,12 +1,12 @@
 /**
- * Shared utility for making fetch requests to the Dyad engine API.
- * Handles common headers including Authorization and X-Dyad-Request-Id.
+ * Shared utility for making fetch requests to the KapAble engine API.
+ * Handles common headers including Authorization and X-KapAble-Request-Id.
  */
 
 import { readSettings } from "@/main/settings";
 import type { AgentContext } from "./types";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
-import { getDyadEngineBaseUrl } from "@/ipc/utils/dyad_engine_url";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
+import { getKapableEngineBaseUrl } from "@/ipc/utils/kapable_engine_url";
 
 export interface EngineFetchOptions extends Omit<RequestInit, "headers"> {
   /** Additional headers to include */
@@ -27,36 +27,36 @@ export interface EngineFetchResponse {
 
 export const DEFAULT_ENGINE_FETCH_TIMEOUT_MS = 300_000;
 
-export class EngineFetchTimeoutError extends DyadError {
+export class EngineFetchTimeoutError extends KapableError {
   constructor(endpoint: string, timeoutMs = DEFAULT_ENGINE_FETCH_TIMEOUT_MS) {
     super(
-      `Dyad engine request to ${endpoint} timed out after ${timeoutMs}ms`,
-      DyadErrorKind.External,
+      `KapAble engine request to ${endpoint} timed out after ${timeoutMs}ms`,
+      KapableErrorKind.External,
     );
     this.name = "EngineFetchTimeoutError";
   }
 }
 
-function createCallerCancellationError(cause: unknown): DyadError {
-  return new DyadError(
+function createCallerCancellationError(cause: unknown): KapableError {
+  return new KapableError(
     "This agent run was cancelled.",
-    DyadErrorKind.UserCancelled,
+    KapableErrorKind.UserCancelled,
     { cause },
   );
 }
 
 /**
- * Fetch wrapper for Dyad engine API calls.
- * Automatically adds Authorization and X-Dyad-Request-Id headers.
+ * Fetch wrapper for KapAble engine API calls.
+ * Automatically adds Authorization and X-KapAble-Request-Id headers.
  *
  * @param ctx - The agent context containing the request ID
  * @param endpoint - The API endpoint path (e.g., "/tools/web-search")
  * @param options - Fetch options (method, body, additional headers, etc.)
  * @returns The fetch Response
- * @throws Error if Dyad Pro API key is not configured
+ * @throws Error if KapAble Pro API key is not configured
  */
 export async function engineFetch(
-  ctx: Pick<AgentContext, "dyadRequestId" | "abortSignal">,
+  ctx: Pick<AgentContext, "kapableRequestId" | "abortSignal">,
   endpoint: string,
   options: EngineFetchOptions = {},
 ): Promise<EngineFetchResponse> {
@@ -72,7 +72,7 @@ export async function engineFetch(
   const apiKey = settings.providerSettings?.auto?.apiKey?.value;
 
   if (!apiKey) {
-    throw new DyadError("Dyad Pro API key is required", DyadErrorKind.Auth);
+    throw new KapableError("KapAble Pro API key is required", KapableErrorKind.Auth);
   }
 
   const {
@@ -120,13 +120,13 @@ export async function engineFetch(
 
   try {
     requestController.signal.throwIfAborted();
-    const response = await fetch(`${getDyadEngineBaseUrl()}${endpoint}`, {
+    const response = await fetch(`${getKapableEngineBaseUrl()}${endpoint}`, {
       ...restOptions,
       signal: requestController.signal,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "X-Dyad-Request-Id": ctx.dyadRequestId,
+        "X-KapAble-Request-Id": ctx.kapableRequestId,
         ...extraHeaders,
       },
     });

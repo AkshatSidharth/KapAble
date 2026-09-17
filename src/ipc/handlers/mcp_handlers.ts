@@ -4,7 +4,7 @@ import { db } from "../../db";
 import { mcpServers, mcpToolConsents } from "../../db/schema";
 import { eq, and, isNotNull } from "drizzle-orm";
 import { createTypedHandler } from "./base";
-import { DyadError, DyadErrorKind } from "../../errors/dyad_error";
+import { KapableError, KapableErrorKind } from "../../errors/kapable_error";
 
 import { getStoredConsent } from "../utils/mcp_consent";
 import { mcpManager } from "../utils/mcp_manager";
@@ -79,9 +79,9 @@ function parseJsonField<T>(
     return JSON.parse(value) as T;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    throw new DyadError(
+    throw new KapableError(
       `Invalid JSON for "${field}": ${message}`,
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
 }
@@ -104,9 +104,9 @@ function parseSecretMapField(
     Array.isArray(parsed) ||
     !Object.values(parsed).every((v) => typeof v === "string")
   ) {
-    throw new DyadError(
+    throw new KapableError(
       `"${field}" must be an object of string values.`,
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
   }
   return parsed as Record<string, string>;
@@ -175,16 +175,16 @@ export function registerMcpHandlers() {
       // here means the fetch failed rather than the slug being unknown.
       // Surface that as a connectivity problem instead of a not-found.
       if (entries.length === 0) {
-        throw new DyadError(
+        throw new KapableError(
           "Could not reach the plugin catalog. Please check your connection and try again.",
-          DyadErrorKind.Precondition,
+          KapableErrorKind.Precondition,
         );
       }
       const entry = entries.find((e) => e.slug === slug);
       if (!entry) {
-        throw new DyadError(
+        throw new KapableError(
           `Unknown catalog entry: ${slug}`,
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
 
@@ -216,9 +216,9 @@ export function registerMcpHandlers() {
         (entry.transport === "stdio" && !stdioMatchesReview) ||
         transportMismatch
       ) {
-        throw new DyadError(
+        throw new KapableError(
           "The plugin catalog changed since you reviewed this plugin. Please try adding it again.",
-          DyadErrorKind.Precondition,
+          KapableErrorKind.Precondition,
         );
       }
 
@@ -260,9 +260,9 @@ export function registerMcpHandlers() {
           .from(mcpServers)
           .where(eq(mcpServers.catalogSlug, slug));
         if (!row) {
-          throw new DyadError(
+          throw new KapableError(
             `Unknown catalog entry: ${slug}`,
-            DyadErrorKind.NotFound,
+            KapableErrorKind.NotFound,
           );
         }
         return toMcpServer(row);
@@ -321,9 +321,9 @@ export function registerMcpHandlers() {
       })
       .returning();
     if (!result[0])
-      throw new DyadError(
+      throw new KapableError(
         "Failed to create MCP server.",
-        DyadErrorKind.Internal,
+        KapableErrorKind.Internal,
       );
     return toMcpServer(result[0]);
   });
@@ -390,9 +390,9 @@ export function registerMcpHandlers() {
         .where(eq(mcpServers.id, params.id))
         .returning();
       if (!result[0])
-        throw new DyadError(
+        throw new KapableError(
           `MCP server not found: ${params.id}`,
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       // Config may have changed; dispose the cached client so the next
       // use rebuilds the transport with the updated row. Fire-and-forget: a

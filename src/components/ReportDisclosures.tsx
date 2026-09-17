@@ -203,7 +203,7 @@ export function ReportDisclosures({
             )}
             <Detail title={t("home:help.systemInformation")} mono={false}>
               <p>
-                {t("home:help.dyadVersion")} {bundle.system.dyadVersion}
+                {t("home:help.kapableVersion")} {bundle.system.kapableVersion}
               </p>
               <p>
                 {t("home:help.platform")} {bundle.system.platform}

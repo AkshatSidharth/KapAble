@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({
   attachments: [] as any[],
   effectiveDefaultChatMode: "build",
   hasManuallySelectedChatMode: false,
-  hasDyadProApiKey: false,
+  hasKapableProApiKey: false,
   inputValue: "Build a notes app",
   isAnyProviderSetup: false,
   isLoadingLanguageModelProviders: false,
@@ -79,7 +79,7 @@ vi.mock("@/hooks/useFreeAgentQuota", () => ({
 vi.mock("@/lib/schemas", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/schemas")>()),
   getEffectiveDefaultChatMode: () => mocks.effectiveDefaultChatMode,
-  hasDyadProKey: () => mocks.hasDyadProApiKey,
+  hasKapableProKey: () => mocks.hasKapableProApiKey,
 }));
 vi.mock("@/lib/homeChatMode", () => ({
   getHomeDefaultChatMode: () => mocks.effectiveDefaultChatMode,
@@ -119,7 +119,7 @@ describe("HomePage first-prompt projection", () => {
     mocks.attachments = [];
     mocks.effectiveDefaultChatMode = "build";
     mocks.hasManuallySelectedChatMode = false;
-    mocks.hasDyadProApiKey = false;
+    mocks.hasKapableProApiKey = false;
     mocks.inputValue = "Build a notes app";
     mocks.isAnyProviderSetup = false;
     mocks.isLoadingLanguageModelProviders = false;
@@ -141,12 +141,12 @@ describe("HomePage first-prompt projection", () => {
     fireEvent.click(screen.getByRole("button", { name: "Upgrade to Pro" }));
 
     expect(mocks.openExternalUrl).toHaveBeenCalledWith(
-      "https://www.dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=home-upgrade-to-pro",
+      "https://www.kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=home-upgrade-to-pro",
     );
   });
 
   it("does not prompt existing Pro users to upgrade", () => {
-    mocks.hasDyadProApiKey = true;
+    mocks.hasKapableProApiKey = true;
 
     render(<HomePage />);
 

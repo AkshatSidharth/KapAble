@@ -24,9 +24,9 @@ import {
   mcpServers,
 } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import { getDyadAppPath } from "../../paths/paths";
+import { getKapableAppPath } from "../../paths/paths";
 import { validateChatContext } from "../utils/context_paths_utils";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   getPackageManagerCommandEnv,
   PNPM_PM_ON_FAIL_IGNORE_ARG,
@@ -111,12 +111,12 @@ async function getSystemDebugInfo({
     console.error("Failed to get node path:", err);
   }
 
-  // Get Dyad version from package.json
+  // Get KapAble version from package.json
   const packageJsonPath = path.resolve(__dirname, "..", "..", "package.json");
-  let dyadVersion = "unknown";
+  let kapableVersion = "unknown";
   try {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
-    dyadVersion = packageJson.version;
+    kapableVersion = packageJson.version;
   } catch (err) {
     console.error("Failed to read package.json:", err);
   }
@@ -167,7 +167,7 @@ async function getSystemDebugInfo({
       serializeModelForDebug(settings.selectedModel) || "unknown",
     telemetryConsent: settings.telemetryConsent || "unknown",
     telemetryUrl: "https://us.i.posthog.com", // Hardcoded from renderer.tsx
-    dyadVersion,
+    kapableVersion,
     platform: process.platform,
     architecture: arch(),
     logs,
@@ -211,7 +211,7 @@ function sanitizeSettingsForDebug(
     selectedChatMode: settings.selectedChatMode ?? null,
     defaultChatMode: settings.defaultChatMode ?? null,
     autoApproveChanges: settings.autoApproveChanges ?? null,
-    enableDyadPro: settings.enableDyadPro ?? null,
+    enableKapablePro: settings.enableKapablePro ?? null,
     effortLevel: selectedModel.effortLevel,
     maxChatTurnsInContext: settings.maxChatTurnsInContext ?? null,
     enableAutoUpdate: settings.enableAutoUpdate,
@@ -340,19 +340,19 @@ export function registerDebugHandlers() {
     try {
       const settings = readSettings();
 
-      // Get Dyad version
+      // Get KapAble version
       const packageJsonPath = path.resolve(
         __dirname,
         "..",
         "..",
         "package.json",
       );
-      let dyadVersion = "unknown";
+      let kapableVersion = "unknown";
       try {
         const packageJson = JSON.parse(
           fs.readFileSync(packageJsonPath, "utf8"),
         );
-        dyadVersion = packageJson.version;
+        kapableVersion = packageJson.version;
       } catch (err) {
         console.error("Failed to read package.json:", err);
       }
@@ -390,9 +390,9 @@ export function registerDebugHandlers() {
       });
 
       if (!chatRecord) {
-        throw new DyadError(
+        throw new KapableError(
           `Chat with ID ${chatId} not found`,
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
 
@@ -402,9 +402,9 @@ export function registerDebugHandlers() {
       });
 
       if (!app) {
-        throw new DyadError(
+        throw new KapableError(
           `App with ID ${chatRecord.appId} not found`,
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
 
@@ -415,7 +415,7 @@ export function registerDebugHandlers() {
           db.select().from(language_models),
           db.select().from(mcpServers),
           extractCodebase({
-            appPath: getDyadAppPath(app.path),
+            appPath: getKapableAppPath(app.path),
             chatContext: validateChatContext(app.chatContext),
           }).then((result) => result.formattedOutput),
         ]);
@@ -429,7 +429,7 @@ export function registerDebugHandlers() {
         exportedAt: new Date().toISOString(),
 
         system: {
-          dyadVersion,
+          kapableVersion,
           platform: process.platform,
           architecture: arch(),
           nodeVersion,
@@ -540,9 +540,9 @@ export function registerDebugHandlers() {
   createTypedHandler(systemContracts.takeScreenshot, async () => {
     const win = BrowserWindow.getFocusedWindow();
     if (!win) {
-      throw new DyadError(
+      throw new KapableError(
         SCREENSHOT_ERRORS.noFocusedWindow,
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
 
@@ -550,7 +550,7 @@ export function registerDebugHandlers() {
     const image = await win.capturePage();
     // Validate image
     if (!image || image.isEmpty()) {
-      throw new DyadError(SCREENSHOT_ERRORS.emptyImage, DyadErrorKind.External);
+      throw new KapableError(SCREENSHOT_ERRORS.emptyImage, KapableErrorKind.External);
     }
     // Write the image to the clipboard
     clipboard.writeImage(image);

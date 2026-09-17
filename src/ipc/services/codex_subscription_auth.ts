@@ -4,7 +4,7 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 import { getUserDataPath } from "@/paths/paths";
 import { readSettings, writeSettings } from "@/main/settings";
@@ -38,7 +38,7 @@ const Tokens = z.object({
   expires_in: z.number().positive().optional(),
 });
 let generation = 0;
-let credentialCache: Credentials | DyadError | null | undefined;
+let credentialCache: Credentials | KapableError | null | undefined;
 let celebrationPending = false;
 export function acknowledgeSubscriptionConnection() {
   celebrationPending = false;
@@ -60,14 +60,14 @@ function requireEncryption() {
     (process.platform === "linux" &&
       safeStorage.getSelectedStorageBackend() === "basic_text")
   ) {
-    throw new DyadError(
+    throw new KapableError(
       "Secure credential storage is unavailable. Configure an OS keyring before connecting ChatGPT.",
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
     );
   }
 }
 function load(): Credentials | undefined {
-  if (credentialCache instanceof DyadError) throw credentialCache;
+  if (credentialCache instanceof KapableError) throw credentialCache;
   if (credentialCache !== undefined) return credentialCache ?? undefined;
   if (!fs.existsSync(credentialPath())) {
     credentialCache = null;
@@ -82,9 +82,9 @@ function load(): Credentials | undefined {
   } catch {
     // A failed read is not an absent connection. Keep reporting it until
     // successful reconnection or explicit disconnect replaces the cache.
-    credentialCache = new DyadError(
+    credentialCache = new KapableError(
       "Saved ChatGPT credentials could not be opened. Reconnect ChatGPT, or disconnect it to use your OpenAI API key.",
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
     throw credentialCache;
   }
@@ -179,9 +179,9 @@ async function exchange(
     body: new URLSearchParams({ ...params, client_id: CLIENT_ID }),
   });
   if (!response.ok)
-    throw new DyadError(
+    throw new KapableError(
       "ChatGPT authentication failed. Reconnect your subscription.",
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   try {
     const tokens = Tokens.parse(await response.json());
@@ -203,18 +203,18 @@ async function exchange(
         (accountId === previous?.accountId ? previous?.planType : undefined),
     });
   } catch {
-    throw new DyadError(
+    throw new KapableError(
       "ChatGPT returned an invalid authentication response. Reconnect your subscription.",
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   }
 }
 export async function getCodexSubscriptionCredentials(): Promise<Credentials> {
   const stored = load();
   if (!stored)
-    throw new DyadError(
+    throw new KapableError(
       "Connect your ChatGPT subscription in the model picker.",
-      DyadErrorKind.Auth,
+      KapableErrorKind.Auth,
     );
   if (stored.expires > Date.now() + 60_000) return stored;
   if (!refreshing) {
@@ -225,9 +225,9 @@ export async function getCodexSubscriptionCredentials(): Promise<Credentials> {
     )
       .then((credentials) => {
         if (generation !== current)
-          throw new DyadError(
+          throw new KapableError(
             "ChatGPT connection changed. Try again.",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         save(credentials);
         return credentials;
@@ -339,7 +339,7 @@ export async function connectCodexSubscription(
       .catch(() => {
         if (generation === current)
           lastError = "ChatGPT sign-in failed. Please try again.";
-        res.end("ChatGPT sign-in failed. Return to Dyad and try again.");
+        res.end("ChatGPT sign-in failed. Return to KapAble and try again.");
       })
       .finally(() => {
         if (generation === current) pending = false;
@@ -374,14 +374,14 @@ export async function connectCodexSubscription(
       code_challenge_method: "S256",
       id_token_add_organizations: "true",
       codex_cli_simplified_flow: "true",
-      originator: "dyad",
+      originator: "kapable",
     });
     await shell.openExternal(`${ISSUER}/oauth/authorize?${params}`);
   } catch {
     stopLogin();
-    throw new DyadError(
+    throw new KapableError(
       "Unable to start ChatGPT sign-in. Close other sign-in windows using port 1455 and try again.",
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
     );
   }
 }

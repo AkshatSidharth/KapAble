@@ -14,7 +14,7 @@ describe("subscription status banner (integration)", () => {
   let previousSubscriptionStatusUrl: string | undefined;
 
   beforeAll(async () => {
-    previousSubscriptionStatusUrl = process.env.DYAD_SUBSCRIPTION_STATUS_URL;
+    previousSubscriptionStatusUrl = process.env.KAPABLE_SUBSCRIPTION_STATUS_URL;
     server = createServer((request, response) => {
       receivedAuthorization = request.headers.authorization;
       response.writeHead(200, { "Content-Type": "application/json" });
@@ -22,7 +22,7 @@ describe("subscription status banner (integration)", () => {
         JSON.stringify({
           alert: "subscription_paused",
           effectiveAt: "2026-08-03T00:00:00.000Z",
-          actionUrl: "https://academy.dyad.sh/subscription?source=integration",
+          actionUrl: "https://academy.kapable.sh/subscription?source=integration",
         }),
       );
     });
@@ -33,7 +33,7 @@ describe("subscription status banner (integration)", () => {
     if (!address || typeof address === "string") {
       throw new Error("Failed to start subscription status test server");
     }
-    process.env.DYAD_SUBSCRIPTION_STATUS_URL = `http://127.0.0.1:${address.port}/subscription-status`;
+    process.env.KAPABLE_SUBSCRIPTION_STATUS_URL = `http://127.0.0.1:${address.port}/subscription-status`;
 
     harness = await setupHybridChatHarness({
       electronMock: h,
@@ -55,9 +55,9 @@ describe("subscription status banner (integration)", () => {
       server.close((error) => (error ? reject(error) : resolve())),
     );
     if (previousSubscriptionStatusUrl === undefined) {
-      delete process.env.DYAD_SUBSCRIPTION_STATUS_URL;
+      delete process.env.KAPABLE_SUBSCRIPTION_STATUS_URL;
     } else {
-      process.env.DYAD_SUBSCRIPTION_STATUS_URL = previousSubscriptionStatusUrl;
+      process.env.KAPABLE_SUBSCRIPTION_STATUS_URL = previousSubscriptionStatusUrl;
     }
   });
 

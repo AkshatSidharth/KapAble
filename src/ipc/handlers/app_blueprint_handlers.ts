@@ -8,7 +8,7 @@ import {
   type AppBlueprintVisual,
 } from "../types/app_blueprint";
 import { broadcastToRegisteredWindows } from "../utils/window_broadcast";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { db } from "../../db";
 import { apps, chats } from "../../db/schema";
 
@@ -90,9 +90,9 @@ export function registerAppBlueprintHandlers() {
     }
 
     if (plan.approved) {
-      throw new DyadError(
+      throw new KapableError(
         `Cannot edit approved app blueprint for chat ${params.chatId}`,
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
 
@@ -127,9 +127,9 @@ export function registerAppBlueprintHandlers() {
     }
 
     if (plan.approved) {
-      throw new DyadError(
+      throw new KapableError(
         `Cannot edit approved app blueprint for chat ${params.chatId}`,
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
 
@@ -147,16 +147,16 @@ export function registerAppBlueprintHandlers() {
   createTypedHandler(appBlueprintContracts.addVisual, async (_, params) => {
     const plan = appBlueprintStore.get(params.chatId);
     if (!plan) {
-      throw new DyadError(
+      throw new KapableError(
         `No app blueprint found for chat ${params.chatId} when adding visual`,
-        DyadErrorKind.NotFound,
+        KapableErrorKind.NotFound,
       );
     }
 
     if (plan.approved) {
-      throw new DyadError(
+      throw new KapableError(
         `Cannot add visual to approved app blueprint for chat ${params.chatId}`,
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
 
@@ -181,9 +181,9 @@ export function registerAppBlueprintHandlers() {
     }
 
     if (plan.approved) {
-      throw new DyadError(
+      throw new KapableError(
         `Cannot remove visual from approved app blueprint for chat ${params.chatId}`,
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
 

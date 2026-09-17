@@ -16,7 +16,7 @@ const temporaryDirectories: string[] = [];
 
 function createTemporaryDirectory() {
   const directory = fs.mkdtempSync(
-    path.join(os.tmpdir(), "dyad-release-provenance-"),
+    path.join(os.tmpdir(), "kapable-release-provenance-"),
   );
   temporaryDirectories.push(directory);
   return directory;
@@ -32,11 +32,11 @@ describe("release provenance generator", () => {
   it("uses the exact asset names produced by Electron Forge's GitHub publisher", () => {
     const directory = createTemporaryDirectory();
     fs.writeFileSync(
-      path.join(directory, "dyad-1.10.0-beta.1 Setup.exe"),
+      path.join(directory, "kapable-1.10.0-beta.1 Setup.exe"),
       "windows",
     );
     fs.writeFileSync(
-      path.join(directory, "dyad_1.10.0~beta.1_amd64.deb"),
+      path.join(directory, "kapable_1.10.0~beta.1_amd64.deb"),
       "linux",
     );
 
@@ -44,13 +44,13 @@ describe("release provenance generator", () => {
       collectReleaseArtifacts(directory).map(
         (artifact: { name: string }) => artifact.name,
       ),
-    ).toEqual(["dyad-1.10.0-beta.1.Setup.exe", "dyad_1.10.0.beta.1_amd64.deb"]);
+    ).toEqual(["kapable-1.10.0-beta.1.Setup.exe", "kapable_1.10.0.beta.1_amd64.deb"]);
   });
 
   it("hashes and sorts only published release artifact types", () => {
     const directory = createTemporaryDirectory();
     fs.mkdirSync(path.join(directory, "nested"));
-    fs.writeFileSync(path.join(directory, "nested", "dyad.zip"), "zip");
+    fs.writeFileSync(path.join(directory, "nested", "kapable.zip"), "zip");
     fs.writeFileSync(path.join(directory, "RELEASES"), "manifest");
     fs.writeFileSync(path.join(directory, "ignored.json"), "{}");
 
@@ -62,7 +62,7 @@ describe("release provenance generator", () => {
         size: 8,
       },
       {
-        name: "dyad.zip",
+        name: "kapable.zip",
         sha256:
           "4a70fe9aa6436e02c2dea340fbd1e352e4ef2d8ce6ca52ad25d4b95471fc8bf2",
         size: 3,
@@ -72,14 +72,14 @@ describe("release provenance generator", () => {
 
   it("binds artifacts to the repository, workflow, ref, and commit", () => {
     const directory = createTemporaryDirectory();
-    fs.writeFileSync(path.join(directory, "dyad.exe"), "binary");
+    fs.writeFileSync(path.join(directory, "kapable.exe"), "binary");
 
     const provenance = createReleaseProvenance({
       outputDirectory: directory,
       platform: "windows",
       environment: {
         GITHUB_REF: "refs/heads/main",
-        GITHUB_REPOSITORY: "dyad-sh/dyad",
+        GITHUB_REPOSITORY: "AkshatSidharth/KapAble",
         GITHUB_REPOSITORY_ID: "964395174",
         GITHUB_RUN_ATTEMPT: "1",
         GITHUB_RUN_ID: "12345",
@@ -91,7 +91,7 @@ describe("release provenance generator", () => {
 
     expect(provenance).toMatchObject({
       schemaVersion: 1,
-      repository: { id: "964395174", name: "dyad", owner: "dyad-sh" },
+      repository: { id: "964395174", name: "KapAble", owner: "AkshatSidharth" },
       source: {
         commit: "0123456789abcdef0123456789abcdef01234567",
         ref: "refs/heads/main",
@@ -105,7 +105,7 @@ describe("release provenance generator", () => {
 
   it("rejects a tag that does not match the package version", () => {
     const directory = createTemporaryDirectory();
-    fs.writeFileSync(path.join(directory, "dyad.exe"), "binary");
+    fs.writeFileSync(path.join(directory, "kapable.exe"), "binary");
 
     expect(() =>
       createReleaseProvenance({
@@ -113,7 +113,7 @@ describe("release provenance generator", () => {
         platform: "windows",
         environment: {
           GITHUB_REF: "refs/heads/main",
-          GITHUB_REPOSITORY: "dyad-sh/dyad",
+          GITHUB_REPOSITORY: "AkshatSidharth/KapAble",
           GITHUB_REPOSITORY_ID: "964395174",
           GITHUB_RUN_ATTEMPT: "1",
           GITHUB_RUN_ID: "12345",

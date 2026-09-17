@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   createFakeClock,
   createSequentialIdSource,
@@ -334,16 +334,16 @@ describe("remote machine transport", () => {
     const renderer = duplex.connect();
 
     await expect(renderer.subscribe(address())).rejects.toMatchObject({
-      name: "DyadError",
-      kind: DyadErrorKind.Precondition,
+      name: "KapableError",
+      kind: KapableErrorKind.Precondition,
     });
     expect(renderer.view(address())).toBeUndefined();
   });
 
   it("preserves classified subscription authorization errors", async () => {
-    const expected = new DyadError(
+    const expected = new KapableError(
       "Synthetic subscription quota",
-      DyadErrorKind.RateLimited,
+      KapableErrorKind.RateLimited,
     );
     const base = createRemoteTestMachine();
     const machine = {
@@ -400,9 +400,9 @@ describe("remote machine transport", () => {
   });
 
   it("propagates non-auth typed dispatch denials", async () => {
-    const expected = new DyadError(
+    const expected = new KapableError(
       "Synthetic dispatch dependency failure",
-      DyadErrorKind.Validation,
+      KapableErrorKind.Validation,
     );
     const base = createRemoteTestMachine();
     const machine = {
@@ -535,7 +535,7 @@ describe("remote machine transport", () => {
     const keyHarness = createHarness({ machine: keyMachine });
     await expect(
       keyHarness.duplex.connect().subscribe(address("legacy-only")),
-    ).rejects.toMatchObject({ kind: DyadErrorKind.Validation });
+    ).rejects.toMatchObject({ kind: KapableErrorKind.Validation });
 
     const snapshotMachine = {
       ...base,
@@ -783,14 +783,14 @@ describe("remote machine transport", () => {
     await expect(
       addressRenderer.subscribe(oversizedAddress),
     ).rejects.toMatchObject({
-      name: "DyadError",
-      kind: DyadErrorKind.Validation,
+      name: "KapableError",
+      kind: KapableErrorKind.Validation,
     });
     await expect(
       addressRenderer.unsubscribe(oversizedAddress),
     ).rejects.toMatchObject({
-      name: "DyadError",
-      kind: DyadErrorKind.Validation,
+      name: "KapableError",
+      kind: KapableErrorKind.Validation,
     });
     expect(addressHarness.transport.inspectSubscriptions()).toEqual([]);
 
@@ -1212,8 +1212,8 @@ describe("remote machine transport", () => {
     await expect(
       renderer.subscribe(address("forbidden")),
     ).rejects.toMatchObject({
-      name: "DyadError",
-      kind: DyadErrorKind.Auth,
+      name: "KapableError",
+      kind: KapableErrorKind.Auth,
       message: "forbidden key",
     });
     expect(renderer.view(address("forbidden"))).toBeUndefined();
@@ -1850,9 +1850,9 @@ describe("remote machine transport", () => {
           if (context.currentState?.value !== 0) {
             return {
               kind: "deny",
-              error: new DyadError(
+              error: new KapableError(
                 "state no longer permits SET",
-                DyadErrorKind.Auth,
+                KapableErrorKind.Auth,
               ),
             } as const;
           }
@@ -2139,7 +2139,7 @@ describe("remote machine transport", () => {
         ...base.remote,
         canonicalizeKeyAfterAuthorization: canonicalize,
         authorizeSubscribe() {
-          throw new DyadError("object key denied", DyadErrorKind.Auth);
+          throw new KapableError("object key denied", KapableErrorKind.Auth);
         },
       },
     } as AnyRemoteMachineDefinition;
@@ -2153,7 +2153,7 @@ describe("remote machine transport", () => {
           ...objectAddress(),
           encodedKey,
         }),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.Auth });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.Auth });
     }
     expect(canonicalize).not.toHaveBeenCalled();
     expect(transport.inspectSubscriptions()).toEqual([]);
@@ -2189,7 +2189,7 @@ describe("remote machine transport", () => {
     await expect(
       transport.subscribe(windows.endpoint(sessionId), objectAddress()),
     ).rejects.toMatchObject({
-      kind: DyadErrorKind.Precondition,
+      kind: KapableErrorKind.Precondition,
       message:
         "Remote machine wire address changed during subscription authorization",
     });

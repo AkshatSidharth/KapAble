@@ -4,9 +4,9 @@ import { z } from "zod";
 import log from "electron-log";
 import type { LanguageModelV3Usage } from "@ai-sdk/provider";
 import { readSettings } from "@/main/settings";
-import { isDyadProEnabled } from "@/lib/schemas";
-import { getDyadEngineBaseUrl } from "@/ipc/utils/dyad_engine_url";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { isKapableProEnabled } from "@/lib/schemas";
+import { getKapableEngineBaseUrl } from "@/ipc/utils/kapable_engine_url";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import type { SubscriptionTokens } from "@/lib/subscriptionUsage";
 import {
   consumeExternalModelAdmission,
@@ -44,27 +44,27 @@ export async function startExternalModelUsage(
   admission?: ExternalModelAdmission,
 ) {
   if (signal?.aborted)
-    throw new DyadError(
+    throw new KapableError(
       "External model request cancelled.",
-      DyadErrorKind.UserCancelled,
+      KapableErrorKind.UserCancelled,
     );
   // null is an explicitly accepted free request; never consult live settings.
   if (apiKey === null && billing.connection === "subscription")
     return undefined;
   const settings = apiKey === undefined ? readSettings() : undefined;
-  // Free subscription requests never check or report Dyad credits. Explicit
+  // Free subscription requests never check or report KapAble credits. Explicit
   // billing keys still belong to the already-resolved Pro request.
   if (
     billing.connection === "subscription" &&
     settings &&
-    !isDyadProEnabled(settings)
+    !isKapableProEnabled(settings)
   )
     return undefined;
   const key = apiKey ?? settings?.providerSettings?.auto?.apiKey?.value;
   if (!key)
-    throw new DyadError(
-      "Add your Dyad Pro key before using Pro with an external model.",
-      DyadErrorKind.Auth,
+    throw new KapableError(
+      "Add your KapAble Pro key before using Pro with an external model.",
+      KapableErrorKind.Auth,
     );
   if (!consumeExternalModelAdmission(admission, key))
     await checkSubscriptionCredits(key, signal);
@@ -107,7 +107,7 @@ export async function finishExternalModelUsage(
   try {
     const tokens = normalizeExternalModelUsage(usage);
     const response = await fetch(
-      `${getDyadEngineBaseUrl().replace(/\/$/, "")}/track-usage`,
+      `${getKapableEngineBaseUrl().replace(/\/$/, "")}/track-usage`,
       {
         method: "POST",
         redirect: "error",

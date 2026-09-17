@@ -92,17 +92,17 @@ describe("SubscriptionStatusBanner", () => {
   it.each([
     {
       alert: "payment_past_due" as const,
-      text: "Payment failed. Update your payment method to keep Dyad Pro active.",
+      text: "Payment failed. Update your payment method to keep KapAble Pro active.",
       action: "Update payment method",
     },
     {
       alert: "subscription_ending" as const,
-      text: "Your Dyad Pro subscription ends in 20 days. You will lose 650 credits.",
+      text: "Your KapAble Pro subscription ends in 20 days. You will lose 650 credits.",
       action: "Manage subscription",
     },
     {
       alert: "subscription_paused" as const,
-      text: "Your Dyad Pro subscription is paused.",
+      text: "Your KapAble Pro subscription is paused.",
       action: "Resume subscription",
     },
   ])("renders the $alert localized variant", ({ alert, text, action }) => {
@@ -110,7 +110,7 @@ describe("SubscriptionStatusBanner", () => {
       alert,
       effectiveAt:
         alert === "payment_past_due" ? null : "2026-08-03T00:00:00.000Z",
-      actionUrl: "https://academy.dyad.sh/subscription",
+      actionUrl: "https://academy.kapable.sh/subscription",
     };
     renderBanner();
     expect(screen.getByText(new RegExp(text))).not.toBeNull();
@@ -122,14 +122,14 @@ describe("SubscriptionStatusBanner", () => {
     mocks.status = {
       alert: "subscription_paused",
       effectiveAt: "2026-08-03T00:00:00.000Z",
-      actionUrl: "https://academy.dyad.sh/subscription?source=app",
+      actionUrl: "https://academy.kapable.sh/subscription?source=app",
     };
     renderBanner();
     await userEvent.click(
       screen.getByRole("button", { name: "Resume subscription" }),
     );
     expect(mocks.openBillingAction).toHaveBeenCalledWith(
-      "https://academy.dyad.sh/subscription?source=app",
+      "https://academy.kapable.sh/subscription?source=app",
     );
     expect(mocks.capture).toHaveBeenCalledWith("billing_nudge_clicked", {
       alert: "subscription_paused",
@@ -141,7 +141,7 @@ describe("SubscriptionStatusBanner", () => {
     mocks.status = {
       alert: "subscription_paused",
       effectiveAt: "2026-08-03T00:00:00.000Z",
-      actionUrl: "https://academy.dyad.sh/subscription",
+      actionUrl: "https://academy.kapable.sh/subscription",
     };
     mocks.openBillingAction.mockRejectedValue(new Error("open failed"));
     renderBanner();
@@ -161,7 +161,7 @@ describe("SubscriptionStatusBanner", () => {
     mocks.status = {
       alert: "subscription_ending",
       effectiveAt: "2026-07-15T00:00:00.000Z",
-      actionUrl: "https://academy.dyad.sh/subscription",
+      actionUrl: "https://academy.kapable.sh/subscription",
     };
     mocks.userBudget = {
       ...mocks.userBudget!,
@@ -172,7 +172,7 @@ describe("SubscriptionStatusBanner", () => {
 
     expect(
       screen.getByText(
-        "Your Dyad Pro subscription ends in 1 day. You will lose 1 credit.",
+        "Your KapAble Pro subscription ends in 1 day. You will lose 1 credit.",
       ),
     ).not.toBeNull();
   });
@@ -181,14 +181,14 @@ describe("SubscriptionStatusBanner", () => {
     mocks.status = {
       alert: "subscription_ending",
       effectiveAt: "2026-07-13T23:59:59.000Z",
-      actionUrl: "https://academy.dyad.sh/subscription",
+      actionUrl: "https://academy.kapable.sh/subscription",
     };
 
     renderBanner();
 
     expect(
       screen.getByText(
-        "Your Dyad Pro subscription ends today. You will lose 650 credits.",
+        "Your KapAble Pro subscription ends today. You will lose 650 credits.",
       ),
     ).not.toBeNull();
   });
@@ -197,7 +197,7 @@ describe("SubscriptionStatusBanner", () => {
     mocks.status = {
       alert: "subscription_paused",
       effectiveAt: "2026-08-03T00:00:00.000Z",
-      actionUrl: "https://academy.dyad.sh/subscription",
+      actionUrl: "https://academy.kapable.sh/subscription",
     };
     const view = renderBanner();
     await userEvent.click(
@@ -221,7 +221,7 @@ describe("SubscriptionStatusBanner", () => {
     mocks.status = {
       alert: "payment_past_due",
       effectiveAt: null,
-      actionUrl: "https://academy.dyad.sh/billing",
+      actionUrl: "https://academy.kapable.sh/billing",
     };
     const view = renderBanner();
     expect(mocks.capture).toHaveBeenCalledWith("billing_nudge_shown", {
@@ -248,7 +248,7 @@ describe("SubscriptionStatusBanner", () => {
     mocks.status = {
       alert: "subscription_paused",
       effectiveAt: "2026-10-03T00:00:00.000Z",
-      actionUrl: "https://academy.dyad.sh/subscription",
+      actionUrl: "https://academy.kapable.sh/subscription",
     };
     const store = createStore();
     const firstView = renderBanner(store);
@@ -266,7 +266,7 @@ describe("SubscriptionStatusBanner", () => {
     mocks.status = {
       alert: "payment_past_due",
       effectiveAt: null,
-      actionUrl: "https://academy.dyad.sh/billing",
+      actionUrl: "https://academy.kapable.sh/billing",
     };
     const view = renderBanner();
     mocks.capture.mockClear();
@@ -280,14 +280,14 @@ describe("SubscriptionStatusBanner", () => {
   });
 
   it.each([
-    ["pt-BR", "Sua assinatura do Dyad Pro está pausada.", "Retomar assinatura"],
-    ["zh-CN", "您的 Dyad Pro 订阅已暂停。", "恢复订阅"],
+    ["pt-BR", "Sua assinatura do KapAble Pro está pausada.", "Retomar assinatura"],
+    ["zh-CN", "您的 KapAble Pro 订阅已暂停。", "恢复订阅"],
   ])("renders localized copy in %s", async (language, text, action) => {
     await i18n.changeLanguage(language);
     mocks.status = {
       alert: "subscription_paused",
       effectiveAt: "2026-08-03T00:00:00.000Z",
-      actionUrl: "https://academy.dyad.sh/subscription",
+      actionUrl: "https://academy.kapable.sh/subscription",
     };
     renderBanner();
     expect(screen.getByText(new RegExp(text))).not.toBeNull();

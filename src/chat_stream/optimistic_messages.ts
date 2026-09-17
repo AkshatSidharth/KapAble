@@ -1,6 +1,6 @@
 import type { Message } from "@/ipc/types";
 import { SnapshotStore } from "@/state_machines/snapshot_store";
-import { buildDyadAttachmentTag } from "../../shared/dyadAttachment";
+import { buildKapableAttachmentTag } from "../../shared/kapableAttachment";
 import type { StreamRequest } from "./renderer_facade";
 
 interface OptimisticMessage {
@@ -32,7 +32,7 @@ export class OptimisticChatMessages {
       .map(({ file, type }) => {
         const url = URL.createObjectURL(file);
         objectUrls.push(url);
-        return buildDyadAttachmentTag({
+        return buildKapableAttachmentTag({
           name: file.name,
           type: file.type,
           url,

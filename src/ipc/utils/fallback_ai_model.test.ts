@@ -13,7 +13,7 @@ import {
   getFallbackFailureAction,
   getFallbackRetryDelayMs,
 } from "./fallback_ai_model";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 const logMocks = vi.hoisted(() => ({
   warn: vi.fn(),
@@ -69,7 +69,7 @@ function apiCallError(params: {
 }): APICallError {
   return new APICallError({
     ...params,
-    url: "https://engine.dyad.sh/v1/responses",
+    url: "https://engine.kapable.sh/v1/responses",
     requestBodyValues: {},
   });
 }
@@ -348,7 +348,7 @@ describe("fallback failure policy", () => {
 
     const result = await model.doStream({
       prompt: [],
-      headers: { "x-dyad-internal-request-id": "request-123" },
+      headers: { "x-kapable-internal-request-id": "request-123" },
     } as unknown as LanguageModelV3CallOptions);
     await drain(result.stream);
 
@@ -493,7 +493,7 @@ describe("fallback failure policy", () => {
 
     const result = await model.doStream({
       prompt: [],
-      headers: { "x-dyad-internal-request-id": "request-stream" },
+      headers: { "x-kapable-internal-request-id": "request-stream" },
     } as unknown as LanguageModelV3CallOptions);
     await drain(result.stream);
 
@@ -653,7 +653,7 @@ describe("fallback failure policy", () => {
     expect(calls).toEqual(["gpt-5.6-sol"]);
   });
 
-  it("classifies exhausted provider failures as external Dyad errors", async () => {
+  it("classifies exhausted provider failures as external KapAble errors", async () => {
     const calls: string[] = [];
     const transientError = apiCallError({
       message: "service unavailable",
@@ -676,9 +676,9 @@ describe("fallback failure policy", () => {
     await expect(
       model.doStream({ prompt: [] } as unknown as LanguageModelV3CallOptions),
     ).rejects.toMatchObject({
-      name: "DyadError",
-      kind: DyadErrorKind.External,
-    } satisfies Partial<DyadError>);
+      name: "KapableError",
+      kind: KapableErrorKind.External,
+    } satisfies Partial<KapableError>);
   });
 
   it("formats diagnostics without serializing request bodies or headers", () => {
@@ -841,7 +841,7 @@ describe("fallback model call options", () => {
       temperature: 0.2,
       maxOutputTokens: 128_000,
       providerOptions: {
-        "dyad-engine": { dyadRequestId: "req-1" },
+        "kapable-engine": { kapableRequestId: "req-1" },
         openai: { reasoningEffort: "medium" },
       },
     } as unknown as LanguageModelV3CallOptions);
@@ -856,8 +856,8 @@ describe("fallback model call options", () => {
       thinking: { type: "adaptive" },
     });
     // ...request-scoped options pass through untouched.
-    expect((seen.providerOptions as any)["dyad-engine"]).toEqual({
-      dyadRequestId: "req-1",
+    expect((seen.providerOptions as any)["kapable-engine"]).toEqual({
+      kapableRequestId: "req-1",
     });
     expect(seen.prompt).toEqual([]);
   });
@@ -946,9 +946,9 @@ describe("subscription billing-source boundary", () => {
     "does not use a paid fallback after a subscription limit (%s)",
     async (type) => {
       const calls: string[] = [];
-      const error = new DyadError(
+      const error = new KapableError(
         "rate_limit: ChatGPT subscription limit reached",
-        DyadErrorKind.RateLimited,
+        KapableErrorKind.RateLimited,
       );
       const model = createFallback({
         models: [
@@ -1081,7 +1081,7 @@ describe("budget exhaustion", () => {
       expect(onError).toHaveBeenCalledExactlyOnceWith({ error: errors[0] });
       expect(errors[0]).toMatchObject({ message });
       if (type === "throw") {
-        expect(errors[0]).toMatchObject({ kind: DyadErrorKind.Precondition });
+        expect(errors[0]).toMatchObject({ kind: KapableErrorKind.Precondition });
       }
     },
   );
@@ -1116,9 +1116,9 @@ describe("budget exhaustion", () => {
 
 it("preserves classified errors containing the budget marker", async () => {
   const calls: string[] = [];
-  const error = new DyadError(
+  const error = new KapableError(
     "ExceededBudget: account exhausted",
-    DyadErrorKind.Auth,
+    KapableErrorKind.Auth,
   );
   const model = createFallback({
     models: [

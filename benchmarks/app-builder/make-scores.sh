@@ -30,10 +30,10 @@ const MODELS = [
   { name: "GLM 5.3 Flash", slug: "z-ai_glm-5.3-flash", vendor: "Z-AI", effort: "provider default" },
   { name: "Gemini 3.8 Flash", slug: "gemini-3.8-flash", vendor: "Google", effort: "medium" },
   { name: "Muse Spark 1.3", slug: "meta_muse-spark-1.3", vendor: "Meta", effort: "provider default" },
-  { name: "Auto Sidekick", slug: "auto-sidekick", vendor: "Dyad", effort: "medium", note: "Sol orchestrator + Luna implementer" },
+  { name: "Auto Sidekick", slug: "auto-sidekick", vendor: "KapAble", effort: "medium", note: "Sol orchestrator + Luna implementer" },
 ];
 // `effort` is what the recording proxy saw on the wire for every request of
-// the cell (`reasoning.effort` for OpenAI, `effort` for Anthropic; Dyad's
+// the cell (`reasoning.effort` for OpenAI, `effort` for Anthropic; KapAble's
 // product default = medium). OpenRouter-routed models are sent no effort field
 // and run at the provider's default; grok-4.6's catalog default is medium.
 const APPS = {
@@ -70,7 +70,7 @@ const APPS = {
 };
 // Vendor colors: validated with dataviz validate_palette.js against the dark
 // surface (all six checks pass; see report.mjs for the light set).
-const VENDOR_COLOR = { OpenAI: "#3987e5", Anthropic: "#d95926", xAI: "#199e70", Dyad: "#9678f0", "Z-AI": "#e0568f", Google: "#e3a72f", Meta: "#2cc4d9" };
+const VENDOR_COLOR = { OpenAI: "#3987e5", Anthropic: "#d95926", xAI: "#199e70", KapAble: "#9678f0", "Z-AI": "#e0568f", Google: "#e3a72f", Meta: "#2cc4d9" };
 
 // Mirrors CELL_OVERRIDES in report.mjs (labelled reruns of cells lost to a
 // provider/harness fault; reasons recorded there).
@@ -186,8 +186,8 @@ const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="v
  .note{color:var(--muted);font-size:12.5px;margin-top:18px}
 </style>
 <div class="wrap">
-<header><div><p class="eyebrow">Dyad · full-stack app builds</p><h1>App-builder benchmark</h1></div><a class="btn" href="index.html">▶ Relay CRM demo videos</a></header>
-<p class="lead">Each model built three full-stack apps end to end inside Dyad — three milestones each, one run per cell — and every build is scored against a fixed suite of customer-journey tests, security probes and an LLM judge. Cost is exact token usage at pinned public list prices.</p>
+<header><div><p class="eyebrow">KapAble · full-stack app builds</p><h1>App-builder benchmark</h1></div><a class="btn" href="index.html">▶ Relay CRM demo videos</a></header>
+<p class="lead">Each model built three full-stack apps end to end inside KapAble — three milestones each, one run per cell — and every build is scored against a fixed suite of customer-journey tests, security probes and an LLM judge. Cost is exact token usage at pinned public list prices.</p>
 
 <section class="card filters">
   <div class="frow"><span class="lbl">Vendor</span><span id="vendors"></span><span class="count" id="count"></span></div>
@@ -354,7 +354,7 @@ document.getElementById("apps").innerHTML = APPS.map((a, i) => { const A = DATA.
     + '<p class="blurb">' + A.blurb + "</p><p class=\\"ml\\">Milestones</p><ol>"
     + A.milestones.map((m, j) => "<li><b>M" + (j + 1) + "</b>" + m + "</li>").join("")
     + "</ol><p class=\\"suite\\">Scored by " + A.cujs + " customer-journey tests and " + A.probes + " security probes across three checkpoints, plus an LLM judge.</p></section>"; }).join("");
-document.getElementById("note").textContent = "Composite = 60% customer-journey tests + 25% security probes + 15% LLM judge, averaged over an app's three checkpoints. Overall = mean of the three apps, shown only once all three are scored. One run per cell — differences of a few points are within run-to-run variance. The effort badge is the reasoning effort recorded on the wire for every request of the cell (Dyad product default = medium); OpenRouter-routed models (Grok, GLM) are sent no effort field and run at the provider default. Generated " + DATA.generated + ".";
+document.getElementById("note").textContent = "Composite = 60% customer-journey tests + 25% security probes + 15% LLM judge, averaged over an app's three checkpoints. Overall = mean of the three apps, shown only once all three are scored. One run per cell — differences of a few points are within run-to-run variance. The effort badge is the reasoning effort recorded on the wire for every request of the cell (KapAble product default = medium); OpenRouter-routed models (Grok, GLM) are sent no effort field and run at the provider default. Generated " + DATA.generated + ".";
 
 function update() { save(); renderFilters(); renderTiles(); renderChart(); renderTable(); }
 update();

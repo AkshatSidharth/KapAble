@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useSettings } from "@/hooks/useSettings";
 import { ipc } from "@/ipc/types";
-import { hasDyadProKey } from "@/lib/schemas";
+import { hasKapableProKey } from "@/lib/schemas";
 
 export function ProModeSelector() {
   const { settings, updateSettings } = useSettings();
@@ -23,11 +23,11 @@ export function ProModeSelector() {
 
   const toggleProEnabled = () => {
     updateSettings({
-      enableDyadPro: !settings?.enableDyadPro,
+      enableKapablePro: !settings?.enableKapablePro,
     });
   };
 
-  const hasProKey = settings ? hasDyadProKey(settings) : false;
+  const hasProKey = settings ? hasKapableProKey(settings) : false;
 
   return (
     <Popover>
@@ -40,14 +40,14 @@ export function ProModeSelector() {
           <Sparkles className="h-3.5 w-3.5" />
           <span className="font-medium">Pro</span>
         </TooltipTrigger>
-        <TooltipContent>Configure Dyad Pro settings</TooltipContent>
+        <TooltipContent>Configure KapAble Pro settings</TooltipContent>
       </Tooltip>
       <PopoverContent className="w-80 border-primary/20">
         <div className="space-y-4">
           <div className="space-y-1">
             <h4 className="font-medium flex items-center gap-1.5">
               <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-primary font-medium">Dyad Pro</span>
+              <span className="text-primary font-medium">KapAble Pro</span>
             </h4>
             <div className="h-px bg-gradient-to-r from-primary/50 via-primary/20 to-transparent" />
           </div>
@@ -56,9 +56,9 @@ export function ProModeSelector() {
               <a
                 className="inline-flex items-center justify-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-medium text-primary shadow-sm transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
                 onClick={() => {
-                  ipc.system.openExternalUrl("https://dyad.sh/pro#ai");
+                  ipc.system.openExternalUrl("https://kapable.sh/pro#ai");
                 }}
-                title="Visit dyad.sh/pro to unlock Pro features"
+                title="Visit kapable.sh/pro to unlock Pro features"
               >
                 Unlock Pro modes
               </a>
@@ -117,10 +117,10 @@ export function ProModeSelector() {
           )}
           <SelectorRow
             id="pro-enabled"
-            label="Enable Dyad Pro"
-            tooltip="Uses your selected model usage source and Dyad Pro credits for Pro features."
+            label="Enable KapAble Pro"
+            tooltip="Uses your selected model usage source and KapAble Pro credits for Pro features."
             isTogglable={hasProKey}
-            settingEnabled={Boolean(settings?.enableDyadPro)}
+            settingEnabled={Boolean(settings?.enableKapablePro)}
             toggle={toggleProEnabled}
           />
         </div>

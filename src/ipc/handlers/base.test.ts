@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   defineContract,
   unwrapIpcEnvelope,
@@ -283,18 +283,18 @@ describe("IPC handler envelopes", () => {
       { sender: { mainFrame }, senderFrame },
     );
 
-    expect(() => unwrapIpcEnvelope(envelope)).toThrow("trusted Dyad renderer");
+    expect(() => unwrapIpcEnvelope(envelope)).toThrow("trusted KapAble renderer");
     expect(implementation).not.toHaveBeenCalled();
   });
 
   it("normalizes the Windows file-volume prefix for packaged SPA routes", () => {
     configureTrustedRenderer({
       packagedRendererUrl:
-        "file:///C:/Program%20Files/Dyad/renderer/main_window/index.html",
+        "file:///C:/Program%20Files/KapAble/renderer/main_window/index.html",
     });
 
     for (const url of [
-      "file:///C:/Program%20Files/Dyad/renderer/main_window/index.html",
+      "file:///C:/Program%20Files/KapAble/renderer/main_window/index.html",
       "file:///C:/",
       "file:///C:/chat?chatId=42#message-3",
       "file:///C:/providers/openai?section=models",
@@ -334,7 +334,7 @@ describe("IPC handler envelopes", () => {
         },
       );
       expect(() => unwrapIpcEnvelope(envelope)).toThrow(
-        "trusted Dyad renderer",
+        "trusted KapAble renderer",
       );
       expect(mocks.sendTelemetryException).not.toHaveBeenCalled();
     } finally {
@@ -376,7 +376,7 @@ describe("IPC handler envelopes", () => {
           { sender: { mainFrame: frame }, senderFrame: frame },
         );
         expect(() => unwrapIpcEnvelope(envelope)).toThrow(
-          "trusted Dyad renderer",
+          "trusted KapAble renderer",
         );
       }
 
@@ -395,7 +395,7 @@ describe("IPC handler envelopes", () => {
           event,
         );
         expect(() => unwrapIpcEnvelope(envelope)).toThrow(
-          "trusted Dyad renderer",
+          "trusted KapAble renderer",
         );
       }
     } finally {
@@ -403,7 +403,7 @@ describe("IPC handler envelopes", () => {
     }
   });
 
-  it("returns validation DyadError envelopes from typed handlers", async () => {
+  it("returns validation KapableError envelopes from typed handlers", async () => {
     createTypedHandler(
       defineContract({
         channel: "validation-channel",
@@ -415,13 +415,13 @@ describe("IPC handler envelopes", () => {
 
     const envelope = await getEnvelope("validation-channel", { value: "nope" });
 
-    expect(() => unwrapIpcEnvelope(envelope)).toThrow(DyadError);
+    expect(() => unwrapIpcEnvelope(envelope)).toThrow(KapableError);
     expect(() => unwrapIpcEnvelope(envelope)).toThrow(
       "[validation-channel] Invalid input",
     );
     expect(envelope.ok).toBe(false);
     if (!envelope.ok) {
-      expect(envelope.error.kind).toBe(DyadErrorKind.Validation);
+      expect(envelope.error.kind).toBe(KapableErrorKind.Validation);
     }
     expect(mocks.sendTelemetryException).not.toHaveBeenCalled();
   });
@@ -444,12 +444,12 @@ describe("IPC handler envelopes", () => {
       { sender: { mainFrame: frame }, senderFrame: frame },
     );
 
-    expect(() => unwrapIpcEnvelope(envelope)).toThrow("trusted Dyad renderer");
+    expect(() => unwrapIpcEnvelope(envelope)).toThrow("trusted KapAble renderer");
     expect(inputValidation).not.toHaveBeenCalled();
     expect(mocks.sendTelemetryException).not.toHaveBeenCalled();
   });
 
-  it("returns handler DyadError envelopes after telemetry", async () => {
+  it("returns handler KapableError envelopes after telemetry", async () => {
     createTypedHandler(
       defineContract({
         channel: "error-channel",
@@ -457,7 +457,7 @@ describe("IPC handler envelopes", () => {
         output: z.void(),
       }),
       async () => {
-        throw new DyadError("Already exists", DyadErrorKind.Conflict);
+        throw new KapableError("Already exists", KapableErrorKind.Conflict);
       },
     );
 
@@ -465,10 +465,10 @@ describe("IPC handler envelopes", () => {
 
     expect(envelope.ok).toBe(false);
     if (!envelope.ok) {
-      expect(envelope.error.kind).toBe(DyadErrorKind.Conflict);
+      expect(envelope.error.kind).toBe(KapableErrorKind.Conflict);
       expect(envelope.error.message).toBe("Already exists");
     }
-    expect(() => unwrapIpcEnvelope(envelope)).toThrow(DyadError);
+    expect(() => unwrapIpcEnvelope(envelope)).toThrow(KapableError);
     expect(mocks.sendTelemetryException).toHaveBeenCalledTimes(1);
   });
 
@@ -480,14 +480,14 @@ describe("IPC handler envelopes", () => {
     };
     const handle = createLoggedHandler(logger as any);
     handle("legacy-channel", async () => {
-      throw new DyadError("Legacy conflict", DyadErrorKind.Conflict);
+      throw new KapableError("Legacy conflict", KapableErrorKind.Conflict);
     });
 
     const envelope = await getEnvelope("legacy-channel");
 
     expect(envelope.ok).toBe(false);
     if (!envelope.ok) {
-      expect(envelope.error.kind).toBe(DyadErrorKind.Conflict);
+      expect(envelope.error.kind).toBe(KapableErrorKind.Conflict);
       expect(envelope.error.message).toBe("Legacy conflict");
     }
     expect(mocks.sendTelemetryException).toHaveBeenCalledTimes(1);
@@ -506,7 +506,7 @@ describe("IPC handler envelopes", () => {
       sender: { mainFrame: frame },
       senderFrame: frame,
     });
-    expect(() => unwrapIpcEnvelope(envelope)).toThrow("trusted Dyad renderer");
+    expect(() => unwrapIpcEnvelope(envelope)).toThrow("trusted KapAble renderer");
   });
 
   it("rejects remote origins in logged typed handlers too", async () => {
@@ -531,7 +531,7 @@ describe("IPC handler envelopes", () => {
       { sender: { mainFrame: frame }, senderFrame: frame },
     );
 
-    expect(() => unwrapIpcEnvelope(envelope)).toThrow("trusted Dyad renderer");
+    expect(() => unwrapIpcEnvelope(envelope)).toThrow("trusted KapAble renderer");
     expect(implementation).not.toHaveBeenCalled();
     expect(mocks.sendTelemetryException).not.toHaveBeenCalled();
   });

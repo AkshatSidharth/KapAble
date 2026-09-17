@@ -7,7 +7,7 @@ import {
   getSupabaseClientCode,
   getSupabaseTableSchema,
 } from "./supabase_context";
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 
 vi.mock("./supabase_management_client", () => ({
   getSupabaseClient: vi.fn(),
@@ -154,7 +154,7 @@ describe("getSupabaseTableSchema", () => {
         organizationSlug: null,
       }),
     ).rejects.toMatchObject({
-      kind: DyadErrorKind.External,
+      kind: KapableErrorKind.External,
       message: expect.stringContaining(
         "Unexpected Supabase runQuery response shape (object keys: error)",
       ),
@@ -171,7 +171,7 @@ describe("getSupabaseTableSchema", () => {
         organizationSlug: null,
       }),
     ).rejects.toMatchObject({
-      kind: DyadErrorKind.External,
+      kind: KapableErrorKind.External,
       message: expect.stringContaining(
         "Supabase schema snapshot query returned no rows",
       ),

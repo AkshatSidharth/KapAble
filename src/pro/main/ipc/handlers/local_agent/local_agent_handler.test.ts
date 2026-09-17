@@ -99,7 +99,7 @@ function buildTestChat(
  */
 function buildTestSettings(
   overrides: {
-    enableDyadPro?: boolean;
+    enableKapablePro?: boolean;
     hasApiKey?: boolean;
     selectedModel?: { name: string; provider: string };
     enableContextCompaction?: boolean;
@@ -121,10 +121,10 @@ function buildTestSettings(
     agentToolConsents: overrides.agentToolConsents,
   };
 
-  if (overrides.enableDyadPro && overrides.hasApiKey !== false) {
+  if (overrides.enableKapablePro && overrides.hasApiKey !== false) {
     return {
       ...baseSettings,
-      enableDyadPro: true,
+      enableKapablePro: true,
       providerSettings: {
         auto: {
           apiKey: { value: "test-api-key" },
@@ -240,7 +240,7 @@ vi.mock("@/main/settings", () => ({
 }));
 
 vi.mock("@/paths/paths", () => ({
-  getDyadAppPath: vi.fn((appPath: string) => `/mock/apps/${appPath}`),
+  getKapableAppPath: vi.fn((appPath: string) => `/mock/apps/${appPath}`),
 }));
 
 // Track IPC messages sent via safeSend
@@ -299,7 +299,7 @@ vi.mock("@/ipc/utils/token_utils", async (importOriginal) => ({
 vi.mock("@/ipc/utils/provider_options", () => ({
   getProviderOptions: vi.fn(() => ({})),
   getAiHeaders: vi.fn(() => ({})),
-  DYAD_INTERNAL_REQUEST_ID_HEADER: "x-dyad-internal-request-id",
+  KAPABLE_INTERNAL_REQUEST_ID_HEADER: "x-kapable-internal-request-id",
 }));
 
 vi.mock("@/ipc/utils/mcp_manager", () => ({
@@ -322,7 +322,7 @@ vi.mock("@/pro/main/ipc/handlers/local_agent/tool_definitions", () => ({
       name: "read_chat",
       buildXml: (args: { chat_id?: number }, isComplete: boolean) =>
         args.chat_id && !isComplete
-          ? `<dyad-read-chat chat-id="${args.chat_id}" state="pending">Reading chat...</dyad-read-chat>`
+          ? `<kapable-read-chat chat-id="${args.chat_id}" state="pending">Reading chat...</kapable-read-chat>`
           : undefined,
     },
     {
@@ -332,7 +332,7 @@ vi.mock("@/pro/main/ipc/handlers/local_agent/tool_definitions", () => ({
         isComplete: boolean,
       ) => {
         if (!args.path) return undefined;
-        return `<dyad-write path="${args.path}">${args.content ?? ""}${isComplete ? "</dyad-write>" : ""}`;
+        return `<kapable-write path="${args.path}">${args.content ?? ""}${isComplete ? "</kapable-write>" : ""}`;
       },
     },
   ],
@@ -411,7 +411,7 @@ import {
   hasCompletedAppBlueprintQuestionnaire,
   shouldStopAfterAppBlueprintWrite,
 } from "@/pro/main/ipc/handlers/local_agent/local_agent_handler";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { buildAgentToolSet } from "@/pro/main/ipc/handlers/local_agent/tool_definitions";
 import {
   commitAllChanges,
@@ -514,12 +514,12 @@ const handleLocalAgentStream = (
 // Tests
 // ============================================================================
 
-const dyadRequestId = "test-request-id";
+const kapableRequestId = "test-request-id";
 
 describe("Implementer outcome notices", () => {
   it("warns when cancelled Implementer edits may be preserved", () => {
     expect(buildImplementerOutcomeNotices([], ["Fix auth"])).toEqual([
-      '<dyad-status title="Implementer cancelled" state="warning">Cancelled before completion: Fix auth. Partial changes may have been preserved; the root agent remains responsible for reviewing the final diff and choosing appropriate verification.</dyad-status>',
+      '<kapable-status title="Implementer cancelled" state="warning">Cancelled before completion: Fix auth. Partial changes may have been preserved; the root agent remains responsible for reviewing the final diff and choosing appropriate verification.</kapable-status>',
     ]);
   });
 });
@@ -1237,7 +1237,7 @@ describe("handleLocalAgentStream", () => {
 
   it("projects the capability-aware Implementer prompt into the root tool context", async () => {
     const { event } = createFakeEvent();
-    mockSettings = buildTestSettings({ enableDyadPro: true });
+    mockSettings = buildTestSettings({ enableKapablePro: true });
     mockChatData = buildTestChat();
     let seenContextFactory: AgentContext["refreshImplementerContext"];
     let seenSupabaseProviderToolsAvailable: boolean | undefined;
@@ -1271,7 +1271,7 @@ describe("handleLocalAgentStream", () => {
         implementerFallbackSystemPrompt: "Fallback implementer rules",
         supabaseProviderToolsAvailable: false,
         neonProviderToolsAvailable: true,
-        dyadRequestId,
+        kapableRequestId,
       },
     );
 
@@ -1323,7 +1323,7 @@ describe("handleLocalAgentStream", () => {
       async ({ provider, name, runtime, shouldNormalize }) => {
         const runtimeModel = runtime ?? { provider, name };
         const { event } = createFakeEvent();
-        mockSettings = buildTestSettings({ enableDyadPro: true });
+        mockSettings = buildTestSettings({ enableKapablePro: true });
         mockChatData = buildTestChat({
           modelSelection: {
             provider,
@@ -1389,7 +1389,7 @@ describe("handleLocalAgentStream", () => {
           {
             placeholderMessageId: 10,
             systemPrompt: "You are helpful",
-            dyadRequestId,
+            kapableRequestId,
           },
         );
 
@@ -1409,7 +1409,7 @@ describe("handleLocalAgentStream", () => {
   describe("MCP result limits", () => {
     it("bounds direct MCP tool output before it reaches XML or model history", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockMcpServers = [{ id: 42, name: "srv" }];
       const hugeText = "m".repeat(MCP_RESULT_MAX_BYTES * 3);
@@ -1455,20 +1455,20 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
       expect(Buffer.byteLength(returnedOutput, "utf8")).toBeLessThanOrEqual(
         MCP_RESULT_MAX_BYTES,
       );
-      expect(returnedOutput).toContain("_dyadMcpTruncation");
+      expect(returnedOutput).toContain("_kapableMcpTruncation");
       expect(returnedOutput).not.toContain(hugeText);
       const persistedContent = dbOperations.updates
         .filter((operation) => typeof operation.data.content === "string")
         .map((operation) => operation.data.content as string)
         .join("\n");
-      expect(persistedContent).toContain("_dyadMcpTruncation");
+      expect(persistedContent).toContain("_kapableMcpTruncation");
       expect(persistedContent).not.toContain(hugeText);
     });
   });
@@ -1476,7 +1476,7 @@ describe("handleLocalAgentStream", () => {
   describe("referenced app reminders", () => {
     it("advertises only registered referenced-app tools", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([]);
       vi.mocked(buildAgentToolSet).mockReturnValue({
@@ -1490,7 +1490,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
           referencedApps: [
             { appName: "Reference App", appPath: "/tmp/reference-app" },
           ],
@@ -1519,7 +1519,7 @@ describe("handleLocalAgentStream", () => {
       ["KEY_REJECTED", "iteration"],
     ] as const)("preserves %s from %s", async (code, source) => {
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       const billingError = new SubscriptionBillingError(code);
       mockStreamTextImpl = (options) => ({
@@ -1540,7 +1540,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
       expect(succeeded).toBe(false);
@@ -1554,10 +1554,10 @@ describe("handleLocalAgentStream", () => {
   });
 
   describe("Pro status validation", () => {
-    it("should send error when Dyad Pro is not enabled", async () => {
+    it("should send error when KapAble Pro is not enabled", async () => {
       // Arrange
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: false });
+      mockSettings = buildTestSettings({ enableKapablePro: false });
 
       // Act
       await handleLocalAgentStream(
@@ -1567,7 +1567,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -1576,7 +1576,7 @@ describe("handleLocalAgentStream", () => {
       expect(errorMessages).toHaveLength(1);
       expect(errorMessages[0].args[0]).toMatchObject({
         chatId: 1,
-        error: expect.stringContaining("Agent v2 requires Dyad Pro"),
+        error: expect.stringContaining("Agent v2 requires KapAble Pro"),
       });
     });
 
@@ -1584,7 +1584,7 @@ describe("handleLocalAgentStream", () => {
       // Arrange
       const { event, getMessagesByChannel } = createFakeEvent();
       mockSettings = buildTestSettings({
-        enableDyadPro: true,
+        enableKapablePro: true,
         hasApiKey: false,
       });
 
@@ -1596,7 +1596,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -1610,7 +1610,7 @@ describe("handleLocalAgentStream", () => {
     it("should throw error when chat is not found", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = null; // Chat not found
 
       // Act & Assert
@@ -1622,7 +1622,7 @@ describe("handleLocalAgentStream", () => {
           {
             placeholderMessageId: 10,
             systemPrompt: "You are helpful",
-            dyadRequestId,
+            kapableRequestId,
           },
         ),
       ).rejects.toThrow("Chat not found: 999");
@@ -1631,7 +1631,7 @@ describe("handleLocalAgentStream", () => {
     it("should throw error when chat has no associated app", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = { ...buildTestChat(), app: null } as any;
 
       // Act & Assert
@@ -1643,7 +1643,7 @@ describe("handleLocalAgentStream", () => {
           {
             placeholderMessageId: 10,
             systemPrompt: "You are helpful",
-            dyadRequestId,
+            kapableRequestId,
           },
         ),
       ).rejects.toThrow("Chat not found: 1");
@@ -1660,7 +1660,7 @@ describe("handleLocalAgentStream", () => {
       "persists Auto's actual %s/%s source",
       async (provider, connection, isEngineEnabled, source) => {
         const { event } = createFakeEvent();
-        mockSettings = buildTestSettings({ enableDyadPro: true });
+        mockSettings = buildTestSettings({ enableKapablePro: true });
         mockChatData = buildTestChat({
           modelSelection: {
             provider: "auto",
@@ -1700,7 +1700,7 @@ describe("handleLocalAgentStream", () => {
           {
             placeholderMessageId: 10,
             systemPrompt: "You are helpful",
-            dyadRequestId,
+            kapableRequestId,
           },
         );
         expect(
@@ -1726,7 +1726,7 @@ describe("handleLocalAgentStream", () => {
         name: "override-model",
         effortLevel: "high",
       };
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat({
         modelSelection: {
           provider: "anthropic",
@@ -1743,7 +1743,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
           modelSelectionOverride,
         },
       );
@@ -1760,7 +1760,7 @@ describe("handleLocalAgentStream", () => {
   describe("Warning propagation", () => {
     it("replaces partial output with an inline warning for Fable refusals", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([
         { type: "text-delta", id: "text-1", text: "Incomplete output" },
@@ -1778,7 +1778,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -1788,7 +1788,7 @@ describe("handleLocalAgentStream", () => {
       const finalContent = contentUpdates.at(-1)?.data.content as string;
       expect(finalContent).not.toContain("Incomplete output");
       expect(finalContent).toContain(
-        '<dyad-output type="warning" message="Model refused to respond for safety reasons">',
+        '<kapable-output type="warning" message="Model refused to respond for safety reasons">',
       );
       const aiMessagesUpdate = dbOperations.updates.find(
         (update) => update.data.aiMessagesJson !== undefined,
@@ -1805,7 +1805,7 @@ describe("handleLocalAgentStream", () => {
 
     it("reports updated files when a successful workspace mutation precedes a refusal", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       vi.mocked(buildAgentToolSet).mockImplementationOnce((ctx) => {
         ctx.workspaceMutated = true;
@@ -1826,7 +1826,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -1838,7 +1838,7 @@ describe("handleLocalAgentStream", () => {
     it("enables Implementer for Auto Sidekick when the experiment is off", async () => {
       const { event } = createFakeEvent();
       mockSettings = buildTestSettings({
-        enableDyadPro: true,
+        enableKapablePro: true,
         enableImplementerSubagent: false,
         selectedModel: { provider: "auto", name: "auto-sidekick" },
       });
@@ -1859,7 +1859,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -1869,7 +1869,7 @@ describe("handleLocalAgentStream", () => {
     it("propagates the advanced sub-agent setting to root tool context", async () => {
       const { event } = createFakeEvent();
       mockSettings = buildTestSettings({
-        enableDyadPro: true,
+        enableKapablePro: true,
         enableAdvancedSubagents: true,
       });
       mockChatData = buildTestChat();
@@ -1889,7 +1889,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -1899,7 +1899,7 @@ describe("handleLocalAgentStream", () => {
     it("keeps root code search available when spawn_agent consent is Never", async () => {
       const { event } = createFakeEvent();
       mockSettings = buildTestSettings({
-        enableDyadPro: true,
+        enableKapablePro: true,
         agentToolConsents: { spawn_agent: "never" },
       });
       mockChatData = buildTestChat();
@@ -1919,7 +1919,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -1929,7 +1929,7 @@ describe("handleLocalAgentStream", () => {
     it("pauses the prompt queue when a real mutation requires auto-review", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
       mockSettings = buildTestSettings({
-        enableDyadPro: true,
+        enableKapablePro: true,
         enableAutoReview: true,
       });
       mockChatData = buildTestChat();
@@ -1948,7 +1948,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -1964,7 +1964,7 @@ describe("handleLocalAgentStream", () => {
     it("treats successful non-file mutations as workspace updates", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
       mockSettings = buildTestSettings({
-        enableDyadPro: true,
+        enableKapablePro: true,
         enableAutoReview: true,
       });
       mockChatData = buildTestChat();
@@ -1983,7 +1983,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -1999,7 +1999,7 @@ describe("handleLocalAgentStream", () => {
     it("refreshes after opaque MCP calls without starting a Git review", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
       mockSettings = buildTestSettings({
-        enableDyadPro: true,
+        enableKapablePro: true,
         enableAutoReview: true,
       });
       mockChatData = buildTestChat();
@@ -2018,7 +2018,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -2036,7 +2036,7 @@ describe("handleLocalAgentStream", () => {
     it("does not report opaque MCP calls as file updates in read-only mode", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
       mockSettings = buildTestSettings({
-        enableDyadPro: true,
+        enableKapablePro: true,
         enableAutoReview: true,
       });
       mockChatData = buildTestChat();
@@ -2055,7 +2055,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
           readOnly: true,
         },
       );
@@ -2072,7 +2072,7 @@ describe("handleLocalAgentStream", () => {
         entityKey: 1,
         operationId: "local-agent-error",
       } as const;
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
 
       const warningMessage = "Firewall checks were skipped for this install.";
@@ -2103,7 +2103,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -2119,7 +2119,7 @@ describe("handleLocalAgentStream", () => {
 
     it("persists successful shared-module Supabase deploy status into aiMessagesJson", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat({
         supabaseProjectId: "supabase-project-id",
       });
@@ -2127,7 +2127,7 @@ describe("handleLocalAgentStream", () => {
       vi.mocked(deployAllFunctionsIfNeeded).mockImplementationOnce(
         async (ctx) => {
           ctx.onXmlComplete(
-            '<dyad-status title="Supabase functions deployed: 2/2 complete" state="finished">\n2 succeeded\n0 failed\n</dyad-status>',
+            '<kapable-status title="Supabase functions deployed: 2/2 complete" state="finished">\n2 succeeded\n0 failed\n</kapable-status>',
           );
           return { success: true };
         },
@@ -2140,7 +2140,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -2150,7 +2150,7 @@ describe("handleLocalAgentStream", () => {
       const finalContent = contentUpdates[contentUpdates.length - 1].data
         .content as string;
 
-      expect(finalContent).toContain("<dyad-status");
+      expect(finalContent).toContain("<kapable-status");
       expect(finalContent).toContain(
         'title="Supabase functions deployed: 2/2 complete"',
       );
@@ -2166,15 +2166,15 @@ describe("handleLocalAgentStream", () => {
             .aiMessagesJson as { messages: unknown[] }
         ).messages,
       );
-      expect(persistedAiMessages).toContain("<dyad-status");
+      expect(persistedAiMessages).toContain("<kapable-status");
       expect(persistedAiMessages).toContain(
         'title=\\"Supabase functions deployed: 2/2 complete\\"',
       );
     });
 
-    it("appends shared-module Supabase deploy warnings as dyad-output", async () => {
+    it("appends shared-module Supabase deploy warnings as kapable-output", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat({
         supabaseProjectId: "supabase-project-id",
       });
@@ -2192,7 +2192,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -2202,7 +2202,7 @@ describe("handleLocalAgentStream", () => {
       const finalContent = contentUpdates[contentUpdates.length - 1].data
         .content as string;
 
-      expect(finalContent).toContain('<dyad-output type="warning"');
+      expect(finalContent).toContain('<kapable-output type="warning"');
       expect(finalContent).toContain(
         'message="Supabase function deploy warning"',
       );
@@ -2222,15 +2222,15 @@ describe("handleLocalAgentStream", () => {
             .aiMessagesJson as { messages: unknown[] }
         ).messages,
       );
-      expect(persistedAiMessages).toContain('<dyad-output type=\\"warning\\"');
+      expect(persistedAiMessages).toContain('<kapable-output type=\\"warning\\"');
       expect(persistedAiMessages).toContain(
         'message=\\"Supabase function deploy warning\\"',
       );
     });
 
-    it("appends shared-module Supabase deploy failures as dyad-output and still commits", async () => {
+    it("appends shared-module Supabase deploy failures as kapable-output and still commits", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat({
         supabaseProjectId: "supabase-project-id",
       });
@@ -2248,7 +2248,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -2261,7 +2261,7 @@ describe("handleLocalAgentStream", () => {
       const finalContent = contentUpdates[contentUpdates.length - 1].data
         .content as string;
 
-      expect(finalContent).toContain('<dyad-output type="error"');
+      expect(finalContent).toContain('<kapable-output type="error"');
       expect(finalContent).toContain(
         'message="Failed to deploy Supabase functions"',
       );
@@ -2281,7 +2281,7 @@ describe("handleLocalAgentStream", () => {
             .aiMessagesJson as { messages: unknown[] }
         ).messages,
       );
-      expect(persistedAiMessages).toContain('<dyad-output type=\\"error\\"');
+      expect(persistedAiMessages).toContain('<kapable-output type=\\"error\\"');
       expect(persistedAiMessages).toContain(
         'message=\\"Failed to deploy Supabase functions\\"',
       );
@@ -2289,7 +2289,7 @@ describe("handleLocalAgentStream", () => {
 
     it("warns when a sandbox script does not read the current attachment", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([
         {
@@ -2307,7 +2307,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
           currentTurnHasOnDiskAttachment: true,
         },
       );
@@ -2323,7 +2323,7 @@ describe("handleLocalAgentStream", () => {
 
     it("does not warn when a sandbox script reads an attachment path", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([
         {
@@ -2341,7 +2341,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
           currentTurnHasOnDiskAttachment: true,
         },
       );
@@ -2357,7 +2357,7 @@ describe("handleLocalAgentStream", () => {
 
     it("does not warn when a sandbox script uses the attachments alias", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([
         {
@@ -2375,7 +2375,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
           currentTurnHasOnDiskAttachment: true,
         },
       );
@@ -2391,7 +2391,7 @@ describe("handleLocalAgentStream", () => {
 
     it("warns when a sandbox script only mentions attachments in prose", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([
         {
@@ -2409,7 +2409,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
           currentTurnHasOnDiskAttachment: true,
         },
       );
@@ -2427,7 +2427,7 @@ describe("handleLocalAgentStream", () => {
   describe("Context compaction setting", () => {
     it("builds model history from the refreshed chat after pending compaction", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat({
         messages: [
           {
@@ -2470,7 +2470,7 @@ describe("handleLocalAgentStream", () => {
               id: 20,
               role: "assistant",
               content:
-                '<dyad-compaction title="Conversation compacted" state="finished">refreshed summary</dyad-compaction>',
+                '<kapable-compaction title="Conversation compacted" state="finished">refreshed summary</kapable-compaction>',
               isCompactionSummary: true,
               createdAt: new Date("2025-01-01T00:02:00Z"),
             },
@@ -2481,7 +2481,7 @@ describe("handleLocalAgentStream", () => {
         return {
           success: true,
           summary: "refreshed summary",
-          backupPath: ".dyad/chats/1/compaction-test.md",
+          backupPath: ".kapable/chats/1/compaction-test.md",
         };
       });
       mockStreamResult = createFakeStream([
@@ -2495,7 +2495,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -2504,7 +2504,7 @@ describe("handleLocalAgentStream", () => {
         {
           role: "assistant",
           content:
-            '<dyad-compaction title="Conversation compacted" state="finished">refreshed summary</dyad-compaction>',
+            '<kapable-compaction title="Conversation compacted" state="finished">refreshed summary</kapable-compaction>',
         },
         { role: "user", content: "current task" },
       ]);
@@ -2514,7 +2514,7 @@ describe("handleLocalAgentStream", () => {
       // Arrange
       const { event } = createFakeEvent();
       mockSettings = buildTestSettings({
-        enableDyadPro: true,
+        enableKapablePro: true,
         enableContextCompaction: false,
       });
       mockChatData = buildTestChat();
@@ -2529,7 +2529,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -2540,7 +2540,7 @@ describe("handleLocalAgentStream", () => {
     it("unwinds immediately when initial compaction is aborted", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
       const abortController = new AbortController();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockIsChatPendingCompaction.mockResolvedValue(true);
       mockPerformCompaction.mockImplementation(async () => {
@@ -2560,7 +2560,7 @@ describe("handleLocalAgentStream", () => {
           {
             placeholderMessageId: 10,
             systemPrompt: "You are helpful",
-            dyadRequestId,
+            kapableRequestId,
           },
         ),
       ).resolves.toBe(false);
@@ -2596,13 +2596,13 @@ describe("handleLocalAgentStream", () => {
       async ({ ending, hasOutput }) => {
         const { event } = createFakeEvent();
         const controller = new AbortController();
-        mockSettings = buildTestSettings({ enableDyadPro: true });
+        mockSettings = buildTestSettings({ enableKapablePro: true });
         mockChatData = buildTestChat();
         let completeTool: () => void;
         vi.mocked(buildAgentToolSet).mockImplementation((ctx) => {
           completeTool = () =>
             ctx.onXmlComplete(
-              '<dyad-write path="new.ts">saved code</dyad-write>',
+              '<kapable-write path="new.ts">saved code</kapable-write>',
             );
           return {};
         });
@@ -2690,7 +2690,7 @@ describe("handleLocalAgentStream", () => {
           {
             placeholderMessageId: 10,
             systemPrompt: "You are helpful",
-            dyadRequestId,
+            kapableRequestId,
           },
         );
         if (ending === "stream error") await expect(run).resolves.toBe(false);
@@ -2735,7 +2735,7 @@ describe("handleLocalAgentStream", () => {
       "keeps the compacted base across later SDK steps and %s",
       async (resume) => {
         const { event } = createFakeEvent();
-        mockSettings = buildTestSettings({ enableDyadPro: true });
+        mockSettings = buildTestSettings({ enableKapablePro: true });
         const oldAssistant = {
           role: "assistant",
           content: [
@@ -2820,7 +2820,7 @@ describe("handleLocalAgentStream", () => {
           return {
             success: true,
             summary: "compacted base",
-            backupPath: ".dyad/chats/1/compaction-test.md",
+            backupPath: ".kapable/chats/1/compaction-test.md",
           };
         });
         const toolPair = (id: string) => [
@@ -2981,7 +2981,7 @@ describe("handleLocalAgentStream", () => {
           {
             placeholderMessageId: 10,
             systemPrompt: "You are helpful",
-            dyadRequestId,
+            kapableRequestId,
           },
         );
         expect(mockPerformCompaction).toHaveBeenCalledTimes(1);
@@ -3072,7 +3072,7 @@ describe("handleLocalAgentStream", () => {
       "preserves %s instructions and the in-flight tail across compaction and retry",
       async (kind) => {
         const { event } = createFakeEvent();
-        mockSettings = buildTestSettings({ enableDyadPro: true });
+        mockSettings = buildTestSettings({ enableKapablePro: true });
         mockChatData = buildTestChat();
 
         vi.mocked(buildAgentToolSet).mockImplementation((ctx) => {
@@ -3123,7 +3123,7 @@ describe("handleLocalAgentStream", () => {
           return {
             success: true,
             summary: "Conversation compacted.",
-            backupPath: ".dyad/chats/1/compaction-test.md",
+            backupPath: ".kapable/chats/1/compaction-test.md",
           };
         });
 
@@ -3282,7 +3282,7 @@ describe("handleLocalAgentStream", () => {
           {
             placeholderMessageId: 10,
             systemPrompt: "You are helpful",
-            dyadRequestId,
+            kapableRequestId,
           },
         );
 
@@ -3314,7 +3314,7 @@ describe("handleLocalAgentStream", () => {
     it("should compact between steps when token usage crosses threshold", async () => {
       // Arrange
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       const t0 = new Date("2025-01-01T00:00:00Z");
       const t1 = new Date("2025-01-01T00:01:00Z");
       const t2 = new Date("2025-01-01T00:02:00Z");
@@ -3350,7 +3350,7 @@ describe("handleLocalAgentStream", () => {
               id: 20,
               role: "assistant",
               content:
-                '<dyad-compaction title="Conversation compacted" state="finished">mid-turn summary</dyad-compaction>',
+                '<kapable-compaction title="Conversation compacted" state="finished">mid-turn summary</kapable-compaction>',
               isCompactionSummary: true,
               createdAt: new Date("2025-01-01T00:03:30Z"),
             },
@@ -3359,7 +3359,7 @@ describe("handleLocalAgentStream", () => {
         return {
           success: true,
           summary: "mid-turn summary",
-          backupPath: ".dyad/chats/1/compaction-test.md",
+          backupPath: ".kapable/chats/1/compaction-test.md",
         };
       });
 
@@ -3417,7 +3417,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -3428,7 +3428,7 @@ describe("handleLocalAgentStream", () => {
         expect.anything(),
         1,
         "/mock/apps/test-app-path",
-        dyadRequestId,
+        kapableRequestId,
         expect.any(Function),
         {
           createdAtStrategy: "now",
@@ -3464,7 +3464,7 @@ describe("handleLocalAgentStream", () => {
       const compactionIndex = finalContent.indexOf("Conversation compacted");
       const doneIndex = finalContent.indexOf("done");
       const backupPathIndex = finalContent.indexOf(
-        ".dyad/chats/1/compaction-test.md",
+        ".kapable/chats/1/compaction-test.md",
       );
 
       expect(beforeCompactionIndex).toBeGreaterThanOrEqual(0);
@@ -3482,7 +3482,7 @@ describe("handleLocalAgentStream", () => {
 
     it("compacts before the next step when a tool error projects usage over the threshold", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockCheckAndMarkForCompaction.mockImplementation(
         async (_chatId, tokens) => tokens >= 220_000,
@@ -3545,7 +3545,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -3558,7 +3558,7 @@ describe("handleLocalAgentStream", () => {
     it("should persist post-compaction response messages without reshaping", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       const t0 = new Date("2025-01-01T00:00:00Z");
       const t1 = new Date("2025-01-01T00:01:00Z");
       const t2 = new Date("2025-01-01T00:02:00Z");
@@ -3594,7 +3594,7 @@ describe("handleLocalAgentStream", () => {
               id: 20,
               role: "assistant",
               content:
-                '<dyad-compaction title="Conversation compacted" state="finished">mid-turn summary</dyad-compaction>',
+                '<kapable-compaction title="Conversation compacted" state="finished">mid-turn summary</kapable-compaction>',
               isCompactionSummary: true,
               createdAt: new Date("2025-01-01T00:03:30Z"),
             },
@@ -3603,7 +3603,7 @@ describe("handleLocalAgentStream", () => {
         return {
           success: true,
           summary: "mid-turn summary",
-          backupPath: ".dyad/chats/1/compaction-test.md",
+          backupPath: ".kapable/chats/1/compaction-test.md",
         };
       });
 
@@ -3725,7 +3725,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -3747,7 +3747,7 @@ describe("handleLocalAgentStream", () => {
   describe("Stream processing - text content", () => {
     it("does not send AI SDK history in full renderer message chunks", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat({
         messages: [
           {
@@ -3777,7 +3777,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -3799,7 +3799,7 @@ describe("handleLocalAgentStream", () => {
         entityKey: 1,
         operationId: "local-agent-success",
       } as const;
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat({
         messages: [{ id: 1, role: "user", content: "Hello" }],
       });
@@ -3816,7 +3816,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -3857,7 +3857,7 @@ describe("handleLocalAgentStream", () => {
     it("should retry and resume when a stream terminates transiently", async () => {
       // Arrange
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
 
       const streamMessagesByAttempt: any[][] = [];
@@ -3901,7 +3901,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -3938,7 +3938,7 @@ describe("handleLocalAgentStream", () => {
     it("should replay emitted tool events before retrying a terminated stream", async () => {
       // Arrange
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
 
       const streamMessagesByAttempt: any[][] = [];
@@ -3994,7 +3994,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4035,7 +4035,7 @@ describe("handleLocalAgentStream", () => {
     it("should retry and resume when the provider emits a retryable server error", async () => {
       // Arrange
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
 
       const streamMessagesByAttempt: any[][] = [];
@@ -4087,7 +4087,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4116,7 +4116,7 @@ describe("handleLocalAgentStream", () => {
     it("should report circular provider errors without overflowing the stack", async () => {
       // Arrange
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
 
       const circularStreamError: Record<string, unknown> = {
@@ -4141,7 +4141,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4159,7 +4159,7 @@ describe("handleLocalAgentStream", () => {
     it("should wrap reasoning content in think tags", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([
         { type: "reasoning-start" },
@@ -4176,7 +4176,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4197,7 +4197,7 @@ describe("handleLocalAgentStream", () => {
     it("should close thinking block when transitioning to text", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       // Simulate reasoning-delta without explicit reasoning-end before text
       mockStreamResult = createFakeStream([
@@ -4213,7 +4213,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4238,7 +4238,7 @@ describe("handleLocalAgentStream", () => {
   describe("Stream processing - pre-execution tool errors", () => {
     it("does not persist a completed tool card before validation succeeds", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       vi.mocked(buildAgentToolSet).mockReturnValue({ write_file: {} });
       const invalidInput = { path: "src/App.tsx" };
@@ -4261,7 +4261,7 @@ describe("handleLocalAgentStream", () => {
           completedCardPersistedBeforeValidation = dbOperations.updates.some(
             (update) =>
               typeof update.data.content === "string" &&
-              update.data.content.includes("<dyad-write"),
+              update.data.content.includes("<kapable-write"),
           );
           yield {
             type: "tool-call",
@@ -4296,7 +4296,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4305,16 +4305,16 @@ describe("handleLocalAgentStream", () => {
         .reverse()
         .find((update) => typeof update.data.content === "string")?.data
         .content as string;
-      expect(finalContent).not.toContain("<dyad-write");
+      expect(finalContent).not.toContain("<kapable-write");
       expect(finalContent).toContain(
-        '<dyad-status title="Tool &quot;write_file&quot; failed" state="error">',
+        '<kapable-status title="Tool &quot;write_file&quot; failed" state="error">',
       );
       expect(finalContent).toContain(validationMessage);
     });
 
     it("persists a completed tool card after validation succeeds", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       vi.mocked(buildAgentToolSet).mockReturnValue({ write_file: {} });
       const validInput = {
@@ -4339,7 +4339,7 @@ describe("handleLocalAgentStream", () => {
           completedCardPersistedBeforeValidation = dbOperations.updates.some(
             (update) =>
               typeof update.data.content === "string" &&
-              update.data.content.includes("<dyad-write"),
+              update.data.content.includes("<kapable-write"),
           );
           yield {
             type: "tool-call",
@@ -4359,7 +4359,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4369,14 +4369,14 @@ describe("handleLocalAgentStream", () => {
         .find((update) => typeof update.data.content === "string")?.data
         .content as string;
       expect(finalContent).toContain(
-        '<dyad-write path="src/App.tsx">export default function App() {}</dyad-write>',
+        '<kapable-write path="src/App.tsx">export default function App() {}</kapable-write>',
       );
-      expect(finalContent.match(/<dyad-write/g)).toHaveLength(1);
+      expect(finalContent.match(/<kapable-write/g)).toHaveLength(1);
     });
 
     it("replaces an invalid tool preview with a persistent error status", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       vi.mocked(buildAgentToolSet).mockReturnValue({ read_chat: {} });
 
@@ -4440,7 +4440,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4454,7 +4454,7 @@ describe("handleLocalAgentStream", () => {
       expect(
         (pendingPreview!.args[0] as any).streamingPreview.content,
       ).toContain(
-        '<dyad-read-chat chat-id="703" state="pending">Reading chat...',
+        '<kapable-read-chat chat-id="703" state="pending">Reading chat...',
       );
       expect(
         (previewChunks.at(-1)!.args[0] as any).streamingPreview.content,
@@ -4462,7 +4462,7 @@ describe("handleLocalAgentStream", () => {
 
       const statusChunkIndex = chunks.findIndex((message) =>
         (message.args[0] as any).streamingPatch?.content?.includes(
-          '<dyad-status title="Tool &quot;read_chat&quot; failed" state="error">',
+          '<kapable-status title="Tool &quot;read_chat&quot; failed" state="error">',
         ),
       );
       const clearPreviewIndex = chunks.findIndex(
@@ -4476,16 +4476,16 @@ describe("handleLocalAgentStream", () => {
         .find((update) => typeof update.data.content === "string")?.data
         .content as string;
       expect(finalContent).toContain(
-        '<dyad-status title="Tool &quot;read_chat&quot; failed" state="error">',
+        '<kapable-status title="Tool &quot;read_chat&quot; failed" state="error">',
       );
       expect(finalContent).toContain(validationMessage);
-      expect(finalContent).toContain("</dyad-status>");
+      expect(finalContent).toContain("</kapable-status>");
       expect(finalContent).toContain("I could not inspect that citation.");
     });
 
     it("does not clear another tool call's active preview", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       vi.mocked(buildAgentToolSet).mockReturnValue({ read_chat: {} });
       let previewClearedBeforeStreamEnd: boolean | undefined;
@@ -4538,7 +4538,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4564,7 +4564,7 @@ describe("handleLocalAgentStream", () => {
     it("injects a non-persisted reflection message after invalid planning_questionnaire input", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat({
         messages: [{ id: 1, role: "user", content: "Help me plan this app" }],
       });
@@ -4653,7 +4653,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4692,7 +4692,7 @@ describe("handleLocalAgentStream", () => {
     it("does not stop the stream when set_chat_summary is called", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([]);
 
@@ -4704,7 +4704,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4718,7 +4718,7 @@ describe("handleLocalAgentStream", () => {
     it("runs a follow-up pass when the first pass ends with set_chat_summary and incomplete todos remain", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
 
       vi.mocked(buildAgentToolSet).mockImplementation((ctx) => {
@@ -4820,7 +4820,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4846,7 +4846,7 @@ describe("handleLocalAgentStream", () => {
   describe("Abort handling", () => {
     it("runs a synthesis pass with completed Explorer reports before finalizing", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       vi.mocked(buildAgentToolSet).mockImplementation((ctx) => {
         if (!ctx.spawnedSubagentThreadIds?.includes("explorer-1")) {
@@ -4876,7 +4876,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4893,7 +4893,7 @@ describe("handleLocalAgentStream", () => {
 
     it("does not inject an Explorer report already returned by blocking spawn", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       vi.mocked(buildAgentToolSet).mockImplementation((ctx) => {
         ctx.spawnedSubagentThreadIds?.push("explorer-1");
@@ -4911,7 +4911,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4921,7 +4921,7 @@ describe("handleLocalAgentStream", () => {
 
     it("releases the root finalization fence when cancellation wins after the join", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([
         { type: "text-delta", text: "Finishing" },
@@ -4941,7 +4941,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -4955,7 +4955,7 @@ describe("handleLocalAgentStream", () => {
 
     it("reports stored Implementer errors and latest activity", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       vi.mocked(buildAgentToolSet).mockImplementationOnce((ctx) => {
         ctx.spawnedSubagentThreadIds?.push("implementer-1");
@@ -4989,7 +4989,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -5016,7 +5016,7 @@ describe("handleLocalAgentStream", () => {
 
     it("reports a failed Implementer when no stored detail exists", async () => {
       const { event, getMessagesByChannel } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       vi.mocked(buildAgentToolSet).mockImplementationOnce((ctx) => {
         ctx.spawnedSubagentThreadIds?.push("implementer-1");
@@ -5046,7 +5046,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -5060,7 +5060,7 @@ describe("handleLocalAgentStream", () => {
 
     it("cancels spawned sub-agents when the root stream fails", async () => {
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       vi.mocked(buildAgentToolSet).mockImplementationOnce((ctx) => {
         expect(ctx.spawnedSubagentThreadIds).toBeDefined();
@@ -5082,7 +5082,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -5095,7 +5095,7 @@ describe("handleLocalAgentStream", () => {
     it("should stop processing stream chunks when abort signal is triggered", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
 
       const abortController = new AbortController();
@@ -5122,7 +5122,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -5143,7 +5143,7 @@ describe("handleLocalAgentStream", () => {
     it("should save partial response with cancellation note when aborted", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
 
       const abortController = new AbortController();
@@ -5153,7 +5153,7 @@ describe("handleLocalAgentStream", () => {
           yield { type: "text-delta", text: "Partial response" };
           abortController.abort();
           // This will not be processed due to abort
-          throw new DyadError("Simulated abort error", DyadErrorKind.Internal);
+          throw new KapableError("Simulated abort error", KapableErrorKind.Internal);
         })(),
         response: Promise.resolve({ messages: [] }),
       };
@@ -5166,7 +5166,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -5185,7 +5185,7 @@ describe("handleLocalAgentStream", () => {
     it("should save commit hash after successful stream", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([
         { type: "text-delta", text: "Done" },
@@ -5199,7 +5199,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 
@@ -5214,7 +5214,7 @@ describe("handleLocalAgentStream", () => {
     it("should set approval state to approved after completion", async () => {
       // Arrange
       const { event } = createFakeEvent();
-      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockSettings = buildTestSettings({ enableKapablePro: true });
       mockChatData = buildTestChat();
       mockStreamResult = createFakeStream([
         { type: "text-delta", text: "Done" },
@@ -5228,7 +5228,7 @@ describe("handleLocalAgentStream", () => {
         {
           placeholderMessageId: 10,
           systemPrompt: "You are helpful",
-          dyadRequestId,
+          kapableRequestId,
         },
       );
 

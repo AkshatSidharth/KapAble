@@ -3,16 +3,16 @@
 ## Architecture and UX
 
 The Subscription section of the model picker connects a ChatGPT account through
-browser OAuth (PKCE). Dyad's main process stores its own credentials using
+browser OAuth (PKCE). KapAble's main process stores its own credentials using
 Electron safeStorage, refreshes them, and calls the Codex Responses endpoint
 directly. Credentials never cross renderer IPC and are not imported from another
 application. An available OS keyring is required; there is no plaintext fallback.
 
-Free Dyad users can connect their ChatGPT subscription without a Dyad Pro key.
-Subscription inference has no Dyad usage fees when Pro is off or no Pro key is
+Free KapAble users can connect their ChatGPT subscription without a KapAble Pro key.
+Subscription inference has no KapAble usage fees when Pro is off or no Pro key is
 configured; the existing Basic Agent quota and free-tier feature limits still
 apply. With Pro enabled, Build, Ask, and Plan subscription inference also skips
-Dyad credit checks and usage charges, including with an exhausted Dyad balance.
+KapAble credit checks and usage charges, including with an exhausted KapAble balance.
 Agent mode retains its existing credit checks and usage charges. The resolved
 chat mode controls billing, not the global default mode. Explicit Pro-credit
 routing and local/custom-provider billing are unchanged.
@@ -27,9 +27,9 @@ adds the model to Recents and sets Agent as
 the selected and default mode, then lets a saved first prompt resume. Free users
 connecting from the model picker's Subscription submenu get the same defaults.
 
-This is a transport for Dyad's existing agent, not the Codex CLI's agent loop.
-Dyad still owns prompts, tool execution, permissions, file edits, preview and undo.
-No extra shell tool is introduced. Existing Dyad tool permissions still apply.
+This is a transport for KapAble's existing agent, not the Codex CLI's agent loop.
+KapAble still owns prompts, tool execution, permissions, file edits, preview and undo.
+No extra shell tool is introduced. Existing KapAble tool permissions still apply.
 Model availability is ultimately decided by the subscription service, not the API
 catalog; unavailable models fail without switching to a paid API automatically.
 
@@ -39,7 +39,7 @@ The Subscription entry carries a **New** chip. Its panel opens beside the model
 list when either side has room; otherwise it replaces the list with a **Back to
 models** action. It displays the ChatGPT tier from `chatgpt_plan_type` inside the
 OAuth token's `https://api.openai.com/auth` claim, or **Plan unavailable**.
-The tier is refreshed with the credentials and never used to bypass Dyad quotas.
+The tier is refreshed with the credentials and never used to bypass KapAble quotas.
 Models present in the effective subscription catalog show a `ChatGPT plan` chip when subscription
 usage is selected, with the tooltip `Uses your connected ChatGPT subscription`.
 Models outside that catalog require their provider API key for free users, or
@@ -59,7 +59,7 @@ Changing it affects the next turn in the same chat, never an in-flight turn.
 While Pro is enabled, gateway-supported providers use Pro inference. Custom
 providers retain their own API keys and endpoints, and Ollama/LM Studio remain
 local; their usage is reported to Engine for billing. With Pro off, local and
-custom requests have no Dyad usage reporting. Legacy per-chat API-key choices
+custom requests have no KapAble usage reporting. Legacy per-chat API-key choices
 do not override this policy. Auto, Auto Sidekick and Auto Balanced apply subscription
 routing after resolving each concrete model. Auto keeps its existing candidate
 order across Agent, Build, Ask and Plan. Eligible OpenAI models use the connected
@@ -72,7 +72,7 @@ Engine-owned tool services and opaque server-side model selections retain their
 existing routes; the client cannot redirect a model selected inside a remote service.
 
 Browser OAuth success returns a static celebration page with automatic
-`dyad://chatgpt-connected` navigation and a manual Open Dyad button. No credentials
+`kapable://chatgpt-connected` navigation and a manual Open KapAble button. No credentials
 are in that link. The app only shows success for a verified pending local
 connection. Pricing is explained on the website rather than in the setup or
 subscription menu. Fast mode uses a toggle and disconnect has an action icon.
@@ -96,17 +96,17 @@ visible messages and tool calls/results. It does not restart the agent or tools.
 After the retried stream completes successfully, a bounded in-memory cache
 remembers hashes of the excluded items for that chat, subscription account,
 endpoint, and model. Later requests omit those items while preserving new
-reasoning. Original database history stays intact. Restarting Dyad or evicting
+reasoning. Original database history stays intact. Restarting KapAble or evicting
 old cache entries may require another recovery retry. Live verification of
 account and connection switches remains necessary.
 
 ## BYO credit preflight
 
-Before durable turn acceptance, Dyad resolves the global source and validates
+Before durable turn acceptance, KapAble resolves the global source and validates
 subscription credentials where applicable, and credits only when Pro is enabled.
-Free subscription requests never check Dyad credits or send usage to Engine.
+Free subscription requests never check KapAble credits or send usage to Engine.
 The credit check issues
-an opaque, main-only admission for the turn, bound to the checked Dyad key. The
+an opaque, main-only admission for the turn, bound to the checked KapAble key. The
 first subscription, local, or custom-provider request consumes it once instead
 of repeating the check after acceptance. A fail-open preflight issues the same
 admission. It is never serialized or persisted, cannot be copied or reused, and
@@ -114,14 +114,14 @@ expires when its turn is cancelled. A mismatched account retires the admission
 and requires a fresh check.
 
 Subsequent agent requests and callers without admission fetch the existing
-`GET https://api.dyad.sh/v1/user/info` using the Dyad billing key for that request.
+`GET https://api.kapable.sh/v1/user/info` using the KapAble billing key for that request.
 These are fresh main-process lookups, not the five-minute UI cache or the UI's
 test-build mock balance. Recreating a model client does not recreate admission.
 
 - Positive `totalCredits - usedCredits`: proceed.
 - Confirmed exhausted balance (including HTTP 200 with exhausted counts) or HTTP
   402: block before inference and ask the user to add credits.
-- HTTP 401/403: block and ask the user to update the Dyad key.
+- HTTP 401/403: block and ask the user to update the KapAble key.
 - Timeout (ten seconds), network failure, rate limiting, service errors, or
   invalid response: log a redacted warning and **allow generation**. No retry.
 - User cancellation is not an outage; it stops the request.
@@ -136,7 +136,7 @@ reporting remains a single attempt with no replay.
 
 ## Engine contract: POST /track-usage
 
-Authentication is the user's **Dyad Pro key**, never their ChatGPT token. The UUID
+Authentication is the user's **KapAble Pro key**, never their ChatGPT token. The UUID
 `id` is for correlation only, not idempotency. There is no idempotency header.
 Example body (all values are illustrative, not credentials):
 
@@ -162,7 +162,7 @@ OpenAI-compatible providers to include usage; missing counts are never estimated
 Deploy the paired Engine change accepting these connection values before the client.
 
 Engine validates counts, authenticates the billing account, and attempts one
-charge through `dyad/dyad-synthetic-cost-tracking`. On success it responds:
+charge through `kapable/kapable-synthetic-cost-tracking`. On success it responds:
 
 ```json
 { "id": "f6d2a682-63bd-4e0a-a36a-78be594c3f93", "chargedUsd": 0.000015 }
@@ -171,7 +171,7 @@ charge through `dyad/dyad-synthetic-cost-tracking`. On success it responds:
 Engine charges **$0.02 per million total tokens** for model IDs containing
 `-luna`, `-mini`, or `-nano`; **$0.10 per million total tokens** for all other
 models, including uncatalogued models. Matching uses the resolved model ID, not
-the display name. Dyad does not calculate or submit a price.
+the display name. KapAble does not calculate or submit a price.
 
 `totalTokens = cachedInputTokens + uncachedInputTokens + outputTokens`. Cached
 input means cache reads; cache creation/write tokens count as uncached input.
@@ -216,15 +216,15 @@ keyring and a ChatGPT subscription:
 
 ```sh
 npm run build
-DYAD_LIVE_SUBSCRIPTION_SMOKE=1 PLAYWRIGHT_HTML_OPEN=never npm run e2e -- codex_subscription_live.spec.ts
+KAPABLE_LIVE_SUBSCRIPTION_SMOKE=1 PLAYWRIGHT_HTML_OPEN=never npm run e2e -- codex_subscription_live.spec.ts
 ```
 
 Complete the official browser sign-in locally; never paste credentials into logs
-or chat. The opt-in test uses real subscription inference through packaged Dyad
+or chat. The opt-in test uses real subscription inference through packaged KapAble
 and a **stub Engine receipt only**. It checks a file-tool edit, a same-chat
 follow-up, model attribution and usage reports; it is not a production charge
 test. Browser traces are disabled and the temporary profile's connection is
-removed on exit. `DYAD_LIVE_SUBSCRIPTION_MODEL` can select an available model.
+removed on exit. `KAPABLE_LIVE_SUBSCRIPTION_MODEL` can select an available model.
 
 Before release, additionally exercise subscription-to-API/Pro switches with
 real history, cancellation recovery, read-only modes, preview and undo on the

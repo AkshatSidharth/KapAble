@@ -1,5 +1,5 @@
 import log from "electron-log";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   BufferedProcessSpawnError,
   DEFAULT_BUFFERED_PROCESS_TIMEOUT_MS,
@@ -71,9 +71,9 @@ export async function runPortalMigrationCommand({
   } catch (error) {
     if (error instanceof BufferedProcessSpawnError) {
       logger.error(`Failed to spawn migrate:create for app ${appId}:`, error);
-      throw new DyadError(
+      throw new KapableError(
         `Failed to run migration command: ${error.message}\n\nOutput:\n${error.stdout}\n\nErrors:\n${error.stderr}`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
         { cause: error },
       );
     }
@@ -86,9 +86,9 @@ export async function runPortalMigrationCommand({
 
   if (result.timedOut) {
     logger.error(`migrate:create timed out for app ${appId}`);
-    throw new DyadError(
+    throw new KapableError(
       `Migration creation timed out after ${timeoutMs} ms\n\n${combinedOutput}`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 
@@ -101,9 +101,9 @@ export async function runPortalMigrationCommand({
     logger.error(
       `migrate:create completed successfully for app ${appId} but no migration was created`,
     );
-    throw new DyadError(
+    throw new KapableError(
       "No migration was created because no changes were found.",
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
     );
   }
 
@@ -111,8 +111,8 @@ export async function runPortalMigrationCommand({
     ? `signal ${result.signal}`
     : `exit code ${result.code}`;
   logger.error(`migrate:create failed for app ${appId} with ${failureReason}`);
-  throw new DyadError(
+  throw new KapableError(
     `Migration creation failed (${failureReason})\n\n${combinedOutput}`,
-    DyadErrorKind.External,
+    KapableErrorKind.External,
   );
 }

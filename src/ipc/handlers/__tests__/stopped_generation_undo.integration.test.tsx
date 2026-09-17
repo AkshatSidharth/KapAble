@@ -28,8 +28,8 @@ describe("stopped generation undo (integration)", () => {
       autoApprove: true,
       settings: {
         isTestMode: true,
-        enableDyadPro: true,
-        providerSettings: { auto: { apiKey: { value: "testdyadkey" } } },
+        enableKapablePro: true,
+        providerSettings: { auto: { apiKey: { value: "testkapablekey" } } },
         enableCodeExplorer: false,
       },
     });

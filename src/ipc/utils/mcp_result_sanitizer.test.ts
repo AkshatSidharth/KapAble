@@ -27,7 +27,7 @@ describe("sanitizeMcpToolResult", () => {
     const result = sanitizeMcpToolResult("x".repeat(MCP_RESULT_MAX_BYTES * 4));
 
     expect(result.truncated).toBe(true);
-    expect(result.serialized).toContain("Dyad truncated MCP result");
+    expect(result.serialized).toContain("KapAble truncated MCP result");
     expect(Buffer.byteLength(result.serialized, "utf8")).toBeLessThanOrEqual(
       MCP_RESULT_MAX_BYTES,
     );
@@ -99,8 +99,8 @@ describe("sanitizeMcpToolResult", () => {
     const parsed = JSON.parse(result.serialized);
 
     expect(result.truncated).toBe(true);
-    expect(parsed._dyadMcpTruncation.reasons).toEqual(["byte-budget"]);
-    expect(parsed._dyadMcpTruncation.limits).toEqual({
+    expect(parsed._kapableMcpTruncation.reasons).toEqual(["byte-budget"]);
+    expect(parsed._kapableMcpTruncation.limits).toEqual({
       maxBytes: MCP_RESULT_MAX_BYTES,
     });
   });
@@ -131,7 +131,7 @@ describe("sanitizeMcpToolResult", () => {
     const result = sanitizeMcpToolResult(input);
     const parsed = JSON.parse(result.serialized);
     expect(result.truncated).toBe(true);
-    expect(parsed.bytes._dyadOmittedBinary.bytes).toBe(
+    expect(parsed.bytes._kapableOmittedBinary.bytes).toBe(
       MCP_RESULT_MAX_BYTES * 2,
     );
     expect(parsed.self).toContain("circular");

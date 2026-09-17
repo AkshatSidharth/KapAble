@@ -5,7 +5,7 @@ import { chats } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getLogs } from "@/lib/log_store";
 import type { ConsoleEntry } from "@/ipc/types";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 const readLogsSchema = z.object({
   type: z
@@ -124,9 +124,9 @@ export const readLogsTool: ToolDefinition<z.infer<typeof readLogsSchema>> = {
 
     const summary = parts.join(" | ");
 
-    return `<dyad-read-logs ${filters.join(" ")}>
+    return `<kapable-read-logs ${filters.join(" ")}>
 ${summary}
-</dyad-read-logs>`;
+</kapable-read-logs>`;
   },
 
   execute: async (args, ctx: AgentContext) => {
@@ -137,7 +137,7 @@ ${summary}
     });
 
     if (!chat || !chat.app) {
-      throw new DyadError("Chat or app not found.", DyadErrorKind.NotFound);
+      throw new KapableError("Chat or app not found.", KapableErrorKind.NotFound);
     }
 
     const appId = chat.app.id;
@@ -211,7 +211,7 @@ ${summary}
 
     // Output the complete results in a single tag
     ctx.onXmlComplete(
-      `<dyad-read-logs ${filters.join(" ")} count="${recentLogs.length}">\n${summary}\n\n${escapeXmlContent(formattedLogs)}\n</dyad-read-logs>`,
+      `<kapable-read-logs ${filters.join(" ")} count="${recentLogs.length}">\n${summary}\n\n${escapeXmlContent(formattedLogs)}\n</kapable-read-logs>`,
     );
 
     return formattedLogs;

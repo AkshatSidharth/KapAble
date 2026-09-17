@@ -41,7 +41,7 @@ import { IssueForm } from "./IssueForm";
 import { ScreenshotField } from "./ScreenshotField";
 import { ReportDisclosures } from "./ReportDisclosures";
 
-const UPLOAD_URL_ENDPOINT = "https://upload-logs.dyad.sh/generate-upload-url";
+const UPLOAD_URL_ENDPOINT = "https://upload-logs.kapable.sh/generate-upload-url";
 
 /**
  * How long the dialog gets to leave the screen before the capture. Its close
@@ -110,10 +110,10 @@ const screenTransition = {
 
 function openGitHubIssue(params: {
   body: string;
-  isDyadProUser: unknown;
+  isKapableProUser: unknown;
 }): Promise<void> {
   const labels = ["bug"];
-  if (params.isDyadProUser) labels.push("pro");
+  if (params.isKapableProUser) labels.push("pro");
   return ipc.system.openExternalUrl(
     buildIssueUrl({ title: ISSUE_TITLE, labels, body: params.body }),
   );
@@ -259,7 +259,7 @@ export function HelpDialog() {
     : null;
   const { userBudget } = useUserBudgetInfo();
   const posthog = usePostHog();
-  const isDyadProUser = settings?.providerSettings?.["auto"]?.apiKey?.value;
+  const isKapableProUser = settings?.providerSettings?.["auto"]?.apiKey?.value;
 
   // ---------------------------------------------------------------------------
   // Navigation and lifecycle
@@ -808,7 +808,7 @@ export function HelpDialog() {
         diagnostics,
         sessionId,
       }),
-      isDyadProUser,
+      isKapableProUser,
     });
 
     // Only tears down the report it filed: the reporter may have moved on.
@@ -834,20 +834,20 @@ export function HelpDialog() {
       </DialogHeader>
       <DialogDescription>{t("home:help.helpOptions")}</DialogDescription>
       <div className="flex flex-col w-full mt-4 space-y-5">
-        {isDyadProUser ? (
+        {isKapableProUser ? (
           <Button
             variant="default"
             onClick={() => setIsHelpBotOpen(true)}
             className="w-full py-6 border-primary/50 shadow-sm shadow-primary/10 transition-all hover:shadow-md hover:shadow-primary/15"
           >
-            <SparklesIcon className="mr-2 h-5 w-5" /> Chat with Dyad help bot
+            <SparklesIcon className="mr-2 h-5 w-5" /> Chat with KapAble help bot
             (Pro)
           </Button>
         ) : (
           <Button
             variant="outline"
             onClick={() =>
-              ipc.system.openExternalUrl("https://www.dyad.sh/docs")
+              ipc.system.openExternalUrl("https://www.kapable.sh/docs")
             }
             className="w-full py-6 bg-(--background-lightest)"
           >

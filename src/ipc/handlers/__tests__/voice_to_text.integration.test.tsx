@@ -11,10 +11,10 @@ import {
 import { h } from "@/testing/hybrid.setup";
 
 const PRO_SETTINGS: Partial<UserSettings> = {
-  enableDyadPro: true,
+  enableKapablePro: true,
   providerSettings: {
     auto: {
-      apiKey: { value: "testdyadkey" },
+      apiKey: { value: "testkapablekey" },
     },
   },
 };
@@ -26,8 +26,8 @@ describe("voice-to-text chat input controls (integration)", () => {
     harness = await setupHybridChatHarness({
       electronMock: h,
       autoApprove: true,
-      // Tests below enable Dyad Pro, which triggers free-quota fetches; route
-      // them to the fake engine instead of the real engine.dyad.sh.
+      // Tests below enable KapAble Pro, which triggers free-quota fetches; route
+      // them to the fake engine instead of the real engine.kapable.sh.
       engine: true,
       settings: { isTestMode: true },
     });
@@ -36,7 +36,7 @@ describe("voice-to-text chat input controls (integration)", () => {
   afterEach(() => {
     cleanup();
     writeSettings({
-      enableDyadPro: false,
+      enableKapablePro: false,
       providerSettings: {},
     });
   });
@@ -59,7 +59,7 @@ describe("voice-to-text chat input controls (integration)", () => {
 
   it("shows the locked mic button for non-Pro users", async () => {
     writeSettings({
-      enableDyadPro: false,
+      enableKapablePro: false,
       providerSettings: {},
     });
     const chatId = await harness.createChat();

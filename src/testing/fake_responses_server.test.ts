@@ -13,7 +13,7 @@ describe("fake Responses API routing", () => {
   let dumpDir: string;
 
   beforeAll(async () => {
-    dumpDir = await fs.mkdtemp(path.join(os.tmpdir(), "dyad-responses-test-"));
+    dumpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kapable-responses-test-"));
     vi.stubEnv("FAKE_LLM_DUMP_DIR", dumpDir);
     vi.stubEnv("FAKE_LLM_QUIET", "1");
     server = await startFakeLlmServer();
@@ -25,7 +25,7 @@ describe("fake Responses API routing", () => {
     await fs.rm(dumpDir, { recursive: true, force: true });
   });
 
-  function request(input: string, stream = false, key = "testdyadkey") {
+  function request(input: string, stream = false, key = "testkapablekey") {
     return fetch(`${server.url}/engine/v1/responses`, {
       method: "POST",
       headers: {
@@ -47,7 +47,7 @@ describe("fake Responses API routing", () => {
     const response = await request(
       "What number is after four?",
       true,
-      "invalid-dyad-key",
+      "invalid-kapable-key",
     );
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("text/event-stream");
@@ -63,7 +63,7 @@ describe("fake Responses API routing", () => {
       const response = await request(input, stream);
       expect(response.ok).toBe(true);
       const body = await response.text();
-      expect(body).toContain("[[dyad-dump-path=");
+      expect(body).toContain("[[kapable-dump-path=");
       expect(body).not.toContain("This is a simple basic response");
       const dumps = await Promise.all(
         (await fs.readdir(dumpDir)).map(async (file) =>

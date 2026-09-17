@@ -17,7 +17,7 @@ vi.mock("@/ipc/services/git_service", () => ({
 }));
 
 vi.mock("@/ipc/handlers/gitignoreUtils", () => ({
-  ensureDyadGitignored: vi.fn(),
+  ensureKapableGitignored: vi.fn(),
 }));
 
 vi.mock("@/ipc/utils/git_utils", () => ({
@@ -44,7 +44,7 @@ vi.mock("@/ipc/utils/git_utils", () => ({
 }));
 
 vi.mock("@/paths/paths", () => ({
-  getDyadAppPath: vi.fn((p: string) => `/mock/apps/${p}`),
+  getKapableAppPath: vi.fn((p: string) => `/mock/apps/${p}`),
 }));
 
 vi.mock("@/db", () => ({

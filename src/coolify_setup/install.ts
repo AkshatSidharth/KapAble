@@ -1,4 +1,4 @@
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { sleep } from "./sleep";
 import { plainUrlFor } from "./https_setup";
 import { SshError } from "@/ipc/utils/ssh_client";
@@ -106,7 +106,7 @@ export async function preflight(
       installedKnown: false,
       memoryMb: null,
       reason:
-        "Dyad could not read anything back from this server. It answered the " +
+        "KapAble could not read anything back from this server. It answered the " +
         "connection but not the question — check it and try again.",
     };
   }
@@ -121,7 +121,7 @@ export async function preflight(
       installedKnown: false,
       memoryMb: null,
       reason:
-        "Docker is installed on this server but not responding, so Dyad " +
+        "Docker is installed on this server but not responding, so KapAble " +
         "cannot tell whether Coolify is already on it. Start Docker and try " +
         "again.",
     };
@@ -167,7 +167,7 @@ export async function preflight(
       installedKnown: true,
       memoryMb: null,
       reason:
-        "Dyad could not read how much memory this server has, so it cannot " +
+        "KapAble could not read how much memory this server has, so it cannot " +
         "tell whether Coolify would run on it. Check the server and try " +
         "again.",
     };
@@ -199,9 +199,9 @@ export async function preflight(
 export function buildInstallScript(credentials: AdminCredentials): string {
   for (const [label, value] of Object.entries(credentials)) {
     if (!isShellSafe(value)) {
-      throw new DyadError(
+      throw new KapableError(
         `The ${label} contains a character that cannot be sent safely.`,
-        DyadErrorKind.Validation,
+        KapableErrorKind.Validation,
       );
     }
   }
@@ -255,10 +255,10 @@ export async function installCoolify(
       .filter(Boolean)
       .slice(-3)
       .join(" ");
-    throw new DyadError(
+    throw new KapableError(
       `Installing Coolify failed (exit ${result.code}).` +
         (tail ? ` The server said: ${tail}` : ""),
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 }
@@ -289,7 +289,7 @@ export async function waitForDashboard(
   const deadline = now() + timeoutMs;
   while (now() < deadline) {
     if (signal?.aborted) {
-      throw new DyadError("Cancelled.", DyadErrorKind.UserCancelled);
+      throw new KapableError("Cancelled.", KapableErrorKind.UserCancelled);
     }
     try {
       const res = await fetchImpl(plainUrlFor(host), {
@@ -327,8 +327,8 @@ export async function isAdminSeeded(
   try {
     const output = await runTinker(
       session,
-      `echo \\App\\Models\\User::where('email', getenv('DYAD_ADMIN_EMAIL'))->exists() ? 'yes' : 'no';`,
-      { env: { DYAD_ADMIN_EMAIL: email }, signal, timeoutMs },
+      `echo \\App\\Models\\User::where('email', getenv('KAPABLE_ADMIN_EMAIL'))->exists() ? 'yes' : 'no';`,
+      { env: { KAPABLE_ADMIN_EMAIL: email }, signal, timeoutMs },
     );
     // One line of the answer: a notice printed beside it must not read as
     // the account not being there.
@@ -431,7 +431,7 @@ export async function waitForAdminSeeded(
     // a server that would not seed. It has to stay a cancellation, or the run
     // ends by telling the user to go and sign in to an install they stopped.
     if (signal?.aborted) {
-      throw new DyadError("Cancelled.", DyadErrorKind.UserCancelled);
+      throw new KapableError("Cancelled.", KapableErrorKind.UserCancelled);
     }
     // Anything else leaves the install standing. Coolify is on the server, and
     // a seeder that timed out or died says nothing either way about whether

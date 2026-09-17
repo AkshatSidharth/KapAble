@@ -10,7 +10,7 @@ export const ALLOWED_LABELS = [
   "issue/incomplete",
 ];
 export const ASSESSMENTS = [
-  "likely_dyad_bug",
+  "likely_kapable_bug",
   "fixed_in_release",
   "external_service",
   "user_app_issue",
@@ -35,7 +35,7 @@ export const INFO_NEEDED = [
 ];
 export const NEEDS_HUMAN_LABEL = "triage/needs-human";
 export const FAILED_LABEL = "triage/failed";
-export const SIGN_OFF = "Someone from the Dyad team will follow up here.";
+export const SIGN_OFF = "Someone from the KapAble team will follow up here.";
 
 const LIMITS = {
   title: 80,
@@ -50,9 +50,9 @@ const LIMITS = {
 };
 
 const ALLOWED_HOSTS = new Set([
-  "www.dyad.sh",
-  "dyad.sh",
-  "academy.dyad.sh",
+  "www.kapable.sh",
+  "kapable.sh",
+  "academy.kapable.sh",
   "nodejs.org",
   "www.githubstatus.com",
   "githubstatus.com",
@@ -67,9 +67,9 @@ const INFO_NEEDED_TEXT = {
   screenshot_not_attached:
     "It looks like your screenshot didn't come through. Could you paste it here?",
   session_id:
-    "In Dyad, open **Help** > **Upload Chat Session** and paste the session id here so we can see the logs.",
+    "In KapAble, open **Help** > **Upload Chat Session** and paste the session id here so we can see the logs.",
   version:
-    "Which version of Dyad are you on, and are you on Windows, Mac, or Linux?",
+    "Which version of KapAble are you on, and are you on Windows, Mac, or Linux?",
 };
 
 const RELATED_OUTCOME_TEXT = {
@@ -240,7 +240,7 @@ export function normalizeTriage(
     }
     fixedIn = {
       version,
-      url: `https://www.dyad.sh/docs/releases/${version}`,
+      url: `https://www.kapable.sh/docs/releases/${version}`,
     };
   }
   if (assessment === "fixed_in_release" && !fixedIn) {
@@ -322,10 +322,10 @@ function renderSteps(label, steps) {
 function stepsWithUpdate(triage) {
   if (!triage.fixedIn) return triage.steps;
   const alreadyMentionsDownload = triage.steps.some((step) =>
-    /dyad\.sh\/download/i.test(step),
+    /kapable\.sh\/download/i.test(step),
   );
   if (alreadyMentionsDownload) return triage.steps;
-  const update = `Update to Dyad ${triage.fixedIn.version} or newer from https://www.dyad.sh/download, which includes the fix ([release notes](${triage.fixedIn.url})).`;
+  const update = `Update to KapAble ${triage.fixedIn.version} or newer from https://www.kapable.sh/download, which includes the fix ([release notes](${triage.fixedIn.url})).`;
   return [update, ...triage.steps].slice(0, LIMITS.steps);
 }
 
@@ -350,7 +350,7 @@ function renderRelated(related) {
 function renderTeamNotes(triage) {
   const lines = [
     "<details>",
-    "<summary>Notes for the Dyad team</summary>",
+    "<summary>Notes for the KapAble team</summary>",
     "",
     triage.developerNotes || "- No notes from the automatic first look.",
     `- Assessment: ${triage.assessment} · Playbook: ${triage.playbookMatch ?? "no match"}`,
@@ -386,7 +386,7 @@ export function composeComment(triage, { author } = {}) {
   }
 
   const lines = [
-    `Hi ${greeting}, thanks for ${triage.filedFromApp ? "sending this from Dyad" : "the report"}.`,
+    `Hi ${greeting}, thanks for ${triage.filedFromApp ? "sending this from KapAble" : "the report"}.`,
   ];
   if (triage.nonEnglish) {
     lines.push(
@@ -419,5 +419,5 @@ export function composeComment(triage, { author } = {}) {
 
 export function composeFallbackComment({ author } = {}) {
   const greeting = author ? `@${author}` : "there";
-  return `Hi ${greeting}, thanks for the report. Our automatic first look didn't complete, so someone from the Dyad team will take a look directly.`;
+  return `Hi ${greeting}, thanks for the report. Our automatic first look didn't complete, so someone from the KapAble team will take a look directly.`;
 }

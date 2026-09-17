@@ -11,10 +11,10 @@ import { h } from "@/testing/hybrid.setup";
 import type { UserSettings } from "@/lib/schemas";
 
 const PRO_SETTINGS: Partial<UserSettings> = {
-  enableDyadPro: true,
+  enableKapablePro: true,
   providerSettings: {
     auto: {
-      apiKey: { value: "testdyadkey" },
+      apiKey: { value: "testkapablekey" },
     },
   },
 };
@@ -48,7 +48,7 @@ describe("settings actions (integration)", () => {
     writeSettings({
       telemetryConsent: "unset",
       maxToolCallSteps: undefined,
-      enableDyadPro: false,
+      enableKapablePro: false,
       providerSettings: {},
       enableProLazyEditsMode: true,
       proLazyEditsMode: "v1",
@@ -116,7 +116,7 @@ describe("settings actions (integration)", () => {
     );
   });
 
-  it("validates Dyad Pro keys before saving provider settings", async () => {
+  it("validates KapAble Pro keys before saving provider settings", async () => {
     resetSettings();
 
     harness.mountSurface({
@@ -125,31 +125,31 @@ describe("settings actions (integration)", () => {
     });
 
     const keyInput = await screen.findByRole("textbox", {
-      name: "Set Dyad API Key",
+      name: "Set KapAble API Key",
     });
-    fireEvent.change(keyInput, { target: { value: "invalid-dyad-key" } });
+    fireEvent.change(keyInput, { target: { value: "invalid-kapable-key" } });
     fireEvent.click(screen.getByRole("button", { name: "Save Key" }));
 
     const dialog = await screen.findByRole("alertdialog");
     expect(
       within(dialog).getByRole("heading", { name: "API key rejected" }),
     ).toBeTruthy();
-    expect(within(dialog).getByText(/Dyad rejected this API key/)).toBeTruthy();
+    expect(within(dialog).getByText(/KapAble rejected this API key/)).toBeTruthy();
     fireEvent.click(
       within(dialog).getByRole("button", { name: "Try another API key" }),
     );
     await waitFor(() => expect(dialog.isConnected).toBe(false));
     expect(readSettings().providerSettings.auto).toBeUndefined();
-    expect(readSettings().enableDyadPro).not.toBe(true);
+    expect(readSettings().enableKapablePro).not.toBe(true);
 
-    fireEvent.change(keyInput, { target: { value: "testdyadkey" } });
+    fireEvent.change(keyInput, { target: { value: "testkapablekey" } });
     fireEvent.click(screen.getByRole("button", { name: "Save Key" }));
 
     await screen.findByText("Current Key (Settings)");
     await waitFor(() => {
       const settings = readSettings();
-      expect(settings.providerSettings.auto?.apiKey?.value).toBe("testdyadkey");
-      expect(settings.enableDyadPro).toBe(true);
+      expect(settings.providerSettings.auto?.apiKey?.value).toBe("testkapablekey");
+      expect(settings.enableKapablePro).toBe(true);
     });
   }, 60_000);
 

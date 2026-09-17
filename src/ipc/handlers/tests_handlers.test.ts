@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 
-import { DyadErrorKind } from "@/errors/dyad_error";
+import { KapableErrorKind } from "@/errors/kapable_error";
 import type { RemoveFileAndCommitResult } from "../services/git_service";
 import { apps } from "@/db/schema";
 import {
@@ -21,7 +21,7 @@ import { WindowSessionIdSchema } from "@/window_infrastructure/types";
 
 // Every app folder lives under one throwaway base so the delete handler runs
 // against real directories (its path guards resolve symlinks on disk).
-const TEMP_BASE = path.join(os.tmpdir(), "dyad-tests-handler-tests");
+const TEMP_BASE = path.join(os.tmpdir(), "kapable-tests-handler-tests");
 const TEST_WINDOW_SESSION_ID = WindowSessionIdSchema.parse(
   "10000000-0000-4000-8000-000000000001",
 );
@@ -35,7 +35,7 @@ vi.mock("electron", () => ({
   BrowserWindow: { fromWebContents: browserWindowFromWebContentsMock },
   app: {
     getPath: vi.fn(() =>
-      path.join(os.tmpdir(), "dyad-tests-handler-user-data"),
+      path.join(os.tmpdir(), "kapable-tests-handler-user-data"),
     ),
     getAppPath: vi.fn(() => process.cwd()),
   },
@@ -45,10 +45,10 @@ vi.mock("@/paths/paths", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/paths/paths")>();
   const nodePath = await import("node:path");
   const nodeOs = await import("node:os");
-  const base = nodePath.join(nodeOs.tmpdir(), "dyad-tests-handler-tests");
+  const base = nodePath.join(nodeOs.tmpdir(), "kapable-tests-handler-tests");
   return {
     ...actual,
-    getDyadAppPath: (appPath: string) =>
+    getKapableAppPath: (appPath: string) =>
       nodePath.isAbsolute(appPath) ? appPath : nodePath.join(base, appPath),
   };
 });
@@ -275,7 +275,7 @@ describe("tests handlers", () => {
             appId,
             source: "panel",
           }),
-        ).rejects.toMatchObject({ kind: DyadErrorKind.Precondition });
+        ).rejects.toMatchObject({ kind: KapableErrorKind.Precondition });
         expect(prepareIsolatedTestDatabaseMock).not.toHaveBeenCalled();
       } finally {
         runSpy.mockRestore();
@@ -618,7 +618,7 @@ describe("tests handlers", () => {
 
       await expect(
         harness.invokeHandler("tests:delete", { appId, testFile }),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.Validation });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.Validation });
 
       expect(fs.existsSync(outside)).toBe(true);
       expect(fs.existsSync(helper)).toBe(true);
@@ -633,7 +633,7 @@ describe("tests handlers", () => {
           appId,
           testFile: "e2e-tests/gone.spec.ts",
         }),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.NotFound });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.NotFound });
 
       expect(removeFileAndCommitMock).not.toHaveBeenCalled();
     });
@@ -648,7 +648,7 @@ describe("tests handlers", () => {
           appId: otherAppId,
           testFile: "e2e-tests/signup.spec.ts",
         }),
-      ).rejects.toMatchObject({ kind: DyadErrorKind.NotFound });
+      ).rejects.toMatchObject({ kind: KapableErrorKind.NotFound });
 
       expect(fs.existsSync(specA)).toBe(true);
     });

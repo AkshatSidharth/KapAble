@@ -6,7 +6,7 @@ import {
   escapeXmlContent,
 } from "./types";
 import { getNeonProjectInfo } from "../../../../../../neon_admin/neon_context";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 // At least one property is needed because Vertex AI rejects empty parameter schemas.
 const getNeonProjectInfoSchema = z.object({
@@ -32,13 +32,13 @@ export const getNeonProjectInfoTool: ToolDefinition<
 
   execute: async (_args, ctx: AgentContext) => {
     if (!canUseNeonTools(ctx)) {
-      throw new DyadError(
+      throw new KapableError(
         "Neon is not connected to this app",
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
 
-    ctx.onXmlStream("<dyad-neon-project-info></dyad-neon-project-info>");
+    ctx.onXmlStream("<kapable-neon-project-info></kapable-neon-project-info>");
 
     const info = await getNeonProjectInfo({
       projectId: ctx.neonProjectId,
@@ -46,7 +46,7 @@ export const getNeonProjectInfoTool: ToolDefinition<
     });
 
     ctx.onXmlComplete(
-      `<dyad-neon-project-info>\n${escapeXmlContent(info)}\n</dyad-neon-project-info>`,
+      `<kapable-neon-project-info>\n${escapeXmlContent(info)}\n</kapable-neon-project-info>`,
     );
 
     return info;

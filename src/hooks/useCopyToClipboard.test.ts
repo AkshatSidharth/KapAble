@@ -12,7 +12,7 @@ function buildWriteXml(args: {
   description?: string;
   content: string;
 }): string {
-  return `<dyad-write path="${args.path}" description="${args.description ?? ""}">\n${args.content}\n</dyad-write>`;
+  return `<kapable-write path="${args.path}" description="${args.description ?? ""}">\n${args.content}\n</kapable-write>`;
 }
 
 function buildEditXml(args: {
@@ -20,21 +20,21 @@ function buildEditXml(args: {
   description?: string;
   content: string;
 }): string {
-  return `<dyad-edit path="${args.path}" description="${args.description ?? ""}">\n${args.content}\n</dyad-edit>`;
+  return `<kapable-edit path="${args.path}" description="${args.description ?? ""}">\n${args.content}\n</kapable-edit>`;
 }
 
 function buildExecuteSqlXml(args: {
   description?: string;
   content: string;
 }): string {
-  return `<dyad-execute-sql description="${args.description ?? ""}">\n${args.content}\n</dyad-execute-sql>`;
+  return `<kapable-execute-sql description="${args.description ?? ""}">\n${args.content}\n</kapable-execute-sql>`;
 }
 
 function buildCodebaseContextXml(args: {
   files?: string;
   content: string;
 }): string {
-  return `<dyad-codebase-context files="${args.files ?? ""}">\n${args.content}\n</dyad-codebase-context>`;
+  return `<kapable-codebase-context files="${args.files ?? ""}">\n${args.content}\n</kapable-codebase-context>`;
 }
 
 function buildScriptXml(args: {
@@ -43,7 +43,7 @@ function buildScriptXml(args: {
   output?: string;
 }): string {
   const payload = JSON.stringify({ script: args.script, output: args.output });
-  return `<dyad-script description="${args.description ?? "Script"}">\n${payload}\n</dyad-script>`;
+  return `<kapable-script description="${args.description ?? "Script"}">\n${payload}\n</kapable-script>`;
 }
 
 // Extract the interior of a fenced code block from the clipboard text.
@@ -89,7 +89,7 @@ describe("useCopyToClipboard", () => {
   }
 
   describe("code-fence fidelity — newlines inside ``` are verbatim", () => {
-    it("preserves 2 PEP-8 blank lines (3 consecutive newlines) inside a dyad-write code fence", async () => {
+    it("preserves 2 PEP-8 blank lines (3 consecutive newlines) inside a kapable-write code fence", async () => {
       const fileContent =
         "def add(a, b):\n    return a + b\n\n\ndef sub(a, b):\n    return a - b\n";
       const out = await copy(
@@ -124,7 +124,7 @@ describe("useCopyToClipboard", () => {
       );
     });
 
-    it("preserves blank lines inside a dyad-edit fence", async () => {
+    it("preserves blank lines inside a kapable-edit fence", async () => {
       const content = "function a() {}\n\n\nfunction b() {}";
       const out = await copy(
         buildEditXml({ path: "fns.ts", description: "ed", content }),
@@ -135,7 +135,7 @@ describe("useCopyToClipboard", () => {
       expect(fence).not.toContain("a() {}\n\nfunction b()");
     });
 
-    it("preserves blank lines inside a dyad-execute-sql fence", async () => {
+    it("preserves blank lines inside a kapable-execute-sql fence", async () => {
       const sql = "SELECT 1;\n\n\nSELECT 2;";
       const out = await copy(
         buildExecuteSqlXml({ description: "q", content: sql }),
@@ -146,7 +146,7 @@ describe("useCopyToClipboard", () => {
       expect(fence).not.toContain("SELECT 1;\n\nSELECT 2;");
     });
 
-    it("preserves blank lines inside a language-less dyad-codebase-context fence", async () => {
+    it("preserves blank lines inside a language-less kapable-codebase-context fence", async () => {
       const content = "fileA\n\n\nfileB";
       const out = await copy(
         buildCodebaseContextXml({ files: "a.ts", content }),
@@ -157,7 +157,7 @@ describe("useCopyToClipboard", () => {
       expect(fence).not.toContain("fileA\n\nfileB");
     });
 
-    it("preserves blank lines inside BOTH the js and text fences of a dyad-script", async () => {
+    it("preserves blank lines inside BOTH the js and text fences of a kapable-script", async () => {
       const out = await copy(
         buildScriptXml({
           description: "run",
@@ -195,9 +195,9 @@ describe("useCopyToClipboard", () => {
     });
 
     it("collapses a multi-newline seam between a converted tag and following markdown", async () => {
-      // dyad-rename ends with "\n\n"; the following markdown starts with
+      // kapable-rename ends with "\n\n"; the following markdown starts with
       // "\n\n\n\n" → a 6-newline seam that must collapse to exactly 2.
-      const message = `<dyad-rename from="old.txt" to="new.txt"></dyad-rename>\n\n\n\nTail para.`;
+      const message = `<kapable-rename from="old.txt" to="new.txt"></kapable-rename>\n\n\n\nTail para.`;
       const out = await copy(message);
       expect(out).toBe("### Rename: old.txt → new.txt\n\nTail para.");
     });

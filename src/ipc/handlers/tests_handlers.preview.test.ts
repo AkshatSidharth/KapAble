@@ -29,7 +29,7 @@ const h = vi.hoisted(() => ({
 vi.mock("electron", () => ({
   BrowserWindow: { fromWebContents: vi.fn(), getAllWindows: vi.fn(() => []) },
   app: {
-    getPath: vi.fn(() => "/tmp/dyad-tests-preview"),
+    getPath: vi.fn(() => "/tmp/kapable-tests-preview"),
     getAppPath: vi.fn(() => process.cwd()),
   },
   ipcMain: { handle: vi.fn(), on: vi.fn() },
@@ -57,8 +57,8 @@ vi.mock("../utils/process_manager", async (importOriginal) => ({
 
 vi.mock("@/paths/paths", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/paths/paths")>()),
-  getDyadAppPath: (appPath: string) =>
-    path.join(os.tmpdir(), "dyad-tests-preview", "apps", appPath),
+  getKapableAppPath: (appPath: string) =>
+    path.join(os.tmpdir(), "kapable-tests-preview", "apps", appPath),
 }));
 
 import {
@@ -75,7 +75,7 @@ import { buildWindowsCommandInvocation } from "../utils/windows_command";
 const PROXY_URL = "http://localhost:42101/";
 const CDP_ENDPOINT = "http://127.0.0.1:51234";
 const CDP_TOKEN = "test-preview-token";
-const APP_PATH = path.join(os.tmpdir(), "dyad-tests-preview", "apps", "my-app");
+const APP_PATH = path.join(os.tmpdir(), "kapable-tests-preview", "apps", "my-app");
 
 function runAppTestsCore(options: RunAppTestsCoreOptions) {
   return runAppTestsCoreWithoutToken({
@@ -254,7 +254,7 @@ describe("preview runs", () => {
     expect(lastSpawn().args).not.toContain("--headed");
   });
 
-  it("keeps Playwright's own recorders off Dyad's windows", async () => {
+  it("keeps Playwright's own recorders off KapAble's windows", async () => {
     const rotatePreviewView = mockPreviewBatch();
 
     await runAppTestsCore({
@@ -265,9 +265,9 @@ describe("preview runs", () => {
 
     expect(h.spawnStreaming).toHaveBeenCalledTimes(2);
     const { args, env } = lastSpawn();
-    // A trace of the borrowed context records every page in it, Dyad's own
+    // A trace of the borrowed context records every page in it, KapAble's own
     // included; the copy-prompt snapshot is taken from the context's FIRST
-    // page, which over CDP is a Dyad window rather than the app.
+    // page, which over CDP is a KapAble window rather than the app.
     expect(args).toContain("--trace=off");
     expect(env.PLAYWRIGHT_NO_COPY_PROMPT).toBe("1");
   });

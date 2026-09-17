@@ -34,7 +34,7 @@ describe("chat annotations (integration)", () => {
         chatId: harness.chatId,
         role: "assistant",
         content:
-          '<dyad-write path="src/pending.tsx" description="Pending change">export const pending = true;</dyad-write>',
+          '<kapable-write path="src/pending.tsx" description="Pending change">export const pending = true;</kapable-write>',
       })
       .returning({ id: messages.id });
 

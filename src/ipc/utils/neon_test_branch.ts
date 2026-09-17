@@ -6,7 +6,7 @@ import { db } from "../../db";
 import { apps } from "../../db/schema";
 import { getNeonClient } from "../../neon_admin/neon_management_client";
 import { getConnectionUri } from "../../neon_admin/neon_context";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { readEnvVarsOrEmpty, updateNeonEnvVars } from "./app_env_var_utils";
 import { detectFrameworkType } from "./framework_utils";
 import { retryOnLocked } from "./retryOnLocked";
@@ -15,7 +15,7 @@ import {
   appOperationCoordinator,
   readAppResource,
 } from "../services/app_operation_coordinator";
-import { getDyadAppPath } from "@/paths/paths";
+import { getKapableAppPath } from "@/paths/paths";
 
 const logger = log.scope("neon_test_branch");
 
@@ -30,7 +30,7 @@ type AppRow = typeof apps.$inferSelect;
 // Keeping that distinction durable prevents a harmless Neon cleanup outage
 // from blocking Run after a restart. Neon branch ids do not use this namespaced
 // value, and every API boundary below strips it before addressing Neon.
-const CLEANUP_ONLY_BRANCH_PREFIX = "dyad-cleanup-only:v1:";
+const CLEANUP_ONLY_BRANCH_PREFIX = "kapable-cleanup-only:v1:";
 
 /**
  * The Neon branch id a `neonTestBranchId` value refers to.
@@ -106,7 +106,7 @@ async function appUsesNeonAuth(appData: AppRow): Promise<boolean> {
   }
 
   try {
-    const appPath = getDyadAppPath(appData.path);
+    const appPath = getKapableAppPath(appData.path);
     const envVars = await readEnvVarsOrEmpty({ appPath });
     return envVars.some(
       (envVar) =>
@@ -139,24 +139,24 @@ function resolveAuthBranchType(
  * auth-gated tests can run. The branch id is persisted on the app row
  * (`neonTestBranchId`) so a crash mid-run can be reconciled on next launch.
  *
- * Throws `DyadError` if the app has no Neon project or no parent branch.
+ * Throws `KapableError` if the app has no Neon project or no parent branch.
  */
 export async function createTempTestBranch(
   appData: AppRow,
 ): Promise<TempTestBranch> {
   const projectId = appData.neonProjectId;
   if (!projectId) {
-    throw new DyadError(
+    throw new KapableError(
       `App ${appData.id} is not connected to a Neon project.`,
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
     );
   }
 
   const parentBranchId = resolveParentBranchId(appData);
   if (!parentBranchId) {
-    throw new DyadError(
+    throw new KapableError(
       `App ${appData.id} has no Neon branch to base a test branch on.`,
-      DyadErrorKind.Precondition,
+      KapableErrorKind.Precondition,
     );
   }
 
@@ -173,15 +173,15 @@ export async function createTempTestBranch(
       trackedBranchId(appData.neonTestBranchId),
     );
     if (!priorCleanupOk) {
-      throw new DyadError(
+      throw new KapableError(
         `Couldn't clean up the previous Neon test branch for app ${appData.id}. Skipping this run to avoid leaking a branch; it will be retried on the next launch.`,
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
   }
 
   const neonClient = await getNeonClient();
-  const branchName = `dyad-test-${appData.id}-${Date.now()}`;
+  const branchName = `kapable-test-${appData.id}-${Date.now()}`;
 
   const response = await retryOnLocked(
     () =>
@@ -205,9 +205,9 @@ export async function createTempTestBranch(
     if (branch) {
       await deleteBranchBestEffort(projectId, branch.id);
     }
-    throw new DyadError(
+    throw new KapableError(
       "Neon did not return a connection string for the test branch.",
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 
@@ -274,9 +274,9 @@ export async function createTempTestBranch(
           .set({ neonTestBranchId: null })
           .where(eq(apps.id, appData.id));
       }
-      throw new DyadError(
+      throw new KapableError(
         "Couldn't set up isolated Neon Auth for the test branch.",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
   }
@@ -318,7 +318,7 @@ export async function deleteTempTestBranch(appData: AppRow): Promise<boolean> {
     // path reads this to decide whether anything was left behind, and would drop
     // the row — the last record of this branch — believing it was cleaned up.
     logger.error(
-      `App ${appData.id} still tracks temporary Neon test branch ${branchId}, but the app is no longer linked to a Neon project; Dyad cannot delete it and it must be removed manually.`,
+      `App ${appData.id} still tracks temporary Neon test branch ${branchId}, but the app is no longer linked to a Neon project; KapAble cannot delete it and it must be removed manually.`,
     );
     return false;
   }
@@ -422,7 +422,7 @@ async function restoreRealBranchEnvVars(appData: AppRow): Promise<boolean> {
   }
 
   try {
-    const appPath = getDyadAppPath(appData.path);
+    const appPath = getKapableAppPath(appData.path);
     const frameworkType = detectFrameworkType(appPath);
     const connectionUri = await retryOnLocked(
       () => getConnectionUri({ projectId, branchId }),

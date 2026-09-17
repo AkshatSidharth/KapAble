@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ResponseValidationError } from "@vercel/sdk/models/responsevalidationerror.js";
 import { SDKError } from "@vercel/sdk/models/sdkerror.js";
 import { z } from "zod/v3";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { getVercelProjectCreationError } from "./vercel_errors";
 
 describe("getVercelProjectCreationError", () => {
@@ -21,7 +21,7 @@ describe("getVercelProjectCreationError", () => {
 
       const result = getVercelProjectCreationError(error);
 
-      expect(result).toBeInstanceOf(DyadError);
+      expect(result).toBeInstanceOf(KapableError);
       expect(result.message).toContain("couldn't read Vercel's response");
       expect(result.message).toContain(`HTTP ${status}`);
       if (status === 200) {
@@ -110,17 +110,17 @@ describe("getVercelProjectCreationError", () => {
   });
 
   it.each([
-    [400, DyadErrorKind.Validation],
-    [401, DyadErrorKind.Auth],
-    [402, DyadErrorKind.Precondition],
-    [403, DyadErrorKind.Auth],
-    [404, DyadErrorKind.NotFound],
-    [409, DyadErrorKind.Conflict],
-    [410, DyadErrorKind.NotFound],
-    [422, DyadErrorKind.Validation],
-    [428, DyadErrorKind.Precondition],
-    [429, DyadErrorKind.RateLimited],
-    [500, DyadErrorKind.External],
+    [400, KapableErrorKind.Validation],
+    [401, KapableErrorKind.Auth],
+    [402, KapableErrorKind.Precondition],
+    [403, KapableErrorKind.Auth],
+    [404, KapableErrorKind.NotFound],
+    [409, KapableErrorKind.Conflict],
+    [410, KapableErrorKind.NotFound],
+    [422, KapableErrorKind.Validation],
+    [428, KapableErrorKind.Precondition],
+    [429, KapableErrorKind.RateLimited],
+    [500, KapableErrorKind.External],
   ] as const)("classifies HTTP %s as %s", (status, kind) => {
     const error = new SDKError("API error occurred", {
       response: new Response(null, { status }),
@@ -152,13 +152,13 @@ describe("getVercelProjectCreationError", () => {
     expect(result.message).toContain('"basic"');
     expect(result.message).toContain("buildMachineType");
     expect(result.message).toContain('"Connect to existing project"');
-    expect(result).toHaveProperty("kind", DyadErrorKind.External);
+    expect(result).toHaveProperty("kind", KapableErrorKind.External);
   });
 
   it("preserves other errors and their classifications", () => {
     for (const error of [
       new Error("Project name is already in use."),
-      new DyadError("Not authenticated with Vercel.", DyadErrorKind.Auth),
+      new KapableError("Not authenticated with Vercel.", KapableErrorKind.Auth),
     ]) {
       expect(getVercelProjectCreationError(error)).toBe(error);
     }

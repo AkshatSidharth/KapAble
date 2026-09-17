@@ -40,7 +40,7 @@ export const deleteFileTool: ToolDefinition<z.infer<typeof deleteFileSchema>> =
 
     buildXml: (args, _isComplete) => {
       if (!args.path?.trim()) return undefined;
-      return `<dyad-delete path="${escapeXmlAttr(args.path)}"></dyad-delete>`;
+      return `<kapable-delete path="${escapeXmlAttr(args.path)}"></kapable-delete>`;
     },
 
     shouldTrackMutation: (_args, result) =>

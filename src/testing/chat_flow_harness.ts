@@ -1,13 +1,13 @@
 /**
  * setupChatFlowHarness — a fast, parallel-safe vitest integration harness that
- * exercises the REAL dyad chat flow without launching Electron.
+ * exercises the REAL kapable chat flow without launching Electron.
  *
  * What is real: the `chat:stream` IPC handler, a real sqlite db built by the
  * app's own `initializeDatabase()`, real settings via `writeSettings`, a real
  * git checkout of an e2e fixture app, the real AI-SDK streaming client talking
  * HTTP to the real fake-LLM server (the same one the Playwright suite uses,
  * serving `e2e-tests/fixtures/*.md` via the `tc=<name>` protocol), and the real
- * response processor (dyad-tag parsing, file writes, git commits, db messages).
+ * response processor (kapable-tag parsing, file writes, git commits, db messages).
  *
  * What is mocked: only the `electron` module (see ./electron_mock).
  *
@@ -86,15 +86,15 @@ let activeChatFlowHarness = false;
 
 /** Every env var the harness may write; snapshotted at setup, restored at dispose. */
 const HARNESS_ENV_KEYS = [
-  "DYAD_DEV_USER_DATA_DIR",
+  "KAPABLE_DEV_USER_DATA_DIR",
   "FAKE_LLM_DUMP_DIR",
   "FAKE_LLM_FIXTURES_DIR",
   "FAKE_LLM_QUIET",
-  "DYAD_LANGUAGE_MODEL_CATALOG_URL",
-  "DYAD_ENGINE_URL",
-  "DYAD_GATEWAY_URL",
-  "DYAD_USER_INFO_URL",
-  "DYAD_SUBSCRIPTION_STATUS_URL",
+  "KAPABLE_LANGUAGE_MODEL_CATALOG_URL",
+  "KAPABLE_ENGINE_URL",
+  "KAPABLE_GATEWAY_URL",
+  "KAPABLE_USER_INFO_URL",
+  "KAPABLE_SUBSCRIPTION_STATUS_URL",
 ] as const;
 
 function snapshotHarnessEnv(): Map<string, string | undefined> {
@@ -170,7 +170,7 @@ export interface ChatFlowHarnessOptions {
    */
   useFakeCatalog?: boolean;
   /**
-   * Point Dyad Engine and Gateway calls at this harness's fake LLM server.
+   * Point KapAble Engine and Gateway calls at this harness's fake LLM server.
    * Useful for Pro/local-agent fixtures without import-time env relay setup.
    */
   engine?: boolean;
@@ -315,7 +315,7 @@ export async function setupChatFlowHarness(
     // Unique, collision-proof temp root (pid + randomness), parallel-safe.
     tmpRoot = path.join(
       os.tmpdir(),
-      `dyad-chat-flow-${process.pid}-${Math.random().toString(36).slice(2, 10)}`,
+      `kapable-chat-flow-${process.pid}-${Math.random().toString(36).slice(2, 10)}`,
     );
     const userDataDir = path.join(tmpRoot, "userData");
     const dumpDir = path.join(tmpRoot, "fake-llm-dumps");
@@ -323,7 +323,7 @@ export async function setupChatFlowHarness(
     fs.mkdirSync(userDataDir, { recursive: true });
     fs.mkdirSync(dumpDir, { recursive: true });
 
-    process.env.DYAD_DEV_USER_DATA_DIR = userDataDir;
+    process.env.KAPABLE_DEV_USER_DATA_DIR = userDataDir;
     process.env.FAKE_LLM_DUMP_DIR = dumpDir;
     process.env.FAKE_LLM_FIXTURES_DIR = FIXTURES_ROOT;
     if (!options.verboseFakeLlm) {
@@ -337,15 +337,15 @@ export async function setupChatFlowHarness(
     const tmpRootPath = tmpRoot;
 
     if (options.useFakeCatalog !== false) {
-      process.env.DYAD_LANGUAGE_MODEL_CATALOG_URL = `${fakeLlmUrl}/api/language-model-catalog`;
+      process.env.KAPABLE_LANGUAGE_MODEL_CATALOG_URL = `${fakeLlmUrl}/api/language-model-catalog`;
     }
-    // Always fake the Dyad Pro user-info endpoint: any test that configures an
+    // Always fake the KapAble Pro user-info endpoint: any test that configures an
     // auto API key would otherwise send get-user-budget requests to the real
-    // api.dyad.sh.
-    process.env.DYAD_USER_INFO_URL = `${fakeLlmUrl}/api/user/info`;
+    // api.kapable.sh.
+    process.env.KAPABLE_USER_INFO_URL = `${fakeLlmUrl}/api/user/info`;
     if (options.engine) {
-      process.env.DYAD_ENGINE_URL = `${fakeLlmUrl}/engine/v1`;
-      process.env.DYAD_GATEWAY_URL = `${fakeLlmUrl}/gateway/v1`;
+      process.env.KAPABLE_ENGINE_URL = `${fakeLlmUrl}/engine/v1`;
+      process.env.KAPABLE_GATEWAY_URL = `${fakeLlmUrl}/gateway/v1`;
     }
 
     // 2. Real sqlite db (drizzle migrations) in the temp userData dir.

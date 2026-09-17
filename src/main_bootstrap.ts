@@ -18,17 +18,17 @@ function getErrorSummary(error: unknown): string {
 }
 
 function reportRuntimeLoadFailure(error: unknown): void {
-  logger.error("Failed to load the Dyad application runtime:", error);
+  logger.error("Failed to load the KapAble application runtime:", error);
   const logPath = log.transports.file.getFile().path;
   dialog.showErrorBox(
-    "Dyad failed to start",
+    "KapAble failed to start",
     `The application runtime could not be loaded.\n\nError: ${getErrorSummary(error)}\n\nDetails were written to:\n${logPath}\n\nPlease share this error and log file when contacting support.`,
   );
   app.exit(1);
 }
 
 // Squirrel expects install/update hooks to exit quickly. Keep this entry point
-// free of application imports so those hooks cannot start normal Dyad services.
+// free of application imports so those hooks cannot start normal KapAble services.
 if (started) {
   app.quit();
 } else {

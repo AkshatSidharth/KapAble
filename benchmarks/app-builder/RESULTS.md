@@ -1,7 +1,7 @@
 # App-Builder Benchmark — Results
 
 Run: 2026-07-29 · 7 models × up to 3 apps (Relay CRM, Deskhero, Portalis) ×
-3 milestones each, N=1, Dyad local-agent mode at product-default reasoning
+3 milestones each, N=1, KapAble local-agent mode at product-default reasoning
 effort (medium, recorded per request). Per checkpoint: fixed Playwright CUJ
 suites + adversarial security probes against pinned UI contracts, plus an LLM
 judge (gpt-5.6-sol, single judge, input-capped). Composite per app =
@@ -35,12 +35,12 @@ Costs are list-price dollars from exact per-request token counts
 ## Reasoning-effort sweep (luna + terra)
 
 The main table runs every model at the product default (medium for every
-model except gpt-6-astra, whose default became `low` in Dyad's catalog on
+model except gpt-6-astra, whose default became `low` in KapAble's catalog on
 2026-09-04; its headline row is the low cells and its medium run is the
 non-default tier below). This sweep
 re-runs the two cheapest models at `high` and `xhigh` — same harness, same
 controls. Effort is applied at the recording proxy (`reasoning_effort` /
-`reasoning.effort`) because Dyad's `thinkingBudget` setting exposes only
+`reasoning.effort`) because KapAble's `thinkingBudget` setting exposes only
 low/medium/high, so these rows do **not** use a product-reachable configuration
 and are reported separately from the headline matrix.
 

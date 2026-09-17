@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { gitAddAll, gitCommit } from "./git_utils";
 import { simpleSpawn } from "./simpleSpawn";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   isPnpmIgnoredBuildsError,
   PNPM_PM_ON_FAIL_IGNORE_ARG,
@@ -118,9 +118,9 @@ export async function applyComponentTagger(
   const viteConfigPath = findViteConfigPath(appPath);
 
   if (!viteConfigPath) {
-    throw new DyadError(
+    throw new KapableError(
       "Could not find vite.config.js or vite.config.ts",
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 
@@ -132,7 +132,7 @@ export async function applyComponentTagger(
 
   if (
     !content.includes(
-      "import dyadComponentTagger from '@dyad-sh/react-vite-component-tagger';",
+      "import kapableComponentTagger from '@dyad-sh/react-vite-component-tagger';",
     )
   ) {
     const lines = content.split("\n");
@@ -146,7 +146,7 @@ export async function applyComponentTagger(
     lines.splice(
       lastImportIndex + 1,
       0,
-      "import dyadComponentTagger from '@dyad-sh/react-vite-component-tagger';",
+      "import kapableComponentTagger from '@dyad-sh/react-vite-component-tagger';",
     );
     content = lines.join("\n");
   }
@@ -173,17 +173,17 @@ export async function applyComponentTagger(
   }
 
   if (pluginsIdx !== -1) {
-    if (!content.includes("dyadComponentTagger()")) {
+    if (!content.includes("kapableComponentTagger()")) {
       const bracketIdx = pluginsIdx + matchStr.indexOf("[");
       content =
         content.slice(0, bracketIdx) +
-        "[dyadComponentTagger(), " +
+        "[kapableComponentTagger(), " +
         content.slice(bracketIdx + 1);
     }
   } else {
-    throw new DyadError(
+    throw new KapableError(
       `Could not find 'plugins: [' in ${path.basename(viteConfigPath)}. Manual installation required.`,
-      DyadErrorKind.External,
+      KapableErrorKind.External,
     );
   }
 
@@ -219,9 +219,9 @@ export async function applyComponentTagger(
         } catch (rollbackErr) {
           logger.error("Failed to rollback vite config changes", rollbackErr);
         }
-        throw new DyadError(
+        throw new KapableError(
           "Failed to install component tagger dependency",
-          DyadErrorKind.Internal,
+          KapableErrorKind.Internal,
         );
       }
     }
@@ -254,9 +254,9 @@ export async function applyComponentTagger(
       } catch (rollbackErr) {
         logger.error("Failed to rollback vite config changes", rollbackErr);
       }
-      throw new DyadError(
+      throw new KapableError(
         `Failed to update package.json for component tagger: ${err instanceof Error ? err.message : String(err)}`,
-        DyadErrorKind.Internal,
+        KapableErrorKind.Internal,
       );
     }
     logger.info("Skipping dependency install for component tagger");
@@ -267,7 +267,7 @@ export async function applyComponentTagger(
     await gitAddAll({ path: appPath });
     await gitCommit({
       path: appPath,
-      message: "add Dyad component tagger",
+      message: "add KapAble component tagger",
     });
     logger.info("Successfully committed component tagger modifications");
   } catch (err) {

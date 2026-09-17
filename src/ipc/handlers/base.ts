@@ -1,6 +1,6 @@
 import type { IpcMainInvokeEvent } from "electron";
 import { z } from "zod";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import {
   createIpcErrorEnvelope,
   createIpcSuccessEnvelope,
@@ -80,9 +80,9 @@ export function createTypedHandler<
           .map((e) => `${e.path.join(".")}: ${e.message}`)
           .join("; ");
         return createIpcErrorEnvelope(
-          new DyadError(
+          new KapableError(
             `[${contract.channel}] Invalid input: ${errorMessage}`,
-            DyadErrorKind.Validation,
+            KapableErrorKind.Validation,
           ),
         );
       }
@@ -163,9 +163,9 @@ export function createLoggedTypedHandler(logger: {
           const errorMessage = parsed.error.issues
             .map((e) => `${e.path.join(".")}: ${e.message}`)
             .join("; ");
-          const error = new DyadError(
+          const error = new KapableError(
             `[${contract.channel}] Invalid input: ${errorMessage}`,
-            DyadErrorKind.Validation,
+            KapableErrorKind.Validation,
           );
           logger.error(`[${contract.channel}] Invalid input`, error);
           return createIpcErrorEnvelope(error);

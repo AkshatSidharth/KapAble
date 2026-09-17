@@ -40,14 +40,14 @@ const authBootstrapToken = workerData?.authBootstrapToken;
 /* ---------- optional resources for HTML injection ---------------------- */
 
 let stacktraceJsContent = null;
-let dyadShimContent = null;
-let dyadComponentSelectorClientContent = null;
-let dyadRecorderClientContent = null;
-let dyadAuthBootstrapContent = null;
-let dyadScreenshotClientContent = null;
+let kapableShimContent = null;
+let kapableComponentSelectorClientContent = null;
+let kapableRecorderClientContent = null;
+let kapableAuthBootstrapContent = null;
+let kapableScreenshotClientContent = null;
 let htmlToImageContent = null;
-let dyadVisualEditorClientContent = null;
-let dyadLogsContent = null;
+let kapableVisualEditorClientContent = null;
+let kapableLogsContent = null;
 
 try {
   const htmlToImagePath = path.join(
@@ -86,121 +86,121 @@ try {
 }
 
 try {
-  const dyadShimPath = path.join(__dirname, "dyad-shim.js");
-  dyadShimContent = fs.readFileSync(dyadShimPath, "utf-8");
-  parentPort?.postMessage("[proxy-worker] dyad-shim.js loaded.");
+  const kapableShimPath = path.join(__dirname, "kapable-shim.js");
+  kapableShimContent = fs.readFileSync(kapableShimPath, "utf-8");
+  parentPort?.postMessage("[proxy-worker] kapable-shim.js loaded.");
 } catch (error) {
   parentPort?.postMessage(
-    `[proxy-worker] Failed to read dyad-shim.js: ${error.message}`,
+    `[proxy-worker] Failed to read kapable-shim.js: ${error.message}`,
   );
 }
 
 try {
-  const dyadComponentSelectorClientPath = path.join(
+  const kapableComponentSelectorClientPath = path.join(
     __dirname,
-    "dyad-component-selector-client.js",
+    "kapable-component-selector-client.js",
   );
-  dyadComponentSelectorClientContent = fs.readFileSync(
-    dyadComponentSelectorClientPath,
+  kapableComponentSelectorClientContent = fs.readFileSync(
+    kapableComponentSelectorClientPath,
     "utf-8",
   );
   parentPort?.postMessage(
-    "[proxy-worker] dyad-component-selector-client.js loaded.",
+    "[proxy-worker] kapable-component-selector-client.js loaded.",
   );
 } catch (error) {
   parentPort?.postMessage(
-    `[proxy-worker] Failed to read dyad-component-selector-client.js: ${error.message}`,
+    `[proxy-worker] Failed to read kapable-component-selector-client.js: ${error.message}`,
   );
 }
 
 try {
-  const dyadRecorderClientPath = path.join(
+  const kapableRecorderClientPath = path.join(
     __dirname,
-    "dyad-recorder-client.js",
+    "kapable-recorder-client.js",
   );
-  dyadRecorderClientContent = fs.readFileSync(dyadRecorderClientPath, "utf-8");
-  parentPort?.postMessage("[proxy-worker] dyad-recorder-client.js loaded.");
+  kapableRecorderClientContent = fs.readFileSync(kapableRecorderClientPath, "utf-8");
+  parentPort?.postMessage("[proxy-worker] kapable-recorder-client.js loaded.");
 } catch (error) {
   parentPort?.postMessage(
-    `[proxy-worker] Failed to read dyad-recorder-client.js: ${error.message}`,
+    `[proxy-worker] Failed to read kapable-recorder-client.js: ${error.message}`,
   );
 }
 
 try {
-  const dyadAuthBootstrapPath = path.join(__dirname, "dyad-auth-bootstrap.js");
-  dyadAuthBootstrapContent = fs.readFileSync(dyadAuthBootstrapPath, "utf-8");
-  parentPort?.postMessage("[proxy-worker] dyad-auth-bootstrap.js loaded.");
+  const kapableAuthBootstrapPath = path.join(__dirname, "kapable-auth-bootstrap.js");
+  kapableAuthBootstrapContent = fs.readFileSync(kapableAuthBootstrapPath, "utf-8");
+  parentPort?.postMessage("[proxy-worker] kapable-auth-bootstrap.js loaded.");
 } catch (error) {
   parentPort?.postMessage(
-    `[proxy-worker] Failed to read dyad-auth-bootstrap.js: ${error.message}`,
+    `[proxy-worker] Failed to read kapable-auth-bootstrap.js: ${error.message}`,
   );
 }
 
 try {
-  const dyadScreenshotClientPath = path.join(
+  const kapableScreenshotClientPath = path.join(
     __dirname,
-    "dyad-screenshot-client.js",
+    "kapable-screenshot-client.js",
   );
-  dyadScreenshotClientContent = fs.readFileSync(
-    dyadScreenshotClientPath,
+  kapableScreenshotClientContent = fs.readFileSync(
+    kapableScreenshotClientPath,
     "utf-8",
   );
-  parentPort?.postMessage("[proxy-worker] dyad-screenshot-client.js loaded.");
+  parentPort?.postMessage("[proxy-worker] kapable-screenshot-client.js loaded.");
 } catch (error) {
   parentPort?.postMessage(
-    `[proxy-worker] Failed to read dyad-screenshot-client.js: ${error.message}`,
+    `[proxy-worker] Failed to read kapable-screenshot-client.js: ${error.message}`,
   );
 }
 
 try {
-  const dyadVisualEditorClientPath = path.join(
+  const kapableVisualEditorClientPath = path.join(
     __dirname,
-    "dyad-visual-editor-client.js",
+    "kapable-visual-editor-client.js",
   );
-  dyadVisualEditorClientContent = fs.readFileSync(
-    dyadVisualEditorClientPath,
+  kapableVisualEditorClientContent = fs.readFileSync(
+    kapableVisualEditorClientPath,
     "utf-8",
   );
   parentPort?.postMessage(
-    "[proxy-worker] dyad-visual-editor-client.js loaded.",
+    "[proxy-worker] kapable-visual-editor-client.js loaded.",
   );
 } catch (error) {
   parentPort?.postMessage(
-    `[proxy-worker] Failed to read dyad-visual-editor-client.js: ${error.message}`,
+    `[proxy-worker] Failed to read kapable-visual-editor-client.js: ${error.message}`,
   );
 }
 
 try {
-  const dyadLogsPath = path.join(__dirname, "dyad_logs.js");
-  dyadLogsContent = fs.readFileSync(dyadLogsPath, "utf-8");
-  parentPort?.postMessage("[proxy-worker] dyad_logs.js loaded.");
+  const kapableLogsPath = path.join(__dirname, "kapable_logs.js");
+  kapableLogsContent = fs.readFileSync(kapableLogsPath, "utf-8");
+  parentPort?.postMessage("[proxy-worker] kapable_logs.js loaded.");
 } catch (error) {
   parentPort?.postMessage(
-    `[proxy-worker] Failed to read dyad_logs.js: ${error.message}`,
+    `[proxy-worker] Failed to read kapable_logs.js: ${error.message}`,
   );
 }
 
 // Load Service Worker files
-let dyadSwContent = null;
-let dyadSwRegisterContent = null;
+let kapableSwContent = null;
+let kapableSwRegisterContent = null;
 
 try {
-  const dyadSwPath = path.join(__dirname, "dyad-sw.js");
-  dyadSwContent = fs.readFileSync(dyadSwPath, "utf-8");
-  parentPort?.postMessage("[proxy-worker] dyad-sw.js loaded.");
+  const kapableSwPath = path.join(__dirname, "kapable-sw.js");
+  kapableSwContent = fs.readFileSync(kapableSwPath, "utf-8");
+  parentPort?.postMessage("[proxy-worker] kapable-sw.js loaded.");
 } catch (error) {
   parentPort?.postMessage(
-    `[proxy-worker] Failed to read dyad-sw.js: ${error.message}`,
+    `[proxy-worker] Failed to read kapable-sw.js: ${error.message}`,
   );
 }
 
 try {
-  const dyadSwRegisterPath = path.join(__dirname, "dyad-sw-register.js");
-  dyadSwRegisterContent = fs.readFileSync(dyadSwRegisterPath, "utf-8");
-  parentPort?.postMessage("[proxy-worker] dyad-sw-register.js loaded.");
+  const kapableSwRegisterPath = path.join(__dirname, "kapable-sw-register.js");
+  kapableSwRegisterContent = fs.readFileSync(kapableSwRegisterPath, "utf-8");
+  parentPort?.postMessage("[proxy-worker] kapable-sw-register.js loaded.");
 } catch (error) {
   parentPort?.postMessage(
-    `[proxy-worker] Failed to read dyad-sw-register.js: ${error.message}`,
+    `[proxy-worker] Failed to read kapable-sw-register.js: ${error.message}`,
   );
 }
 
@@ -213,8 +213,8 @@ function needsInjection(pathname) {
 
 function injectHTML(buf) {
   let txt = buf.toString("utf8");
-  // These are strings that were used since the first version of the dyad shim.
-  // If the dyad shim is used from legacy apps which came pre-baked with the shim
+  // These are strings that were used since the first version of the kapable shim.
+  // If the kapable shim is used from legacy apps which came pre-baked with the shim
   // as a vite plugin, then do not inject the shim twice to avoid weird behaviors.
   const legacyAppWithShim =
     txt.includes("window-error") && txt.includes("unhandled-rejection");
@@ -238,37 +238,37 @@ function injectHTML(buf) {
       );
     }
 
-    if (dyadShimContent) {
-      scripts.push(`<script>${dyadShimContent}</script>`);
+    if (kapableShimContent) {
+      scripts.push(`<script>${kapableShimContent}</script>`);
     } else {
       scripts.push(
-        '<script>console.warn("[proxy-worker] dyad shim was not injected.");</script>',
+        '<script>console.warn("[proxy-worker] kapable shim was not injected.");</script>',
       );
     }
   }
-  if (dyadComponentSelectorClientContent) {
-    scripts.push(`<script>${dyadComponentSelectorClientContent}</script>`);
+  if (kapableComponentSelectorClientContent) {
+    scripts.push(`<script>${kapableComponentSelectorClientContent}</script>`);
   } else {
     scripts.push(
-      '<script>console.warn("[proxy-worker] dyad component selector client was not injected.");</script>',
+      '<script>console.warn("[proxy-worker] kapable component selector client was not injected.");</script>',
     );
   }
-  if (dyadRecorderClientContent) {
+  if (kapableRecorderClientContent) {
     scripts.push(
-      `<script data-dyad-recorder-token="${escapedProxyToken}">${dyadRecorderClientContent}</script>`,
+      `<script data-kapable-recorder-token="${escapedProxyToken}">${kapableRecorderClientContent}</script>`,
     );
   } else {
     scripts.push(
-      '<script>console.warn("[proxy-worker] dyad recorder client was not injected.");</script>',
+      '<script>console.warn("[proxy-worker] kapable recorder client was not injected.");</script>',
     );
   }
-  if (dyadAuthBootstrapContent) {
+  if (kapableAuthBootstrapContent) {
     scripts.push(
-      `<script data-dyad-auth-token="${escapedProxyToken}">${dyadAuthBootstrapContent}</script>`,
+      `<script data-kapable-auth-token="${escapedProxyToken}">${kapableAuthBootstrapContent}</script>`,
     );
   } else {
     scripts.push(
-      '<script>console.warn("[proxy-worker] dyad auth bootstrap was not injected.");</script>',
+      '<script>console.warn("[proxy-worker] kapable auth bootstrap was not injected.");</script>',
     );
   }
   if (htmlToImageContent) {
@@ -284,32 +284,32 @@ function injectHTML(buf) {
       "[proxy-worker] WARNING: html-to-image not injected!",
     );
   }
-  if (dyadScreenshotClientContent) {
-    scripts.push(`<script>${dyadScreenshotClientContent}</script>`);
+  if (kapableScreenshotClientContent) {
+    scripts.push(`<script>${kapableScreenshotClientContent}</script>`);
   } else {
     scripts.push(
-      '<script>console.warn("[proxy-worker] dyad screenshot client was not injected.");</script>',
+      '<script>console.warn("[proxy-worker] kapable screenshot client was not injected.");</script>',
     );
   }
-  if (dyadVisualEditorClientContent) {
-    scripts.push(`<script>${dyadVisualEditorClientContent}</script>`);
+  if (kapableVisualEditorClientContent) {
+    scripts.push(`<script>${kapableVisualEditorClientContent}</script>`);
   } else {
     scripts.push(
-      '<script>console.warn("[proxy-worker] dyad visual editor client was not injected.");</script>',
+      '<script>console.warn("[proxy-worker] kapable visual editor client was not injected.");</script>',
     );
   }
-  if (dyadLogsContent) {
-    scripts.push(`<script>${dyadLogsContent}</script>`);
+  if (kapableLogsContent) {
+    scripts.push(`<script>${kapableLogsContent}</script>`);
   } else {
     scripts.push(
-      '<script>console.warn("[proxy-worker] dyad_logs.js was not injected.");</script>',
+      '<script>console.warn("[proxy-worker] kapable_logs.js was not injected.");</script>',
     );
   }
-  if (dyadSwRegisterContent) {
-    scripts.push(`<script>${dyadSwRegisterContent}</script>`);
+  if (kapableSwRegisterContent) {
+    scripts.push(`<script>${kapableSwRegisterContent}</script>`);
   } else {
     scripts.push(
-      '<script>console.warn("[proxy-worker] dyad-sw-register.js was not injected.");</script>',
+      '<script>console.warn("[proxy-worker] kapable-sw-register.js was not injected.");</script>',
     );
   }
   const allScripts = scripts.join("\n");
@@ -356,7 +356,7 @@ function buildTargetURL(clientReq) {
 /* ----------------------------------------------------------------------- */
 /* Cookie rewriting for the embedded preview iframe                        */
 /*                                                                         */
-/* In a packaged build the Dyad shell loads from file://, a cross-site     */
+/* In a packaged build the KapAble shell loads from file://, a cross-site     */
 /* top-level ancestor to the http://localhost preview. That makes the      */
 /* request's "site for cookies" cross-site, so the browser withholds       */
 /* default Lax/Strict cookies and auth sessions fail to stick. (Dev mode   */
@@ -435,14 +435,14 @@ function applyProxyFrameAncestorsCsp(headers) {
 
 const server = http.createServer((clientReq, clientRes) => {
   // Special handling for Service Worker file
-  if (clientReq.url === "/dyad-sw.js") {
-    if (dyadSwContent) {
+  if (clientReq.url === "/kapable-sw.js") {
+    if (kapableSwContent) {
       clientRes.writeHead(200, {
         "content-type": "application/javascript",
         "service-worker-allowed": "/",
         "cache-control": "no-cache",
       });
-      clientRes.end(dyadSwContent);
+      clientRes.end(kapableSwContent);
       return;
     } else {
       clientRes.writeHead(404, { "content-type": "text/plain" });
@@ -526,7 +526,7 @@ const server = http.createServer((clientReq, clientRes) => {
         // Never cache an injected document. The scripts above are stamped with
         // this proxy instance's capability token, and a restart mints a new one
         // — so a cached copy carries a token the proxy no longer honors, and
-        // recorder control and `dyad-auth-login` messages sent with it are
+        // recorder control and `kapable-auth-login` messages sent with it are
         // rejected with nothing on screen explaining why. `last-modified` and
         // `expires` go too: left behind they still permit heuristic freshness
         // and conditional revalidation into the same stale document.

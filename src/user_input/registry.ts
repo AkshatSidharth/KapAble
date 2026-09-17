@@ -7,7 +7,7 @@
  * the state-machine event enumeration. `request` also accepts an optional
  * requestId solely to preserve/test duplicate-correlation supersession.
  */
-import { DyadError, DyadErrorKind } from "../errors/dyad_error";
+import { KapableError, KapableErrorKind } from "../errors/kapable_error";
 import type { Clock, ClockHandle, IdSource } from "../state_machines/clock";
 import { createTraceObserver } from "../state_machines/trace";
 import {
@@ -349,9 +349,9 @@ export function createUserInputRegistry(deps: {
         response,
       });
       if (!applied) {
-        throw new DyadError(
+        throw new KapableError(
           `No pending user-input request: ${requestId}`,
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
     },
@@ -406,9 +406,9 @@ export function createUserInputRegistry(deps: {
         requestId,
       });
       if (!applied) {
-        throw new DyadError(
+        throw new KapableError(
           `No due user-input request: ${requestId}`,
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
     },
@@ -423,9 +423,9 @@ export function createUserInputRegistry(deps: {
         requestId,
       });
       if (!applied) {
-        throw new DyadError(
+        throw new KapableError(
           `No live user-input follow-up: ${requestId}`,
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
     },

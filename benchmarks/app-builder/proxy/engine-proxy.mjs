@@ -1,14 +1,14 @@
 // Engine recording proxy for the app-builder benchmark.
 //
-// Forwards every request to the Dyad engine (streaming pass-through) and
+// Forwards every request to the KapAble engine (streaming pass-through) and
 // records one JSONL row per /chat/completions request with exact token usage
-// parsed from the final SSE usage chunk, correlated to Dyad chat turns via the
-// X-Dyad-Request-Id header. Also serves the pinned language-model catalog at
-// /catalog so runs are deterministic (point DYAD_LANGUAGE_MODEL_CATALOG_URL
+// parsed from the final SSE usage chunk, correlated to KapAble chat turns via the
+// X-KapAble-Request-Id header. Also serves the pinned language-model catalog at
+// /catalog so runs are deterministic (point KAPABLE_LANGUAGE_MODEL_CATALOG_URL
 // here).
 //
 // Usage:
-//   node engine-proxy.mjs [--port 7789] [--upstream https://engine.dyad.sh/v1] \
+//   node engine-proxy.mjs [--port 7789] [--upstream https://engine.kapable.sh/v1] \
 //     [--out <dir>] [--cell <cellId>]
 // Env: APPBENCH_CELL_CEILING_USD (abort cell when estimated spend exceeds it)
 import http from "node:http";
@@ -25,7 +25,7 @@ function argOf(flag, dflt) {
   return i >= 0 ? args[i + 1] : dflt;
 }
 const PORT = Number(argOf("--port", "7789"));
-const UPSTREAM = new URL(argOf("--upstream", "https://engine.dyad.sh/v1"));
+const UPSTREAM = new URL(argOf("--upstream", "https://engine.kapable.sh/v1"));
 const OUT_DIR = argOf("--out", path.join(__dirname, "logs"));
 const CELL_ID = argOf("--cell", "adhoc");
 const CEILING = Number(process.env.APPBENCH_CELL_CEILING_USD || "0") || null;
@@ -119,7 +119,7 @@ const server = http.createServer((req, res) => {
   req.on("data", (c) => chunks.push(c));
   req.on("end", () => {
     let body = Buffer.concat(chunks);
-    // Effort override for the reasoning-effort sweep. Dyad's settings expose
+    // Effort override for the reasoning-effort sweep. KapAble's settings expose
     // only low/medium/high (thinkingBudget), but the engine accepts xhigh, so
     // the sweep applies effort here instead of patching the product. Disclosed
     // in the report: these runs do NOT use the product default.
@@ -129,10 +129,10 @@ const server = http.createServer((req, res) => {
         const parsed = JSON.parse(body.toString("utf8"));
         if (parsed.thinking && /^gemini\//.test(parsed.model || "")) {
           // Gemini through the engine (LiteLLM) takes a thinking BUDGET, not
-          // reasoning_effort. Mirror Dyad's own thinkingBudget setting mapping
+          // reasoning_effort. Mirror KapAble's own thinkingBudget setting mapping
           // (thinking_utils.getGeminiThinkingBudgetTokens: medium=4000,
           // high=-1 dynamic) so a forced tier is exactly what the product
-          // sends at that setting. Tiers Dyad has no budget for are refused
+          // sends at that setting. Tiers KapAble has no budget for are refused
           // loudly rather than silently running at the default.
           const budget = { minimal: 0, low: 1000, medium: 4000, high: -1 }[
             forcedEffort
@@ -228,7 +228,7 @@ const server = http.createServer((req, res) => {
           record({
             ts: new Date(startedAt).toISOString(),
             cellId: CELL_ID,
-            dyadRequestId: req.headers["x-dyad-request-id"] ?? null,
+            kapableRequestId: req.headers["x-kapable-request-id"] ?? null,
             path: req.url,
             status: upstreamRes.statusCode,
             ...requestMeta,
@@ -245,7 +245,7 @@ const server = http.createServer((req, res) => {
       record({
         ts: new Date(startedAt).toISOString(),
         cellId: CELL_ID,
-        dyadRequestId: req.headers["x-dyad-request-id"] ?? null,
+        kapableRequestId: req.headers["x-kapable-request-id"] ?? null,
         path: req.url,
         ...requestMeta,
         error: clientGone ? "client_abort" : String(err),

@@ -1,6 +1,6 @@
 # Contributor License Agreement (Individual)
 
-Thank you for your interest in contributing to Dyad.
+Thank you for your interest in contributing to KapAble.
 
 This Contributor License Agreement (“Agreement”) clarifies the intellectual property license granted by you to the project owner, **Dyad Tech, Inc.**, for your contributions.
 
@@ -12,7 +12,7 @@ This Contributor License Agreement (“Agreement”) clarifies the intellectual 
 
 **“Contribution”** means any original work of authorship, including code, documentation, or other material, that you intentionally submit for inclusion in the project.
 
-**“Project”** means the Dyad open-source software project to which the Contribution is submitted.
+**“Project”** means the KapAble open-source software project to which the Contribution is submitted.
 
 ---
 

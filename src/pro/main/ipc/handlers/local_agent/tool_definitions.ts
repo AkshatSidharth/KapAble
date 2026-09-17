@@ -101,7 +101,7 @@ import {
 import type { AgentToolConsent } from "@/lib/schemas";
 import { getSupabaseClientCode } from "@/supabase_admin/supabase_context";
 import { getNeonClientCode } from "@/neon_admin/neon_context";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { ExecuteAddDependencyError } from "@/ipc/processors/executeAddDependency";
 import { withTrackedMutation } from "./subagents/mutation_activity_tracker";
 import { estimateTokens } from "@/ipc/utils/token_utils";
@@ -299,9 +299,9 @@ export async function requireAgentToolConsent(
 
   if (current === "always") return true;
   if (current === "never")
-    throw new DyadError(
+    throw new KapableError(
       "Should not ask for consent for a tool marked as 'never'",
-      DyadErrorKind.Internal,
+      KapableErrorKind.Internal,
     );
 
   if (
@@ -406,9 +406,9 @@ function convertToolResultForAiSdk(
   if (typeof result === "string") {
     return { type: "text", value: result };
   }
-  throw new DyadError(
+  throw new KapableError(
     `Unsupported tool result type: ${typeof result}`,
-    DyadErrorKind.Internal,
+    KapableErrorKind.Internal,
   );
 }
 
@@ -439,7 +439,7 @@ export interface BuildAgentToolSetOptions {
    */
   basicAgentMode?: boolean;
   /**
-   * If true, exclude tools that call separate Dyad Engine endpoints.
+   * If true, exclude tools that call separate KapAble Engine endpoints.
    * The free Pro model only uses the engine chat-completions endpoint.
    */
   freeModelMode?: boolean;
@@ -483,7 +483,7 @@ export async function estimateAgentToolTokens({
   basicAgentMode = false,
   freeModelMode = false,
   enableAppBlueprint,
-  isDyadPro,
+  isKapablePro,
   frameworkType,
   supabaseProjectId,
   supabaseProviderToolsAvailable = false,
@@ -505,7 +505,7 @@ export async function estimateAgentToolTokens({
   basicAgentMode?: boolean;
   freeModelMode?: boolean;
   enableAppBlueprint: boolean;
-  isDyadPro: boolean;
+  isKapablePro: boolean;
   frameworkType: AgentContext["frameworkType"];
   supabaseProjectId: string | null;
   supabaseProviderToolsAvailable?: boolean;
@@ -522,7 +522,7 @@ export async function estimateAgentToolTokens({
   mcpToolDefs?: McpToolDef[];
 }): Promise<number> {
   const estimateContext = {
-    isDyadPro,
+    isKapablePro,
     frameworkType,
     supabaseProjectId,
     supabaseProviderToolsAvailable,
@@ -728,7 +728,7 @@ export function shouldIncludeTool(
   if (options.freeModelMode && tool.usesEngineEndpoint) {
     return false;
   }
-  if (tool.subagentOnly && !ctx.isDyadPro) {
+  if (tool.subagentOnly && !ctx.isKapablePro) {
     return false;
   }
   // search_chats is superseded by the explore_chat_history sub-agent wherever
@@ -856,9 +856,9 @@ export function buildAgentToolSet(
           await requireToolConsentOrThrow(tool, processedArgs, invocationCtx);
           const invoke = async () => {
             if (invocationCtx.abortSignal?.aborted) {
-              throw new DyadError(
+              throw new KapableError(
                 "This agent run was cancelled.",
-                DyadErrorKind.UserCancelled,
+                KapableErrorKind.UserCancelled,
               );
             }
             // Track file edit tool usage before execution to capture all attempts
@@ -909,7 +909,7 @@ export function buildAgentToolSet(
           const errorMessage = getToolErrorSummary(error);
           const errorDetails = getToolErrorDisplayDetails(error);
 
-          const errorXml = `<dyad-output type="error" message="Tool '${tool.name}' failed: ${escapeXmlAttr(errorMessage)}">${escapeXmlContent(errorDetails)}</dyad-output>`;
+          const errorXml = `<kapable-output type="error" message="Tool '${tool.name}' failed: ${escapeXmlAttr(errorMessage)}">${escapeXmlContent(errorDetails)}</kapable-output>`;
           invocationCtx.onXmlComplete(errorXml);
           if (toolCallId && invocationCtx.onToolActivity) {
             await invocationCtx.onToolActivity({

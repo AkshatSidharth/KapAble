@@ -18,7 +18,7 @@ function validateFixture({
   expectedError,
 } = {}) {
   const fixtureDirectory = fs.mkdtempSync(
-    path.join(os.tmpdir(), "dyad-pr-review-validation-"),
+    path.join(os.tmpdir(), "kapable-pr-review-validation-"),
   );
 
   try {

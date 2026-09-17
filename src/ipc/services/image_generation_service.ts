@@ -4,8 +4,8 @@ import {
 } from "../types/image_generation";
 import { db } from "../../db";
 import { apps } from "../../db/schema";
-import { getDyadAppPath } from "../../paths/paths";
-import { DYAD_MEDIA_DIR_NAME } from "../utils/media_path_utils";
+import { getKapableAppPath } from "../../paths/paths";
+import { KAPABLE_MEDIA_DIR_NAME } from "../utils/media_path_utils";
 import { safeJoin } from "../utils/path_utils";
 import {
   appOperationCoordinator,
@@ -17,9 +17,9 @@ import { eq } from "drizzle-orm";
 import fs from "node:fs";
 import path from "node:path";
 import log from "electron-log";
-import { DyadError, DyadErrorKind, isDyadError } from "@/errors/dyad_error";
-import { getDyadEngineBaseUrl } from "../utils/dyad_engine_url";
-import { ensureDyadGitignored } from "../handlers/gitignoreUtils";
+import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import { getKapableEngineBaseUrl } from "../utils/kapable_engine_url";
+import { ensureKapableGitignored } from "../handlers/gitignoreUtils";
 
 const logger = log.scope("image_generation_service");
 
@@ -43,21 +43,21 @@ interface ActiveGeneration {
 
 function throwIfGenerationCancelled(signal: AbortSignal): void {
   if (signal.aborted) {
-    throw new DyadError(
+    throw new KapableError(
       "Image generation cancelled.",
-      DyadErrorKind.UserCancelled,
+      KapableErrorKind.UserCancelled,
     );
   }
 }
 
-function getHttpErrorKind(status: number): DyadErrorKind {
+function getHttpErrorKind(status: number): KapableErrorKind {
   if (status === 401 || status === 403) {
-    return DyadErrorKind.Auth;
+    return KapableErrorKind.Auth;
   }
   if (status === 429) {
-    return DyadErrorKind.RateLimited;
+    return KapableErrorKind.RateLimited;
   }
-  return DyadErrorKind.External;
+  return KapableErrorKind.External;
 }
 
 const THEME_SYSTEM_PROMPTS: Record<ImageThemeMode, string | null> = {
@@ -82,9 +82,9 @@ export class ImageGenerationService {
     // what happened to this request, and reporting it as blocked by a recording
     // would both misname it and leave its tombstone behind until eviction.
     if (this.cancellationTombstones.delete(params.requestId)) {
-      throw new DyadError(
+      throw new KapableError(
         "Image generation cancelled.",
-        DyadErrorKind.UserCancelled,
+        KapableErrorKind.UserCancelled,
       );
     }
     // Refuse before the generation, not just before the save: the save runs
@@ -94,9 +94,9 @@ export class ImageGenerationService {
     // starts mid-generation; this one is only the early exit.
     assertNoActiveRecording(params.targetAppId, IMAGE_SAVE_ACTION);
     if (this.active.has(params.requestId)) {
-      throw new DyadError(
+      throw new KapableError(
         "Image generation invocation is already active",
-        DyadErrorKind.Conflict,
+        KapableErrorKind.Conflict,
       );
     }
     const controller = new AbortController();
@@ -133,9 +133,9 @@ export class ImageGenerationService {
 
   assertAcceptingGenerations(appId: number): void {
     if (this.resetFenceCount > 0 || this.deletionFences.has(appId)) {
-      throw new DyadError(
+      throw new KapableError(
         "The app is being deleted",
-        DyadErrorKind.Precondition,
+        KapableErrorKind.Precondition,
       );
     }
   }
@@ -148,9 +148,9 @@ export class ImageGenerationService {
     const apiKey = settings.providerSettings?.auto?.apiKey?.value;
 
     if (!apiKey) {
-      throw new DyadError(
-        "Dyad Pro API key is required for image generation",
-        DyadErrorKind.Auth,
+      throw new KapableError(
+        "KapAble Pro API key is required for image generation",
+        KapableErrorKind.Auth,
       );
     }
 
@@ -158,7 +158,7 @@ export class ImageGenerationService {
       where: eq(apps.id, params.targetAppId),
     });
     if (!app) {
-      throw new DyadError("Target app not found", DyadErrorKind.NotFound);
+      throw new KapableError("Target app not found", KapableErrorKind.NotFound);
     }
 
     const systemPrompt = THEME_SYSTEM_PROMPTS[params.themeMode];
@@ -174,29 +174,29 @@ export class ImageGenerationService {
 
     let response: Response;
     try {
-      response = await fetch(`${getDyadEngineBaseUrl()}/images/generations`, {
+      response = await fetch(`${getKapableEngineBaseUrl()}/images/generations`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
-          "X-Dyad-Request-Id": requestId,
+          "X-KapAble-Request-Id": requestId,
         },
         body: JSON.stringify({
           prompt: fullPrompt,
-          model: "dyad/image-gen",
+          model: "kapable/image-gen",
         }),
         signal: controller.signal,
       });
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
-        throw new DyadError(
+        throw new KapableError(
           "Image generation cancelled or timed out.",
-          DyadErrorKind.UserCancelled,
+          KapableErrorKind.UserCancelled,
         );
       }
-      throw new DyadError(
+      throw new KapableError(
         "Failed to connect to image generation service.",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     } finally {
       clearTimeout(timeoutId);
@@ -208,7 +208,7 @@ export class ImageGenerationService {
       logger.error(
         `Image generation API error: HTTP ${response.status} (request: ${requestId})`,
       );
-      throw new DyadError(
+      throw new KapableError(
         `Image generation failed (HTTP ${response.status}). Please try again.`,
         getHttpErrorKind(response.status),
       );
@@ -218,17 +218,17 @@ export class ImageGenerationService {
     const parsed = ImageGenerationApiResponseSchema.safeParse(rawData);
     if (!parsed.success) {
       logger.error("Invalid image generation response:", parsed.error);
-      throw new DyadError(
+      throw new KapableError(
         "Invalid response from image generation service",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
     const imageData = parsed.data.data[0];
     if (!imageData?.b64_json && !imageData?.url) {
-      throw new DyadError(
+      throw new KapableError(
         "No image data returned from generation service",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
@@ -237,15 +237,15 @@ export class ImageGenerationService {
     if (imageData.b64_json) {
       imageBuffer = Buffer.from(imageData.b64_json, "base64");
       if (imageBuffer.byteLength > MAX_IMAGE_SIZE) {
-        throw new DyadError(
+        throw new KapableError(
           "Decoded image exceeds maximum allowed size",
-          DyadErrorKind.Validation,
+          KapableErrorKind.Validation,
         );
       }
     } else if (imageData.url) {
       const imageUrl = new URL(imageData.url);
       if (imageUrl.protocol !== "https:") {
-        throw new DyadError("Image URL must use HTTPS", DyadErrorKind.External);
+        throw new KapableError("Image URL must use HTTPS", KapableErrorKind.External);
       }
       const downloadTimeoutSignal = AbortSignal.timeout(
         IMAGE_GENERATION_TIMEOUT_MS,
@@ -255,41 +255,41 @@ export class ImageGenerationService {
           signal: AbortSignal.any([controller.signal, downloadTimeoutSignal]),
         });
         if (!imgResponse.ok) {
-          throw new DyadError(
+          throw new KapableError(
             `Failed to download image: ${imgResponse.status} ${imgResponse.statusText}`,
             getHttpErrorKind(imgResponse.status),
           );
         }
         const arrayBuffer = await imgResponse.arrayBuffer();
         if (arrayBuffer.byteLength > MAX_IMAGE_SIZE) {
-          throw new DyadError(
+          throw new KapableError(
             "Downloaded image exceeds maximum allowed size",
-            DyadErrorKind.Validation,
+            KapableErrorKind.Validation,
           );
         }
         imageBuffer = Buffer.from(arrayBuffer);
       } catch (dlError) {
         throwIfGenerationCancelled(controller.signal);
         if (downloadTimeoutSignal.aborted) {
-          throw new DyadError(
+          throw new KapableError(
             "Image download timed out. Please try again.",
-            DyadErrorKind.External,
+            KapableErrorKind.External,
             { cause: dlError },
           );
         }
-        if (isDyadError(dlError)) {
+        if (isKapableError(dlError)) {
           throw dlError;
         }
-        throw new DyadError(
+        throw new KapableError(
           "Failed to download generated image.",
-          DyadErrorKind.External,
+          KapableErrorKind.External,
           { cause: dlError },
         );
       }
     } else {
-      throw new DyadError(
+      throw new KapableError(
         "Unexpected image response format",
-        DyadErrorKind.External,
+        KapableErrorKind.External,
       );
     }
 
@@ -312,11 +312,11 @@ export class ImageGenerationService {
           where: eq(apps.id, params.targetAppId),
         });
         if (!currentApp) {
-          throw new DyadError("Target app not found", DyadErrorKind.NotFound);
+          throw new KapableError("Target app not found", KapableErrorKind.NotFound);
         }
-        const resolvedAppPath = getDyadAppPath(currentApp.path);
-        await ensureDyadGitignored(resolvedAppPath);
-        const mediaDir = path.join(resolvedAppPath, DYAD_MEDIA_DIR_NAME);
+        const resolvedAppPath = getKapableAppPath(currentApp.path);
+        await ensureKapableGitignored(resolvedAppPath);
+        const mediaDir = path.join(resolvedAppPath, KAPABLE_MEDIA_DIR_NAME);
         await fs.promises.mkdir(mediaDir, { recursive: true });
 
         const timestamp = Date.now();

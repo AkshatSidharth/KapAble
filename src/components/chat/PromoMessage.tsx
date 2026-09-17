@@ -4,11 +4,11 @@ import { usePostHog } from "posthog-js/react";
 import { useEffect, useRef, useState } from "react";
 
 import { selectedAppIdAtom } from "@/atoms/appAtoms";
-import { DyadProTrialDialog } from "@/components/DyadProTrialDialog";
+import { KapableProTrialDialog } from "@/components/KapableProTrialDialog";
 import { useSettings } from "@/hooks/useSettings";
 import { useUserBudgetInfo } from "@/hooks/useUserBudgetInfo";
 import { ipc, type UserBudgetInfo } from "@/ipc/types";
-import { hasDyadProKey, type UserSettings } from "@/lib/schemas";
+import { hasKapableProKey, type UserSettings } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import { useChatMessageCount } from "@/hooks/useChatMessages";
 import { useChatStreamState } from "@/hooks/useChatStream";
@@ -28,71 +28,71 @@ export interface PromoMessageConfig {
 export const PROMO_MESSAGES: PromoMessageConfig[] = [
   {
     id: "pro-trial",
-    text: "Build more with Dyad Pro — free for 7 days.",
+    text: "Build more with KapAble Pro — free for 7 days.",
     cta: "Start Free Trial",
     target: { type: "trial-dialog" },
     weight: 3,
   },
   {
     id: "agent-mode",
-    text: "Let Dyad Pro fix bugs with Agent mode.",
-    cta: "Get Dyad Pro",
+    text: "Let KapAble Pro fix bugs with Agent mode.",
+    cta: "Get KapAble Pro",
     target: { type: "trial-dialog" },
     weight: 3,
   },
   {
     id: "custom-theme",
     text: "Give your app a unique look with AI theme generator.",
-    cta: "Get Dyad Pro",
+    cta: "Get KapAble Pro",
     target: { type: "trial-dialog" },
     weight: 2,
   },
   {
     id: "speech-to-text",
-    text: "Tired of typing? Talk to Dyad with your voice.",
-    cta: "Get Dyad Pro",
+    text: "Tired of typing? Talk to KapAble with your voice.",
+    cta: "Get KapAble Pro",
     target: { type: "trial-dialog" },
     weight: 3,
   },
   {
     id: "web-search",
-    text: "Let Dyad use the web for fresh information and better builds.",
-    cta: "Get Dyad Pro",
+    text: "Let KapAble use the web for fresh information and better builds.",
+    cta: "Get KapAble Pro",
     target: { type: "trial-dialog" },
     weight: 2,
   },
   {
     id: "pro-tools",
-    text: "Recreate a website with Dyad Pro.",
-    cta: "Unlock Dyad Pro",
+    text: "Recreate a website with KapAble Pro.",
+    cta: "Unlock KapAble Pro",
     target: { type: "trial-dialog" },
     weight: 2,
   },
   {
     id: "all-models",
     text: "Access all the leading AI models in one subscription.",
-    cta: "Get Dyad Pro",
+    cta: "Get KapAble Pro",
     target: { type: "trial-dialog" },
     weight: 3,
   },
   {
     id: "github-star",
-    text: "Enjoying Dyad? Star us on GitHub.",
+    text: "Enjoying KapAble? Star us on GitHub.",
     cta: "Star on GitHub",
-    target: { type: "url", url: "https://github.com/dyad-sh/dyad" },
+    target: { type: "url", url: "https://github.com/AkshatSidharth/KapAble" },
     weight: 1,
   },
   {
     id: "reddit",
-    text: "Join 4000+ builders in the Dyad subreddit.",
+    text: "Join 4000+ builders in the KapAble subreddit.",
     cta: "Join r/dyadbuilders",
     target: { type: "url", url: "https://www.reddit.com/r/dyadbuilders/" },
     weight: 1,
   },
   {
     id: "follow-x",
-    text: "Follow Dyad on X for build tips and release updates.",
-    cta: "Follow @dyad_sh",
+    text: "Follow KapAble on X for build tips and release updates.",
+    cta: "Follow @kapable_sh",
     target: { type: "url", url: "https://x.com/dyad_sh" },
     weight: 0.5,
   },
@@ -127,7 +127,7 @@ export function shouldShowPromoMessage({
   userBudget: UserBudgetInfo | undefined;
   messagesLength: number;
 }) {
-  const hasProKey = settings ? hasDyadProKey(settings) : false;
+  const hasProKey = settings ? hasKapableProKey(settings) : false;
   return (
     promoSeed !== null &&
     !settings?.isTestMode &&
@@ -266,7 +266,7 @@ export function PromoMessage({ seed }: { seed: number }) {
           </button>
         )}
       </div>
-      <DyadProTrialDialog
+      <KapableProTrialDialog
         isOpen={isTrialDialogOpen}
         onClose={() => setIsTrialDialogOpen(false)}
         utmCampaign={`streaming-promo-${message.id}`}

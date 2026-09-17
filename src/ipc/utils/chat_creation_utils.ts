@@ -3,8 +3,8 @@ import { apps, chats } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import log from "electron-log";
 import type { ChatMode } from "../../lib/schemas";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
-import { getDyadAppPath } from "../../paths/paths";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
+import { getKapableAppPath } from "../../paths/paths";
 import { getCurrentCommitHash } from "./git_utils";
 import { getInitialChatModeForNewChat } from "../handlers/chat_mode_resolution";
 import { assertAppChatCreationOpen } from "../services/app_chat_creation_fence";
@@ -45,13 +45,13 @@ export async function createChatForApp({
         columns: { path: true },
       });
       if (!app) {
-        throw new DyadError("App not found", DyadErrorKind.NotFound);
+        throw new KapableError("App not found", KapableErrorKind.NotFound);
       }
 
       let initialCommitHash = null;
       try {
         initialCommitHash = await getCurrentCommitHash({
-          path: getDyadAppPath(app.path),
+          path: getKapableAppPath(app.path),
         });
       } catch (error) {
         logger.error("Error getting git revision:", error);

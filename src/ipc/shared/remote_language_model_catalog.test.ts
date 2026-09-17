@@ -10,25 +10,25 @@ type RemoteAlias = {
 
 const DEFAULT_REMOTE_ALIASES: RemoteAlias[] = [
   {
-    id: "dyad/auto/openai",
+    id: "kapable/auto/openai",
     providerId: "openai",
     apiName: "gpt-5.2",
     purpose: "auto-mode",
   },
   {
-    id: "dyad/auto/anthropic",
+    id: "kapable/auto/anthropic",
     providerId: "anthropic",
     apiName: "claude-sonnet-4-6",
     purpose: "auto-mode",
   },
   {
-    id: "dyad/theme-generator/openai",
+    id: "kapable/theme-generator/openai",
     providerId: "openai",
     apiName: "gpt-5.2",
     purpose: "theme-generation",
   },
   {
-    id: "dyad/help-bot/default",
+    id: "kapable/help-bot/default",
     providerId: "openai",
     apiName: "gpt-5.2",
     purpose: "help-bot",
@@ -115,7 +115,7 @@ describe("remote language model catalog", () => {
     expect(catalog.source).toBe("fallback");
     expect(catalog.version).toBeUndefined();
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe(GPT_5_5_MODEL_NAME);
   });
 
@@ -137,15 +137,15 @@ describe("remote language model catalog", () => {
     await mod.getBuiltinLanguageModelCatalog();
     expect(fetchCalls).toBe(1);
 
-    const beforeOpenAi = await mod.resolveBuiltinModelAlias("dyad/auto/openai");
+    const beforeOpenAi = await mod.resolveBuiltinModelAlias("kapable/auto/openai");
     const beforeAnthropic = await mod.resolveBuiltinModelAlias(
-      "dyad/auto/anthropic",
+      "kapable/auto/anthropic",
     );
     const beforeTheme = await mod.resolveBuiltinModelAlias(
-      "dyad/theme-generator/openai",
+      "kapable/theme-generator/openai",
     );
     const beforeHelpBot = await mod.resolveBuiltinModelAlias(
-      "dyad/help-bot/default",
+      "kapable/help-bot/default",
     );
     expect(beforeOpenAi?.apiName).toBe("gpt-5.2");
     expect(beforeAnthropic?.apiName).toBe("claude-sonnet-4-6");
@@ -169,15 +169,15 @@ describe("remote language model catalog", () => {
     expect(preserved.source).toBe("remote");
     expect(fetchCalls).toBe(2);
 
-    const afterOpenAi = await mod.resolveBuiltinModelAlias("dyad/auto/openai");
+    const afterOpenAi = await mod.resolveBuiltinModelAlias("kapable/auto/openai");
     const afterAnthropic = await mod.resolveBuiltinModelAlias(
-      "dyad/auto/anthropic",
+      "kapable/auto/anthropic",
     );
     const afterTheme = await mod.resolveBuiltinModelAlias(
-      "dyad/theme-generator/openai",
+      "kapable/theme-generator/openai",
     );
     const afterHelpBot = await mod.resolveBuiltinModelAlias(
-      "dyad/help-bot/default",
+      "kapable/help-bot/default",
     );
     expect(afterOpenAi?.apiName).toBe("gpt-5.2");
     expect(afterAnthropic?.apiName).toBe("claude-sonnet-4-6");
@@ -205,7 +205,7 @@ describe("remote language model catalog", () => {
                     version: "remote-v2",
                     aliases: [
                       {
-                        id: "dyad/auto/openai",
+                        id: "kapable/auto/openai",
                         providerId: "openai",
                         apiName: "gpt-5.3",
                         purpose: "auto-mode",
@@ -225,7 +225,7 @@ describe("remote language model catalog", () => {
     await mod.getBuiltinLanguageModelCatalog();
     expect(fetchCalls).toBe(1);
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe("gpt-5.2");
 
     // Let the cache go stale.
@@ -242,14 +242,14 @@ describe("remote language model catalog", () => {
     expect(secondStale.source).toBe("remote");
     expect(fetchCalls).toBe(2);
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe("gpt-5.2");
 
     // Let the in-flight refresh resolve successfully; the next read reflects
     // the updated remote catalog (no regression on the happy SWR path).
     await new Promise((r) => setTimeout(r, 200));
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe("gpt-5.3");
     expect(fetchCalls).toBe(2);
   });
@@ -278,7 +278,7 @@ describe("remote language model catalog", () => {
     expect(coldCatalog.source).toBe("remote");
     expect(fetchCalls).toBe(1);
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe("gpt-5.2");
 
     // Advance past the server-declared expiry; the stale read triggers a
@@ -291,7 +291,7 @@ describe("remote language model catalog", () => {
     expect(staleCatalog.source).toBe("remote");
     expect(fetchCalls).toBe(2);
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe("gpt-5.2");
 
     // Advance past the 30s grace TTL; the next stale read triggers a second
@@ -308,7 +308,7 @@ describe("remote language model catalog", () => {
       "fallback",
     );
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe(GPT_5_5_MODEL_NAME);
     expect(fetchCalls).toBe(3);
   });
@@ -327,7 +327,7 @@ describe("remote language model catalog", () => {
                 expiresInMs: 1000,
                 aliases: [
                   {
-                    id: "dyad/auto/openai",
+                    id: "kapable/auto/openai",
                     providerId: "openai",
                     apiName: "gpt-5.2",
                     purpose: "auto-mode",
@@ -348,7 +348,7 @@ describe("remote language model catalog", () => {
                 expiresInMs: 1000,
                 aliases: [
                   {
-                    id: "dyad/auto/openai",
+                    id: "kapable/auto/openai",
                     providerId: "openai",
                     apiName: "gpt-5.3",
                     purpose: "auto-mode",
@@ -373,7 +373,7 @@ describe("remote language model catalog", () => {
     await cold;
     expect(fetchCalls).toBe(1);
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe("gpt-5.2");
 
     // (A) Advance past expiry; refresh #2 fails -> preserve remote (grace used).
@@ -384,7 +384,7 @@ describe("remote language model catalog", () => {
     expect(fetchCalls).toBe(2);
     await vi.advanceTimersByTimeAsync(0);
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe("gpt-5.2");
 
     // (B) Advance past the grace TTL; refresh #3 SUCCEEDS with gpt-5.3, which
@@ -396,7 +396,7 @@ describe("remote language model catalog", () => {
     expect(fetchCalls).toBe(3);
     await vi.advanceTimersByTimeAsync(0);
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe("gpt-5.3");
 
     // (C) Advance past expiry; refresh #4 fails. Because the successful refresh
@@ -409,7 +409,7 @@ describe("remote language model catalog", () => {
     await vi.advanceTimersByTimeAsync(0);
     expect((await mod.getBuiltinLanguageModelCatalog()).source).toBe("remote");
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe("gpt-5.3");
 
     // (D) Advance past the grace TTL; refresh #5 fails again and now falls
@@ -424,7 +424,7 @@ describe("remote language model catalog", () => {
       "fallback",
     );
     expect(
-      (await mod.resolveBuiltinModelAlias("dyad/auto/openai"))?.apiName,
+      (await mod.resolveBuiltinModelAlias("kapable/auto/openai"))?.apiName,
     ).toBe(GPT_5_5_MODEL_NAME);
   });
 });

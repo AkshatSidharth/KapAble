@@ -54,7 +54,7 @@ export const enableNitroTool: ToolDefinition<
   shouldTrackMutation: (_args, result) =>
     result.startsWith("Nitro server layer added"),
 
-  buildXml: () => `<dyad-enable-nitro></dyad-enable-nitro>`,
+  buildXml: () => `<kapable-enable-nitro></kapable-enable-nitro>`,
 
   execute: async (_args, ctx: AgentContext) => {
     // Belt-and-suspenders: `isEnabled` already filters this tool out when

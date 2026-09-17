@@ -1,4 +1,4 @@
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 const admissionBlockCounts = new Map<number, number>();
 
@@ -21,8 +21,8 @@ export const beginChatActorDeletion = beginChatActorMutation;
 
 export function assertChatActorAdmissionOpen(
   chatId: number,
-  errorKind: DyadErrorKind = DyadErrorKind.Precondition,
+  errorKind: KapableErrorKind = KapableErrorKind.Precondition,
 ): void {
   if (!admissionBlockCounts.has(chatId)) return;
-  throw new DyadError("Chat is temporarily unavailable", errorKind);
+  throw new KapableError("Chat is temporarily unavailable", errorKind);
 }

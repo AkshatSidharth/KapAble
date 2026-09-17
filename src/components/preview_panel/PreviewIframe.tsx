@@ -200,7 +200,7 @@ export const PreviewIframe = ({
     // `page.goto("/that/path")` against the app — a destination the user never
     // visited. Unknown or off-origin means no hint at all.
     //
-    // And only for a route the user picked through Dyad's chrome: one the app
+    // And only for a route the user picked through KapAble's chrome: one the app
     // reached itself is not a starting point anyone chose, and opening a
     // session there makes replay `goto` the destination and skip the
     // navigation — often a redirect that is the thing under test — that got to
@@ -213,7 +213,7 @@ export const PreviewIframe = ({
     // from.
     // Asks first — setup clears the preview's cookies and local storage.
     recorder.requestStartRecording(
-      iframeState.currentUrlSource === "dyad"
+      iframeState.currentUrlSource === "kapable"
         ? sameOriginStartPath(currentHistoryUrl, appUrl)
         : undefined,
     );
@@ -311,7 +311,7 @@ export const PreviewIframe = ({
 
     const requestId = crypto.randomUUID();
     pendingAnnotatorScreenshotRequestIdRef.current = requestId;
-    postPreviewMessage({ type: "dyad-take-screenshot", requestId });
+    postPreviewMessage({ type: "kapable-take-screenshot", requestId });
   };
 
   // AST Analysis State
@@ -383,15 +383,15 @@ export const PreviewIframe = ({
       sendIframeEvent({
         type: "IFRAME_ERROR",
         message: cloudSandboxStatus.lastErrorMessage
-          ? cloudSandboxStatus.lastErrorMessage.includes("Dyad stopped")
+          ? cloudSandboxStatus.lastErrorMessage.includes("KapAble stopped")
             ? cloudSandboxStatus.lastErrorMessage
             : cloudSandboxStatus.terminationReason === "credits_exhausted"
-              ? "This cloud sandbox was stopped because your Dyad Pro credits ran out. Add credits and start it again."
-              : "This cloud sandbox was stopped because Dyad could not confirm billing. Please try starting it again."
+              ? "This cloud sandbox was stopped because your KapAble Pro credits ran out. Add credits and start it again."
+              : "This cloud sandbox was stopped because KapAble could not confirm billing. Please try starting it again."
           : cloudSandboxStatus.terminationReason === "credits_exhausted"
-            ? "This cloud sandbox was stopped because your Dyad Pro credits ran out. Add credits and start it again."
-            : "This cloud sandbox was stopped because Dyad could not confirm billing. Please try starting it again.",
-        source: "dyad-app",
+            ? "This cloud sandbox was stopped because your KapAble Pro credits ran out. Add credits and start it again."
+            : "This cloud sandbox was stopped because KapAble could not confirm billing. Please try starting it again.",
+        source: "kapable-app",
       });
     }
   }, [cloudSandboxStatus, isCloudMode, sendIframeEvent]);
@@ -447,7 +447,7 @@ export const PreviewIframe = ({
       if (result.hasStaticText && iframeRef.current?.contentWindow) {
         iframeRef.current.contentWindow.postMessage(
           {
-            type: "enable-dyad-text-editing",
+            type: "enable-kapable-text-editing",
             data: {
               componentId: componentId,
               runtimeId: visualEditingSelectedComponent?.runtimeId,
@@ -511,7 +511,7 @@ export const PreviewIframe = ({
       // Send message to iframe to get current styles
       iframeRef.current.contentWindow.postMessage(
         {
-          type: "get-dyad-component-styles",
+          type: "get-kapable-component-styles",
           data: {
             elementId: visualEditingSelectedComponent.id,
             runtimeId: visualEditingSelectedComponent.runtimeId,
@@ -537,7 +537,7 @@ export const PreviewIframe = ({
   useEffect(() => {
     if (iframeRef.current?.contentWindow && isComponentSelectorInitialized) {
       iframeRef.current.contentWindow.postMessage(
-        { type: "dyad-pro-mode", enabled: isProMode },
+        { type: "kapable-pro-mode", enabled: isProMode },
         "*",
       );
     }
@@ -672,30 +672,30 @@ export const PreviewIframe = ({
         return;
       }
 
-      if (event.data?.type === "dyad-component-selector-initialized") {
+      if (event.data?.type === "kapable-component-selector-initialized") {
         iframeRef.current?.contentWindow?.postMessage(
-          { type: "dyad-pro-mode", enabled: isProMode },
+          { type: "kapable-pro-mode", enabled: isProMode },
           "*",
         );
         return;
       }
 
-      if (event.data?.type === "dyad-preview-reload-shortcut") {
+      if (event.data?.type === "kapable-preview-reload-shortcut") {
         handleReload();
         return;
       }
 
-      if (event.data?.type === "dyad-text-updated") {
+      if (event.data?.type === "kapable-text-updated") {
         handleTextUpdated(event.data);
         return;
       }
 
-      if (event.data?.type === "dyad-text-finalized") {
+      if (event.data?.type === "kapable-text-finalized") {
         handleTextUpdated(event.data);
         return;
       }
 
-      if (event.data?.type === "dyad-component-selected") {
+      if (event.data?.type === "kapable-component-selected") {
         console.log("Component picked:", event.data);
 
         const component = parseComponentSelection(event.data);
@@ -733,14 +733,14 @@ export const PreviewIframe = ({
         return;
       }
 
-      if (event.data?.type === "dyad-component-deselected") {
+      if (event.data?.type === "kapable-component-deselected") {
         const componentId = event.data.componentId;
         if (componentId) {
           // Disable text editing for the deselected component
           if (iframeRef.current?.contentWindow) {
             iframeRef.current.contentWindow.postMessage(
               {
-                type: "disable-dyad-text-editing",
+                type: "disable-kapable-text-editing",
                 data: { componentId },
               },
               "*",
@@ -761,7 +761,7 @@ export const PreviewIframe = ({
         return;
       }
 
-      if (event.data?.type === "dyad-image-load-error") {
+      if (event.data?.type === "kapable-image-load-error") {
         showError("Image failed to load. Please check the URL and try again.");
         // Remove the broken image from pending changes
         const { elementId } = event.data;
@@ -790,14 +790,14 @@ export const PreviewIframe = ({
         return;
       }
 
-      if (event.data?.type === "dyad-component-coordinates-updated") {
+      if (event.data?.type === "kapable-component-coordinates-updated") {
         if (event.data.coordinates) {
           setCurrentComponentCoordinates(event.data.coordinates);
         }
         return;
       }
 
-      if (event.data?.type === "dyad-screenshot-response") {
+      if (event.data?.type === "kapable-screenshot-response") {
         const requestId =
           typeof event.data.requestId === "string"
             ? event.data.requestId
@@ -1605,7 +1605,7 @@ export const PreviewIframe = ({
         <PreviewLoadingScreen
           loading={loading}
           isAppUrlReady={!!appUrl}
-          hasStartupError={!loading && errorMessage?.source === "dyad-app"}
+          hasStartupError={!loading && errorMessage?.source === "kapable-app"}
         />
         {!loading && appUrl && (
           <div
@@ -1723,7 +1723,7 @@ function RecordingSetupOverlay({
         </p>
         <p className="text-sm text-muted-foreground">
           {recorder.phase === "starting" || recorder.phase === "authenticating"
-            ? "Dyad is preparing an isolated environment for your recording — hold off on interacting with the preview until it's ready."
+            ? "KapAble is preparing an isolated environment for your recording — hold off on interacting with the preview until it's ready."
             : "Hold off on interacting with the preview until this finishes."}
         </p>
       </div>
@@ -1732,7 +1732,7 @@ function RecordingSetupOverlay({
 }
 
 function parseComponentSelection(data: any): ComponentSelection | null {
-  if (!data || data.type !== "dyad-component-selected") {
+  if (!data || data.type !== "kapable-component-selected") {
     return null;
   }
 

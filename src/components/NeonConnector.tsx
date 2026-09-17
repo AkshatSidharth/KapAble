@@ -136,7 +136,7 @@ export function NeonConnector({ appId }: { appId: number }) {
     }
   }, [flowState, t]);
 
-  // A dyad://neon-oauth-return processed with no active flow (cold start,
+  // A kapable://neon-oauth-return processed with no active flow (cold start,
   // app restarted mid-flow, or a return that arrived after the flow timed
   // out): tokens are already stored — refresh what we show and confirm the
   // (late but real) success, matching the pre-machine behavior where every
@@ -160,7 +160,7 @@ export function NeonConnector({ appId }: { appId: number }) {
           await ipc.neon.fakeConnect();
         } else {
           await ipc.system.openExternalUrl(
-            "https://oauth.dyad.sh/api/integrations/neon/login",
+            "https://oauth.kapable.sh/api/integrations/neon/login",
           );
         }
       } catch (error) {

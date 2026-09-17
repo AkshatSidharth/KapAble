@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import { createLoggedHandler } from "./safe_handle";
 import log from "electron-log";
-import { getDyadAppPath, isAppLocationAccessible } from "../../paths/paths";
+import { getKapableAppPath, isAppLocationAccessible } from "../../paths/paths";
 import { apps } from "@/db/schema";
 import { db } from "@/db";
 import { chats } from "@/db/schema";
@@ -12,7 +12,7 @@ import { eq } from "drizzle-orm";
 import { ImportAppParams, ImportAppResult } from "@/ipc/types";
 import { copyDirectoryRecursive } from "../utils/file_utils";
 import { gitService } from "../services/git_service";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { getInitialChatModeForNewChat } from "./chat_mode_resolution";
 import {
   sanitizeAppDisplayName,
@@ -81,9 +81,9 @@ export function registerImportHandlers() {
       try {
         await fs.access(sourcePath);
       } catch {
-        throw new DyadError(
+        throw new KapableError(
           "Source folder does not exist",
-          DyadErrorKind.NotFound,
+          KapableErrorKind.NotFound,
         );
       }
 
@@ -93,9 +93,9 @@ export function registerImportHandlers() {
         where: eq(apps.name, appName),
       });
       if (existingApp) {
-        throw new DyadError(
+        throw new KapableError(
           "An app with this name already exists",
-          DyadErrorKind.Conflict,
+          KapableErrorKind.Conflict,
         );
       }
 
@@ -106,7 +106,7 @@ export function registerImportHandlers() {
           slugifyAppFolderName(appName),
         );
       }
-      const appPath = skipCopy ? sourcePath : getDyadAppPath(folderName!);
+      const appPath = skipCopy ? sourcePath : getKapableAppPath(folderName!);
 
       if (!skipCopy) {
         if (!isAppLocationAccessible(appPath)) {
@@ -115,7 +115,7 @@ export function registerImportHandlers() {
           );
         }
 
-        // Copy the app folder to the Dyad apps directory.
+        // Copy the app folder to the KapAble apps directory.
         // Why not use fs.cp? Because we want stable ordering for
         // tests.
         await copyDirectoryRecursive(sourcePath, appPath);

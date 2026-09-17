@@ -10,7 +10,7 @@ const require = createRequire(import.meta.url);
  * Recovery for Bug #3837: on macOS, Electron `safeStorage` ciphertext can
  * become undecryptable when the Keychain identity flips between the
  * "Chromium Safe Storage" item (used by a pre-`ready` race in Electron 40) and
- * the "dyad Safe Storage" item (used post-`ready` / Electron 43). The
+ * the "kapable Safe Storage" item (used post-`ready` / Electron 43). The
  * decryption key never leaves the user's Keychain — `safeStorage` just derives
  * it from the wrong Keychain item. This module re-implements Chromium's frozen,
  * deterministic macOS `os_crypt` scheme so we can read the correct Keychain
@@ -45,10 +45,10 @@ interface LegacyIdentity {
   account: string;
 }
 
-// Ordered by likelihood on a current install: the post-`ready` "dyad" identity
+// Ordered by likelihood on a current install: the post-`ready` "kapable" identity
 // first, then the legacy "Chromium" identity from the pre-`ready` race.
 const LEGACY_IDENTITIES: LegacyIdentity[] = [
-  { service: "dyad Safe Storage", account: "dyad Key" },
+  { service: "kapable Safe Storage", account: "kapable Key" },
   { service: "Chromium Safe Storage", account: "Chromium Key" },
 ];
 
@@ -118,7 +118,7 @@ type KeychainReaderBindingLoader = () => KeychainReaderBinding;
 let inProcessBinding: KeychainReaderBinding | null | undefined;
 let inProcessBindingLoadFailureLogged = false;
 let inProcessBindingLoader: KeychainReaderBindingLoader = () =>
-  require("dyad-keychain-reader") as KeychainReaderBinding;
+  require("kapable-keychain-reader") as KeychainReaderBinding;
 let interactionNeededIdentities = new Set<string>();
 let unlockPromptAttempted = false;
 
@@ -140,7 +140,7 @@ function loadInProcessKeychainReaderBinding(): KeychainReaderBinding | null {
 }
 
 function createDefaultKeychainPasswordReader(): KeychainPasswordReader {
-  return process.env.DYAD_SAFE_STORAGE_READER === "cli"
+  return process.env.KAPABLE_SAFE_STORAGE_READER === "cli"
     ? new SecurityCliKeychainPasswordReader()
     : new InProcessKeychainPasswordReader();
 }
@@ -183,7 +183,7 @@ function isUnlockCanceledStatus(status: number): boolean {
  *
  * v1 trade-off: shelling out to `security` can trigger a macOS Keychain
  * permission prompt for items created by the app, because the `security` tool
- * is a differently-signed program than Dyad. This interface exists so a future
+ * is a differently-signed program than KapAble. This interface exists so a future
  * in-process implementation (SecItemCopyMatching, silent for same-signed apps)
  * can replace this reader without touching the recovery logic.
  */
@@ -400,10 +400,10 @@ export function recoveryNeedsKeychainUnlock(): boolean {
   if (process.platform !== "darwin") {
     return false;
   }
-  if (process.env.DYAD_DISABLE_SAFE_STORAGE_RECOVERY === "1") {
+  if (process.env.KAPABLE_DISABLE_SAFE_STORAGE_RECOVERY === "1") {
     return false;
   }
-  if (process.env.DYAD_DISABLE_SAFE_STORAGE_UNLOCK_PROMPT === "1") {
+  if (process.env.KAPABLE_DISABLE_SAFE_STORAGE_UNLOCK_PROMPT === "1") {
     return false;
   }
   if (interactionNeededIdentities.size === 0 || stats.failed === 0) {
@@ -416,10 +416,10 @@ export function retryRecoveryWithKeychainUnlock(): boolean {
   if (process.platform !== "darwin") {
     return false;
   }
-  if (process.env.DYAD_DISABLE_SAFE_STORAGE_RECOVERY === "1") {
+  if (process.env.KAPABLE_DISABLE_SAFE_STORAGE_RECOVERY === "1") {
     return false;
   }
-  if (process.env.DYAD_DISABLE_SAFE_STORAGE_UNLOCK_PROMPT === "1") {
+  if (process.env.KAPABLE_DISABLE_SAFE_STORAGE_UNLOCK_PROMPT === "1") {
     return false;
   }
   if (unlockPromptAttempted) {
@@ -459,7 +459,7 @@ export function retryRecoveryWithKeychainUnlock(): boolean {
  * ciphertext by reading the correct Keychain password directly.
  *
  * Returns null (without reading the Keychain) when recovery is not applicable:
- * non-darwin, the `DYAD_DISABLE_SAFE_STORAGE_RECOVERY=1` kill switch, or a
+ * non-darwin, the `KAPABLE_DISABLE_SAFE_STORAGE_RECOVERY=1` kill switch, or a
  * ciphertext lacking the "v10" prefix.
  */
 export function recoverLegacySafeStorageSecret(
@@ -469,7 +469,7 @@ export function recoverLegacySafeStorageSecret(
   if (process.platform !== "darwin") {
     return null;
   }
-  if (process.env.DYAD_DISABLE_SAFE_STORAGE_RECOVERY === "1") {
+  if (process.env.KAPABLE_DISABLE_SAFE_STORAGE_RECOVERY === "1") {
     return null;
   }
 
@@ -552,7 +552,7 @@ export function clearRecoveryCacheForTesting(): void {
   inProcessBinding = undefined;
   inProcessBindingLoadFailureLogged = false;
   inProcessBindingLoader = () =>
-    require("dyad-keychain-reader") as KeychainReaderBinding;
+    require("kapable-keychain-reader") as KeychainReaderBinding;
 }
 
 /** Test-only: snapshot of the recovery counters. */

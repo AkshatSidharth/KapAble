@@ -11,7 +11,7 @@ import {
 } from "@/distributed_machines/operation_registry";
 import type { RequestId } from "@/distributed_machines/request_identity";
 import { defineRuntimeRemoteIntentContract } from "@/distributed_machines/remote_intent_contract";
-import { DyadError, DyadErrorKind, isDyadError } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
 import { addLog } from "@/lib/log_store";
 import { appRuntimeService } from "@/ipc/services/app_runtime_service";
 import { REMOTE_MACHINE_PROTOCOL_VERSION } from "@/distributed_machines/remote_protocol";
@@ -440,20 +440,20 @@ async function appExists(appId: number): Promise<boolean> {
 
 export async function requireExistingApp(appId: number): Promise<void> {
   if (!(await appExists(appId))) {
-    throw new DyadError("App not found", DyadErrorKind.NotFound);
+    throw new KapableError("App not found", KapableErrorKind.NotFound);
   }
 }
 
 async function authorizeApp(appId: number): Promise<void> {
   if (!(await appExists(appId))) {
-    throw new DyadError("App not found", DyadErrorKind.Auth);
+    throw new KapableError("App not found", KapableErrorKind.Auth);
   }
 }
 
 function runErrorInfo(error: unknown): RunErrorInfo {
   return {
     message: error instanceof Error ? error.message : String(error),
-    ...(isDyadError(error) ? { kind: error.kind } : {}),
+    ...(isKapableError(error) ? { kind: error.kind } : {}),
   };
 }
 
@@ -655,9 +655,9 @@ export const appRunDefinition = defineFrameworkCoveredRemoteMachine({
         event.type === "STOP_REQUESTED" &&
         !isCurrentInvocation(currentState?.runState, event.activeInvocationRef)
       ) {
-        throw new DyadError(
+        throw new KapableError(
           "Cancellation does not target the active app run",
-          DyadErrorKind.Auth,
+          KapableErrorKind.Auth,
         );
       }
     },
@@ -673,9 +673,9 @@ export const appRunDefinition = defineFrameworkCoveredRemoteMachine({
     keyToString: (key: AppRunKey) => String(key.appId),
     toInternalEvent: ({ intent, sender, requestIdentity }) => {
       if (!requestIdentity && intent.type !== "MANUAL_RELOAD") {
-        throw new DyadError(
+        throw new KapableError(
           "App run request identity is missing",
-          DyadErrorKind.Validation,
+          KapableErrorKind.Validation,
         );
       }
       return Object.freeze({
@@ -689,7 +689,7 @@ export const appRunDefinition = defineFrameworkCoveredRemoteMachine({
         await authorizeApp(key.appId);
         return { kind: "allow" as const };
       } catch (error) {
-        if (isDyadError(error)) {
+        if (isKapableError(error)) {
           return { kind: "deny" as const, error };
         }
         throw error;
@@ -705,14 +705,14 @@ export const appRunDefinition = defineFrameworkCoveredRemoteMachine({
             intent.activeInvocationRef,
           )
         ) {
-          throw new DyadError(
+          throw new KapableError(
             "Cancellation does not target the active app run",
-            DyadErrorKind.Auth,
+            KapableErrorKind.Auth,
           );
         }
         return { kind: "allow" as const };
       } catch (error) {
-        if (isDyadError(error)) {
+        if (isKapableError(error)) {
           return { kind: "deny" as const, error };
         }
         throw error;

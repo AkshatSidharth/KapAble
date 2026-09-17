@@ -52,7 +52,7 @@ export function HomeChatInput({
   }); // eslint-disable-line @typescript-eslint/no-unused-vars
   useChatModeToggle();
   const { userBudget } = useUserBudgetInfo();
-  const isProEnabled = !!userBudget && !!settings?.enableDyadPro;
+  const isProEnabled = !!userBudget && !!settings?.enableKapablePro;
 
   const handleTranscription = useCallback(
     (text: string) => {
@@ -79,7 +79,7 @@ export function HomeChatInput({
   ]);
   const placeholder = selectedApp
     ? `Send a message to ${selectedApp.name}...`
-    : `Ask Dyad to build ${typingText ?? ""}`;
+    : `Ask KapAble to build ${typingText ?? ""}`;
 
   // Use the attachments hook
   const {
@@ -229,7 +229,7 @@ export function HomeChatInput({
                   render={
                     <button
                       onClick={() =>
-                        ipc.system.openExternalUrl("https://dyad.sh/pro")
+                        ipc.system.openExternalUrl("https://kapable.sh/pro")
                       }
                       disabled={disabled}
                       aria-label="Voice to text (Pro)"

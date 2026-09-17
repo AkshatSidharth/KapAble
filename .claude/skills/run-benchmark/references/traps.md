@@ -34,7 +34,7 @@ refuses a mismatch. Ledger tell-tale: `effort` column ≠ the cell's suffix.
 
 ## Gemini effort on the engine path is a thinking BUDGET
 
-Through the engine (LiteLLM) Dyad sends Gemini `thinking: {type: "enabled",
+Through the engine (LiteLLM) KapAble sends Gemini `thinking: {type: "enabled",
 budget_tokens: N}` with medium = 4000 and high = -1 (dynamic), not a
 `thinkingLevel`. The proxy override mirrors that mapping for `gemini/` models
 and records `thinking:enabled:budget=N`.

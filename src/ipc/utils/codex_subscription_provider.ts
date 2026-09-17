@@ -13,7 +13,7 @@ import {
   finishSubscriptionUsage,
   interruptSubscriptionUsage,
 } from "../services/codex_subscription_usage";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { safeGithubOpsErrorMessage } from "../services/github_ops_safe_error";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { createHash, randomUUID } from "node:crypto";
@@ -192,20 +192,20 @@ export async function createCodexSubscriptionModel(
       if (!response.ok) {
         const kind =
           response.status === 429
-            ? DyadErrorKind.RateLimited
+            ? KapableErrorKind.RateLimited
             : response.status === 401 || response.status === 403
-              ? DyadErrorKind.Auth
+              ? KapableErrorKind.Auth
               : response.status === 400 ||
                   response.status === 404 ||
                   response.status === 422
-                ? DyadErrorKind.Validation
-                : DyadErrorKind.External;
+                ? KapableErrorKind.Validation
+                : KapableErrorKind.External;
         const { detail } =
-          kind !== DyadErrorKind.External
+          kind !== KapableErrorKind.External
             ? (errorDetail ??
               (await readSubscriptionErrorDetail(response, credentials)))
             : { detail: "" };
-        if (kind === DyadErrorKind.External)
+        if (kind === KapableErrorKind.External)
           await response.body?.cancel().catch(() => {});
         // Never let SDK errors retain an OAuth request or raw upstream body.
         const summary =
@@ -214,7 +214,7 @@ export async function createCodexSubscriptionModel(
             : response.status === 429
               ? "ChatGPT subscription limit reached. Wait for your limit to reset, upgrade your ChatGPT subscription tier, or choose another available model."
               : `ChatGPT subscription request failed (HTTP ${response.status}).`;
-        throw new DyadError(detail ? `${summary} ${detail}` : summary, kind);
+        throw new KapableError(detail ? `${summary} ${detail}` : summary, kind);
       }
       return response;
     },
@@ -249,11 +249,11 @@ export async function createCodexSubscriptionModel(
         } catch (error) {
           interruptSubscriptionUsage(
             id,
-            error instanceof DyadError &&
+            error instanceof KapableError &&
               [
-                DyadErrorKind.Auth,
-                DyadErrorKind.RateLimited,
-                DyadErrorKind.Validation,
+                KapableErrorKind.Auth,
+                KapableErrorKind.RateLimited,
+                KapableErrorKind.Validation,
               ].includes(error.kind),
           );
           throw error;

@@ -15,13 +15,13 @@ describe("addresses Coolify would turn down", () => {
   // well-formed they look. Catching them here means the user finds out while
   // typing rather than after a multi-minute install that seeds nothing.
   it.each([
-    ["admin@dyad.test", false, "a reserved TLD that cannot resolve"],
+    ["admin@kapable.test", false, "a reserved TLD that cannot resolve"],
     ["admin@my.localhost", false, "reserved for loopback"],
     ["admin@thing.invalid", false, "reserved to always fail"],
     ["admin@example.com", false, "reserved for documentation"],
     ["admin", false, "not an address at all"],
     ["admin@nodomain", false, "no dot, so no resolvable domain"],
-    ["admin@ dyad.sh", false, "a space is not allowed"],
+    ["admin@ kapable.sh", false, "a space is not allowed"],
     ["someone@gmail.com", true, "an ordinary address"],
     ["dev+coolify@sub.domain.co.uk", true, "tagging and subdomains are fine"],
   ])("reads %s as %s (%s)", (email, usable) => {
@@ -37,9 +37,9 @@ describe("addresses Coolify would turn down", () => {
 });
 
 describe("adminEmailRefusal", () => {
-  it("does not call an address Dyad cannot send undeliverable", () => {
+  it("does not call an address KapAble cannot send undeliverable", () => {
     // `!` and `#` are legal in a local part, so this address may work
-    // perfectly well — the refusal is Dyad's, and saying the domain does not
+    // perfectly well — the refusal is KapAble's, and saying the domain does not
     // resolve sends the user to check something that was never wrong.
     const refusal = adminEmailRefusal("will!s@gmail.com");
 
@@ -76,20 +76,20 @@ describe("adminEmailRefusal", () => {
     // The branch a half-typed address lands on, which is most of the
     // keystrokes anyone makes here — so the wrong message on it is the one a
     // user sees most. `foo..com` is the same: a shape Coolify will not
-    // resolve, not a character Dyad cannot send.
-    const undeliverable = adminEmailRefusal("admin@dyad.test");
+    // resolve, not a character KapAble cannot send.
+    const undeliverable = adminEmailRefusal("admin@kapable.test");
 
     expect(adminEmailRefusal("adm")).toBe(undeliverable);
     expect(adminEmailRefusal("admin@nodomain")).toBe(undeliverable);
     expect(adminEmailRefusal("admin@foo..com")).toBe(undeliverable);
     // Reserved for documentation, which is a fact about where mail goes and
-    // not about anything Dyad cannot send.
+    // not about anything KapAble cannot send.
     expect(adminEmailRefusal("admin@example.com")).toBe(undeliverable);
     expect(adminEmailRefusal("admin@mail.example.net")).toBe(undeliverable);
   });
 
   it("still says what a domain nobody can reach is", () => {
-    expect(adminEmailRefusal("admin@dyad.test")).toMatch(/receive mail at/);
+    expect(adminEmailRefusal("admin@kapable.test")).toMatch(/receive mail at/);
   });
 
   it("says nothing about an address it takes", () => {

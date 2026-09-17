@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { db } from "@/db";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { projectChatMessageForSearch } from "./chat_search_text";
 import {
   AgentContext,
@@ -127,10 +127,10 @@ function toIso(unixSeconds: number): string {
   return new Date(unixSeconds * 1000).toISOString();
 }
 
-function notFound(): DyadError {
+function notFound(): KapableError {
   // Missing and cross-app IDs are indistinguishable by design — no
   // cross-app existence disclosure.
-  return new DyadError("Chat or message not found", DyadErrorKind.NotFound);
+  return new KapableError("Chat or message not found", KapableErrorKind.NotFound);
 }
 
 function buildReadChatXml(params: {
@@ -150,9 +150,9 @@ function buildReadChatXml(params: {
   if (!params.complete) {
     attrs.push(`state="pending"`);
   }
-  return `<dyad-read-chat ${attrs.join(" ")}>${
+  return `<kapable-read-chat ${attrs.join(" ")}>${
     params.content ? escapeXmlContent(params.content) : ""
-  }</dyad-read-chat>`;
+  }</kapable-read-chat>`;
 }
 
 export const readChatTool: ToolDefinition<ReadChatArgs> = {

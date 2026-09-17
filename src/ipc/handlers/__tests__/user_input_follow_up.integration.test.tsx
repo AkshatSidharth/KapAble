@@ -30,8 +30,8 @@ describe("main-owned user-input follow-up recovery (integration)", () => {
       chatMode: "local-agent",
       settings: {
         isTestMode: true,
-        enableDyadPro: true,
-        providerSettings: { auto: { apiKey: { value: "testdyadkey" } } },
+        enableKapablePro: true,
+        providerSettings: { auto: { apiKey: { value: "testkapablekey" } } },
       },
     });
   }, 60_000);

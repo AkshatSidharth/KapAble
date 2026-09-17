@@ -33,7 +33,7 @@ import {
   useFirstPromptSend,
 } from "@/first_prompt/FirstPromptProvider";
 import { getHomeDefaultChatMode } from "@/lib/homeChatMode";
-import { upgradeUrl } from "@/constants/brand";
+import { isManagedPlanConfigured, upgradeUrl } from "@/constants/brand";
 
 // Adding an export for attachments
 export interface HomeSubmitOptions {
@@ -194,7 +194,7 @@ export default function HomePage() {
                 variant="outline"
                 size="sm"
               />
-              {!hasKapableProApiKey && (
+              {!hasKapableProApiKey && isManagedPlanConfigured() && (
                 <Button
                   size="sm"
                   onClick={() =>

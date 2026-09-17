@@ -7,6 +7,11 @@ import { useSidebar } from "@/components/ui/sidebar";
 
 const hideBannerAtom = atom(false);
 
+const analyticsConfigured = Boolean(
+  // @ts-ignore - import.meta.env is provided by Vite.
+  import.meta.env?.VITE_KAPABLE_POSTHOG_KEY,
+);
+
 export function PrivacyBanner() {
   const [hideBanner, setHideBanner] = useAtom(hideBannerAtom);
   const { settings, updateSettings } = useSettings();
@@ -14,6 +19,14 @@ export function PrivacyBanner() {
   const { t } = useTranslation("settings");
 
   if (hideBanner) {
+    return null;
+  }
+  // Asking to "help improve KapAble with anonymous usage data" when the build
+  // has no analytics project configured would be asking for consent to
+  // something that cannot happen. This is the same build-time key renderer.tsx
+  // gates PostHog on: with none, no analytics client is active and no request
+  // is ever made, so there is nothing to consent to.
+  if (!analyticsConfigured) {
     return null;
   }
   if (settings?.telemetryConsent !== "unset") {

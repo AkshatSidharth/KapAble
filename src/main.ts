@@ -693,6 +693,12 @@ async function promptMoveToApplicationsFolder(): Promise<void> {
   // in e2e testing mode.
   if (IS_TEST_BUILD) return;
   if (process.platform !== "darwin") return;
+  // Never in development. The bundle running then is the generic Electron.app
+  // inside node_modules/electron/dist, not KapAble, so accepting would move
+  // the shared dev binary into /Applications and leave `npm start` with
+  // nothing to launch ("executable is missing") for the whole checkout.
+  // Auto-update, the reason for the prompt, does not apply to a dev run either.
+  if (!app.isPackaged) return;
   if (app.isInApplicationsFolder()) return;
   logger.log("Prompting user to move to applications folder");
 

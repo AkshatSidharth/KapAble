@@ -354,14 +354,70 @@ function RendererServices() {
   return windowReady ? <RouterProvider router={router} /> : null;
 }
 
+/**
+ * Every screen in the app talks to the main process through
+ * `window.electron.ipcRenderer`, which the preload script exposes. If preload
+ * failed to build or load, that object is missing, the window-session
+ * bootstrap throws, and React renders nothing — a white window with no clue
+ * why. That is a miserable thing to debug, so say it plainly instead.
+ */
+function MissingPreloadBridge() {
+  const panel: React.CSSProperties = {
+    fontFamily:
+      "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+    maxWidth: 560,
+    margin: "12vh auto",
+    padding: "0 24px",
+    lineHeight: 1.6,
+    color: "#1f2328",
+  };
+  return (
+    <div style={panel}>
+      <h1 style={{ fontSize: 20, marginBottom: 8 }}>
+        KapAble could not reach its main process
+      </h1>
+      <p style={{ marginTop: 0 }}>
+        The preload bridge (<code>window.electron</code>) is missing, so the UI
+        has nothing to talk to. This almost always means the preload bundle
+        failed to build.
+      </p>
+      <p>Check the terminal running KapAble for a line like:</p>
+      <pre
+        style={{
+          background: "#f6f8fa",
+          padding: 12,
+          borderRadius: 6,
+          overflowX: "auto",
+          fontSize: 12,
+        }}
+      >
+        ✖ Building src/preload.ts target
+      </pre>
+      <p>
+        Fix the error it reports, then fully quit and restart KapAble — a
+        preload change needs a real restart, not a hot reload.
+      </p>
+    </div>
+  );
+}
+
+const hasPreloadBridge = Boolean(
+  (window as unknown as { electron?: { ipcRenderer?: unknown } }).electron
+    ?.ipcRenderer,
+);
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <PostHogProvider client={posthogClient}>
-        <EntityDisposalProvider>
-          <App />
-        </EntityDisposalProvider>
-      </PostHogProvider>
-    </QueryClientProvider>
+    {hasPreloadBridge ? (
+      <QueryClientProvider client={queryClient}>
+        <PostHogProvider client={posthogClient}>
+          <EntityDisposalProvider>
+            <App />
+          </EntityDisposalProvider>
+        </PostHogProvider>
+      </QueryClientProvider>
+    ) : (
+      <MissingPreloadBridge />
+    )}
   </StrictMode>,
 );

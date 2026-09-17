@@ -98,7 +98,22 @@ export const TitleBar = () => {
         <div className="flex items-center shrink-0">
           <div className={`${showWindowControls ? "pl-2" : "pl-18"}`}></div>
 
-          <img src={logo} alt="KapAble" className="ml-2 w-5 h-5 shrink-0" />
+          <div className="ml-2 flex items-center gap-1.5 shrink-0">
+            <img src={logo} alt="KapAble" className="w-5 h-5 shrink-0" />
+            {/*
+             * The wordmark is aria-hidden because the logo already carries
+             * "KapAble" as its alt text — without this the product name would
+             * be announced twice. It drops out on narrow windows so the app
+             * chip and chat tabs keep their space; the mark still identifies
+             * the app on its own there.
+             */}
+            <span
+              aria-hidden="true"
+              className="hidden @lg:inline text-sm font-semibold tracking-tight text-sidebar-foreground select-none"
+            >
+              KapAble
+            </span>
+          </div>
 
           <Tooltip>
             <TooltipTrigger

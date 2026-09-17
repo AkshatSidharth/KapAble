@@ -27,6 +27,7 @@ vi.mock("electron-log", () => ({
 }));
 import { createCodexSubscriptionModel } from "./codex_subscription_provider";
 import { KapableErrorKind } from "@/errors/kapable_error";
+import { requireUserInfoUrl } from "@/constants/brand";
 
 const info = {
   totalCredits: 100,
@@ -78,7 +79,7 @@ describe("BYO subscription preflight through the actual provider", () => {
       vi.mocked(fetch).mock.invocationCallOrder[0],
     );
     expect(mocks.accountFetch).toHaveBeenCalledWith(
-      "https://api.kapable.sh/v1/user/info",
+      requireUserInfoUrl(),
       expect.objectContaining({
         method: "GET",
         redirect: "error",

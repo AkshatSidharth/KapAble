@@ -2,6 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { KapableErrorKind } from "@/errors/kapable_error";
+import { upgradeUrl } from "@/constants/brand";
 import { unwrapIpcEnvelope } from "@/ipc/contracts/core";
 import { configureTrustedRenderer } from "@/ipc/utils/renderer_security";
 import {
@@ -349,8 +350,10 @@ describe("subscription status handlers", () => {
     );
   });
 
-  it("accepts and opens an Academy HTTPS billing URL", async () => {
-    const url = "https://academy.kapable.sh/subscription?source=app";
+  it("accepts and opens an HTTPS billing URL on the configured account host", async () => {
+    // Built from the configured portal rather than a literal: the validator
+    // pins to that host, so a hard-coded one would only pass by coincidence.
+    const url = upgradeUrl("/subscription?source=app");
     expect(parseBillingActionUrl(url)).toBe(url);
     await expect(openBillingAction({} as never, url)).resolves.toBeUndefined();
     expect(mocks.openExternal).not.toHaveBeenCalled();

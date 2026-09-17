@@ -41,7 +41,7 @@ describe("prepare release tag script", () => {
   it("parses GitHub repository coordinates", () => {
     expect(getRepoParts("AkshatSidharth/KapAble")).toEqual({
       owner: "AkshatSidharth",
-      repo: "kapable",
+      repo: "KapAble",
     });
   });
 

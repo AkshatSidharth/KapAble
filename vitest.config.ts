@@ -56,6 +56,7 @@ export default defineConfig({
           environment: "happy-dom",
           include: ["src/**/*.{test,spec}.{ts,tsx}"],
           exclude: [...configDefaults.exclude, ...hybridIntegrationTests],
+          setupFiles: ["src/testing/hosted_services.setup.ts"],
         },
       },
       {
@@ -73,7 +74,10 @@ export default defineConfig({
             },
           },
           include: hybridIntegrationTests,
-          setupFiles: ["src/testing/hybrid.setup.ts"],
+          setupFiles: [
+            "src/testing/hosted_services.setup.ts",
+            "src/testing/hybrid.setup.ts",
+          ],
           pool: "forks",
         },
       },

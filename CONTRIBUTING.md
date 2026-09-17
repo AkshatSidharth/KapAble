@@ -99,6 +99,19 @@ Run a specific test file:
 npm run e2e e2e-tests/context_manage.spec.ts
 ```
 
+> **Snapshots are stale from the rebrand.** The scaffold's "Made with KapAble"
+> footer now links to this repository instead of a marketing site, so every
+> snapshot that renders it still records the old URL. Regenerate them on a
+> machine that can run Playwright against a packaged build:
+>
+> ```sh
+> npm run build && npm run e2e -- --update-snapshots
+> ```
+>
+> They were left rather than hand-edited: several are binary, and the engine
+> recordings are keyed by a content-addressed id that only a real run
+> produces. Nothing else depends on them, and the unit suite is unaffected.
+
 Update snapshots for a test:
 
 ```sh

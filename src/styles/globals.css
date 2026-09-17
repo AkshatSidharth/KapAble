@@ -89,97 +89,126 @@ body[data-scroll-locked] .app-region-drag {
 :root {
   /* Matches TitleBar height — keep TitleBar using this var so main panel clears it exactly */
   --layout-title-bar-offset: 2.25rem;
-  --docs-bg: #f5f5f5;
+  --docs-bg: #f1f5f9;
   --default-font-family: "Geist", sans-serif;
   --default-mono-font-family: "Geist Mono", monospace;
-  /* --background: oklch(1 0 0); */
-  --background-lightest: #fff;
-  --background-lighter: oklch(0.995 0.0188 292.61);
-  --background: oklch(0.985 0.0188 292.61);
-  --background-darker: oklch(0.955 0.0188 292.61);
-  --background-darkest: oklch(0.925 0.0188 292.61);
 
-  --foreground: oklch(0.25 0.0679 293.36);
+  /* --- Kapable brand ------------------------------------------------------
+   * Source hexes, converted to oklch so lighter/darker steps stay on-hue:
+   *   primary    #E11D2E  oklch(0.5823 0.2233 24.75)
+   *   secondary  #FF6B80  oklch(0.7159 0.1805 14.25)
+   *   text       #0F172A  oklch(0.2077 0.0398 265.75)
+   *   background #F1F5F9  oklch(0.9683 0.0069 247.90)
+   *
+   * Contrast, measured rather than assumed:
+   *   white on primary ............ 4.75:1  passes AA for text
+   *   text on background .......... 16.30:1
+   *   primary as text on bg ....... 4.34:1  UI/large text only, not body copy
+   *   secondary on light bg ....... 2.50:1  never text or a thin UI element
+   *   secondary on dark text bg ... 6.52:1  safe as an accent in dark
+   * So secondary is used as a fill carrying dark text, or as a dark-mode
+   * accent — never as a light-mode foreground.
+   */
+  --brand-primary: oklch(0.5823 0.2233 24.75);
+  --brand-secondary: oklch(0.7159 0.1805 14.25);
+
+  --background-lightest: #fff;
+  --background-lighter: oklch(0.99 0.004 247.9);
+  --background: oklch(0.9683 0.0069 247.9);
+  --background-darker: oklch(0.94 0.009 247.9);
+  --background-darkest: oklch(0.91 0.012 247.9);
+
+  --foreground: oklch(0.2077 0.0398 265.75);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.2077 0.0398 265.75);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.59 0.16 287.69);
-  /* --primary: oklch(0.205 0 0); */
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --popover-foreground: oklch(0.2077 0.0398 265.75);
+  --primary: var(--brand-primary);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.945 0.012 247.9);
+  --secondary-foreground: oklch(0.2077 0.0398 265.75);
+  --muted: oklch(0.945 0.012 247.9);
+  --muted-foreground: oklch(0.505 0.035 258);
+  --accent: oklch(0.935 0.033 20);
+  --accent-foreground: oklch(0.2077 0.0398 265.75);
+  /* Deliberately darker than --primary. The stock destructive red sat at
+   * oklch(0.577 0.245 27.3), all but identical to the brand red, which would
+   * make "Delete" look like every other primary action. */
+  --destructive: oklch(0.455 0.196 22);
+  --destructive-foreground: oklch(0.455 0.196 22);
+  --border: oklch(0.9 0.013 247.9);
+  --input: oklch(0.9 0.013 247.9);
+  --ring: var(--brand-primary);
+  --chart-1: oklch(0.5823 0.2233 24.75);
+  --chart-2: oklch(0.7159 0.1805 14.25);
+  --chart-3: oklch(0.45 0.09 258);
+  --chart-4: oklch(0.72 0.11 45);
+  --chart-5: oklch(0.63 0.07 230);
   --radius: 0.625rem;
-  --sidebar: oklch(0.96 0.0188 292.61);
-  /* --sidebar: oklch(0.975 0.0188 292.61); */
-  /* --sidebar: oklch(0.985 0 0); */
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  /* --sidebar-accent: oklch(0.97 0 0); */
-  --sidebar-accent: oklch(0.88 0.07 291.44);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: var(--sidebar);
-  /* --sidebar-border: oklch(0.922 0 0); */
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Dark navy rail with a brand-red active state, as in the brand sheet. */
+  --sidebar: oklch(0.2077 0.0398 265.75);
+  --sidebar-foreground: oklch(0.96 0.006 247.9);
+  --sidebar-primary: var(--brand-primary);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: var(--brand-primary);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.28 0.04 265.75);
+  --sidebar-ring: var(--brand-primary);
 }
 
 .prose {
   --tw-prose-pre-bg: var(--background);
 }
 .dark {
-  --docs-bg: #121212;
+  --docs-bg: #0b1120;
 
-  --background-lightest: oklch(0.285 0 0);
-  --background-lighter: oklch(0.185 0 0);
-  --background: oklch(0.145 0 0);
-  --background-darker: oklch(0.125 0 0);
-  --background-darkest: oklch(0.105 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.35 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* Neutrals carry the brand's navy hue rather than pure grey, so dark mode
+   * reads as the same family as the light theme. */
+  --background-lightest: oklch(0.3 0.032 265.75);
+  --background-lighter: oklch(0.245 0.033 265.75);
+  --background: oklch(0.2077 0.0398 265.75);
+  --background-darker: oklch(0.175 0.036 265.75);
+  --background-darkest: oklch(0.15 0.032 265.75);
+  --foreground: oklch(0.96 0.006 247.9);
+  --card: oklch(0.245 0.033 265.75);
+  --card-foreground: oklch(0.96 0.006 247.9);
+  --popover: oklch(0.245 0.033 265.75);
+  --popover-foreground: oklch(0.96 0.006 247.9);
+  /* Dark mode uses the brand *secondary* as --primary, and this is deliberate.
+   * --primary is both a fill and, via text-primary, a foreground. On navy no
+   * single red can serve both: passing 4.5:1 as text needs L >= 0.226, while
+   * carrying white text needs L <= 0.183. The brand red would leave every
+   * text-primary link at 3.75:1.
+   * Coral with navy text resolves it at 6.52:1 in both directions, and is the
+   * brand's own dark-surface accent. The red stays on the sidebar's active
+   * state below, where it is a fill only. */
+  --primary: var(--brand-secondary);
+  --primary-foreground: oklch(0.2077 0.0398 265.75);
+  --secondary: oklch(0.285 0.032 265.75);
+  --secondary-foreground: oklch(0.96 0.006 247.9);
+  --muted: oklch(0.285 0.032 265.75);
+  --muted-foreground: oklch(0.72 0.022 258);
+  --accent: oklch(0.32 0.042 265.75);
+  --accent-foreground: oklch(0.96 0.006 247.9);
+  --destructive: oklch(0.42 0.17 22);
+  --destructive-foreground: oklch(0.75 0.16 18);
+  --border: oklch(0.3 0.032 265.75);
+  --input: oklch(0.3 0.032 265.75);
+  --ring: var(--brand-secondary);
+  --chart-1: oklch(0.65 0.21 24.75);
+  /* The one place brand secondary is safe as a foreground: 6.52:1 on navy. */
+  --chart-2: oklch(0.7159 0.1805 14.25);
+  --chart-3: oklch(0.7 0.09 230);
+  --chart-4: oklch(0.78 0.12 45);
+  --chart-5: oklch(0.68 0.07 258);
+  --sidebar: oklch(0.175 0.036 265.75);
+  --sidebar-foreground: oklch(0.96 0.006 247.9);
+  --sidebar-primary: var(--brand-primary);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: var(--brand-primary);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.28 0.04 265.75);
+  --sidebar-ring: var(--brand-primary);
 }
 
 @theme inline {

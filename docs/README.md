@@ -295,3 +295,28 @@ better code on the first try; smaller ones are cheaper for small edits.
 **How is this related to Dyad?** KapAble is a fork of
 [Dyad](https://github.com/dyad-sh/dyad), rebranded and reconfigured to run
 standalone. See the [NOTICE](../NOTICE) file for attribution and licensing.
+
+## Brand assets
+
+The mark lives in one place: [`assets/logo.svg`](../assets/logo.svg). It is
+what the title bar and setup banner render, and the source the app icons are
+built from.
+
+To change it, replace that file and regenerate the icons:
+
+```bash
+node scripts/brand/generate-icons.mjs
+```
+
+That rewrites `assets/icon/logo.png`, `logo.ico` and `logo.icns` — Electron
+Forge picks a different one per platform (`.icns` macOS, `.ico` Windows,
+`.png` Linux), so all three have to be rebuilt or packaged builds keep
+shipping the previous mark. The script renders through the Chromium that
+Playwright already installs and writes the ICO/ICNS containers directly, so it
+needs no image toolchain.
+
+Colours are defined as design tokens at the top of
+[`src/styles/globals.css`](../src/styles/globals.css) — `--brand-primary` and
+`--brand-secondary`, with every other token derived from them. The comments
+there record the measured contrast of each pairing and why dark mode uses the
+brand secondary as `--primary`.

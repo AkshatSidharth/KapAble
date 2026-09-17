@@ -21,7 +21,7 @@ Snippet:
 ```
     <div className="p-4 text-center">
       <a // <-- EDIT HERE
-        href="https://www.kapable.sh/"
+        href="https://github.com/AkshatSidharth/KapAble"
         target="_blank"
         rel="noopener noreferrer"
 ```

@@ -3,4 +3,4 @@
 - region "Notifications alt+T"
 - heading "No more errors!" [level=1]
 - link "Made with KapAble":
-  - /url: https://www.kapable.sh/
+  - /url: https://github.com/AkshatSidharth/KapAble

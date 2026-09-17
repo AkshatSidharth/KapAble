@@ -4,5 +4,5 @@
 - heading "Welcome to Your Blank App" [level=1]
 - paragraph: Start building your amazing project here!
 - link "Made with KapAble":
-  - /url: https://www.kapable.sh/
+  - /url: https://github.com/AkshatSidharth/KapAble
 - text: h1 src/pages/Index.tsx

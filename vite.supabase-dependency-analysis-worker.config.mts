@@ -5,6 +5,14 @@ import path from "node:path";
 const nodeBuiltins = builtinModules.flatMap((name) => [name, `node:${name}`]);
 
 export default defineConfig({
+  // Every other Vite config defines this. Without it, the first "@/" import
+  // that reaches this worker fails Rollup resolution while typecheck still
+  // passes, because tsconfig resolves "@/" independently of Vite.
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
   build: {
     sourcemap: true,
     lib: {

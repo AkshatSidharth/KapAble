@@ -134,10 +134,17 @@ const posthogClient = posthog.init(
       "https://us.i.posthog.com",
     opt_out_capturing_by_default: !analyticsEnabled,
     advanced_disable_decide: !analyticsEnabled,
+    // Opting out stops events being *sent*, but PostHog still fetches its
+    // exception-autocapture bundle from its CDN on init, which is a request to
+    // a third party the user never agreed to. These keep the unconfigured
+    // build genuinely silent on the network.
+    disable_external_dependency_loading: !analyticsEnabled,
+    disable_session_recording: !analyticsEnabled,
+    disable_surveys: !analyticsEnabled,
     // @ts-ignore
     debug: import.meta.env.MODE === "development",
     autocapture: false,
-    capture_exceptions: true,
+    capture_exceptions: analyticsEnabled,
     capture_pageview: false,
     before_send: (event) => {
       if (!analyticsEnabled) {

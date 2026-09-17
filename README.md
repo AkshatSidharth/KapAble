@@ -2,8 +2,9 @@
 
 **KapAble is a local, open-source AI app builder.** Describe an app in plain
 language and KapAble writes the code onto your machine, installs it, and runs a
-live preview you can click through — like Lovable, v0 or Bolt, except nothing
-leaves your computer except the prompts you send to the AI provider you chose.
+live preview you can click through — like Lovable, v0 or Bolt, except your code
+stays on your machine and the only thing sent anywhere is the prompt context
+you give to the AI provider you chose.
 
 - ⚡️ **Local first** — your code, your keys, your machine. No lock-in.
 - 🔑 **Bring your own key** — Anthropic, OpenAI, Google, xAI, Bedrock, Azure,

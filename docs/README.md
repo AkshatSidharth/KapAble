@@ -194,9 +194,20 @@ If you want analytics for your own deployment, set `VITE_KAPABLE_POSTHOG_KEY`
 (and optionally `VITE_KAPABLE_POSTHOG_HOST`) at build time. Even then, events
 are only sent if the user also opts in from the telemetry banner.
 
-What always stays local: your source code, your prompts, your API keys, and
-your apps. Your prompts do go to whichever AI provider you configured — that
-provider's privacy policy applies to them.
+What always stays local: your source code, your API keys, and your apps. Your
+prompts do go to whichever AI provider you configured — that provider's
+privacy policy applies to them.
+
+Two other outbound requests exist and are worth knowing about, neither
+carrying anything about you:
+
+- The code editor (Monaco) is fetched from `cdn.jsdelivr.net` on first use, so
+  the editor needs network access once. Everything else in the UI is bundled.
+- Creating an app clones its starter template from GitHub and installs its
+  dependencies from npm.
+
+Verified by launching the app and recording every request it makes: with no
+analytics key configured, zero requests go to any PostHog host.
 
 ## Troubleshooting
 

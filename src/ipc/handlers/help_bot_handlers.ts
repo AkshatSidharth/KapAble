@@ -18,6 +18,7 @@ import { helpContracts } from "../types/help";
 import { getTestFetchOption } from "../utils/test_fetch_override";
 import { resolveBuiltinModelAlias } from "../shared/remote_language_model_catalog";
 import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
+import { requireHelpChatUrl } from "@/constants/brand";
 
 const logger = log.scope("help-bot");
 
@@ -66,7 +67,7 @@ export function registerHelpBotHandlers() {
       const settings = await readSettings();
       const apiKey = settings.providerSettings?.["auto"]?.apiKey?.value;
       const provider = createOpenAI({
-        baseURL: "https://helpchat.kapable.sh/v1",
+        baseURL: requireHelpChatUrl(),
         apiKey,
         ...getTestFetchOption(),
       });

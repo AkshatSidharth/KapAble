@@ -14,7 +14,9 @@ export async function getGitAuthor(): Promise<GitAuthor> {
       }
     : {
         name: "KapAble",
-        email: "git@kapable.sh",
+        // Used when no GitHub account is connected. Deliberately on a domain
+        // that cannot receive mail, rather than one this project does not own.
+        email: "kapable@users.noreply.github.com",
       };
   return author;
 }

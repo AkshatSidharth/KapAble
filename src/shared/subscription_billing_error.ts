@@ -1,4 +1,5 @@
 import { KapableError, KapableErrorKind } from "../errors/kapable_error";
+import { upgradeUrl } from "@/constants/brand";
 
 export const SUBSCRIPTION_BILLING_ERRORS = {
   OUT_OF_CREDITS: {
@@ -7,14 +8,14 @@ export const SUBSCRIPTION_BILLING_ERRORS = {
     message:
       "You're out of KapAble credits. Add credits to continue using your subscription.",
     action: "Get more credits",
-    url: "https://academy.kapable.sh/subscription",
+    url: upgradeUrl("/subscription"),
   },
   KEY_REJECTED: {
     title: "Your KapAble Pro key was rejected",
     description: "Get your current Pro key.",
     message: "Your KapAble Pro key was rejected. Get your current Pro key.",
     action: "Open membership portal",
-    url: "https://academy.kapable.sh",
+    url: upgradeUrl(),
   },
 } as const;
 

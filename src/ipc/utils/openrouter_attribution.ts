@@ -1,4 +1,7 @@
-export const OPENROUTER_APP_REFERER = "https://www.kapable.sh";
+// Sent as HTTP-Referer to OpenRouter for app attribution on their leaderboard.
+// Points at the repository, since KapAble has no marketing site.
+export const OPENROUTER_APP_REFERER =
+  "https://github.com/AkshatSidharth/KapAble";
 export const OPENROUTER_APP_TITLE = "KapAble";
 export const OPENROUTER_APP_CATEGORIES = "native-app-builder,programming-app";
 

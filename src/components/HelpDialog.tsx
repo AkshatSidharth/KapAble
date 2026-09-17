@@ -40,9 +40,15 @@ import {
 import { IssueForm } from "./IssueForm";
 import { ScreenshotField } from "./ScreenshotField";
 import { ReportDisclosures } from "./ReportDisclosures";
+import { hostedServices } from "@/constants/brand";
 
-const UPLOAD_URL_ENDPOINT =
-  "https://upload-logs.kapable.sh/generate-upload-url";
+// Undefined unless KAPABLE_LOG_UPLOAD_URL names a sink this deployment runs.
+// Without one the dialog still builds the bug-report bundle and saves it
+// locally; only the upload step is unavailable.
+const UPLOAD_URL_ENDPOINT = (() => {
+  const base = hostedServices.logUploadUrl();
+  return base ? `${base.replace(/\/+$/, "")}/generate-upload-url` : undefined;
+})();
 
 /**
  * How long the dialog gets to leave the screen before the capture. Its close
@@ -481,6 +487,14 @@ export function HelpDialog() {
 
     const bundle = loaded ?? (await readSession(chatId));
     if (captureToken.current !== token) return null;
+
+    if (!UPLOAD_URL_ENDPOINT) {
+      throw new Error(
+        "No log upload endpoint is configured for this build, so the report " +
+          "cannot be attached automatically. Set KAPABLE_LOG_UPLOAD_URL, or " +
+          "attach the saved bundle to your issue by hand.",
+      );
+    }
 
     const response = await fetch(UPLOAD_URL_ENDPOINT, {
       method: "POST",

@@ -36,6 +36,7 @@ import { useVoiceToText } from "@/hooks/useVoiceToText";
 import { useUserBudgetInfo } from "@/hooks/useUserBudgetInfo";
 import { showError } from "@/lib/toast";
 import { ipc } from "@/ipc/types";
+import { upgradeUrl } from "@/constants/brand";
 
 export function HomeChatInput({
   onSubmit,
@@ -229,7 +230,7 @@ export function HomeChatInput({
                   render={
                     <button
                       onClick={() =>
-                        ipc.system.openExternalUrl("https://kapable.sh/pro")
+                        ipc.system.openExternalUrl(upgradeUrl("/pro"))
                       }
                       disabled={disabled}
                       aria-label="Voice to text (Pro)"

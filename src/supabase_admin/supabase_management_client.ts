@@ -23,6 +23,7 @@ import {
   isKapableError,
 } from "@/errors/kapable_error";
 import { enqueueSupabaseDeploy } from "./supabase_deploy_queue";
+import { requireSupabaseOauthBroker } from "@/constants/brand";
 
 const fsPromises = fs.promises;
 
@@ -179,7 +180,7 @@ async function refreshSupabaseTokenOnce(): Promise<void> {
   try {
     // Make request to Supabase refresh endpoint
     const response = await fetch(
-      "https://supabase-oauth.kapable.sh/api/connect-supabase/refresh",
+      `${requireSupabaseOauthBroker()}/api/connect-supabase/refresh`,
       {
         method: "POST",
         headers: {
@@ -327,7 +328,7 @@ async function refreshSupabaseTokenForOrganization(
 
   try {
     const response = await fetch(
-      "https://supabase-oauth.kapable.sh/api/connect-supabase/refresh",
+      `${requireSupabaseOauthBroker()}/api/connect-supabase/refresh`,
       {
         method: "POST",
         headers: {

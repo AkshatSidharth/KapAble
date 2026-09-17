@@ -6,16 +6,31 @@ import { IS_TEST_BUILD } from "../utils/test_utils";
 import { isFileWithinAnyKapableMediaDir } from "../utils/media_path_utils";
 import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { registerKapableProtocolLinux } from "../../main/linux_protocol_registration";
+import { hostedServices } from "@/constants/brand";
 
 const logger = log.scope("shell_handlers");
 const handle = createLoggedHandler(logger);
 
-// Hosts whose OAuth flows redirect back into the app via a kapable:// deep link
-// (Neon, Supabase, and KapAble Pro all live under *.kapable.sh).
+// Hosts whose OAuth flows redirect back into the app via a kapable:// deep
+// link. Upstream could hard-code its own domain here; KapAble's brokers are
+// configured per deployment, so the hosts are derived from that configuration.
+// Purely a hint for the Linux protocol-reclaim below — never an allowlist for
+// which URLs may be opened.
 function isKapableOAuthUrl(url: string): boolean {
   try {
     const host = new URL(url).hostname;
-    return host === "kapable.sh" || host.endsWith(".kapable.sh");
+    return [
+      hostedServices.oauthBrokerUrl(),
+      hostedServices.supabaseOauthBrokerUrl(),
+      hostedServices.accountUrl(),
+    ].some((configured) => {
+      if (!configured) return false;
+      try {
+        return new URL(configured).hostname === host;
+      } catch {
+        return false;
+      }
+    });
   } catch {
     return false;
   }

@@ -2,6 +2,7 @@ import { AlertTriangle, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFreeAgentQuota } from "@/hooks/useFreeAgentQuota";
 import { ipc } from "@/ipc/types";
+import { upgradeUrl } from "@/constants/brand";
 
 interface FreeAgentQuotaBannerProps {
   onSwitchToBuildMode?: () => void;
@@ -44,7 +45,7 @@ export function FreeAgentQuotaBanner({
     : "";
 
   const handleUpgrade = () => {
-    ipc.system.openExternalUrl("https://kapable.sh/pro");
+    ipc.system.openExternalUrl(upgradeUrl("/pro"));
   };
 
   return (

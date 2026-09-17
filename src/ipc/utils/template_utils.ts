@@ -1,3 +1,4 @@
+import { hostedServices } from "@/constants/brand";
 import {
   type Template,
   type ApiTemplate,
@@ -38,7 +39,16 @@ export async function fetchApiTemplates(): Promise<Template[]> {
   // Start new fetch
   apiTemplatesFetchPromise = (async (): Promise<Template[]> => {
     try {
-      const response = await fetch("https://api.kapable.sh/v1/templates");
+      // Community templates come from a catalog service KapAble does not
+      // host. Without one the built-in templates in shared/templates.ts
+      // are the whole list, which is what the catch below falls back to.
+      const apiBaseUrl = hostedServices.apiBaseUrl();
+      if (!apiBaseUrl) {
+        throw new Error("No template catalog endpoint is configured");
+      }
+      const response = await fetch(
+        `${apiBaseUrl.replace(/\/+$/, "")}/v1/templates`,
+      );
       if (!response.ok) {
         throw new Error(
           `Failed to fetch templates: ${response.status} ${response.statusText}`,

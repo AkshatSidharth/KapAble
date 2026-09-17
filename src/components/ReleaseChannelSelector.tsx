@@ -1,3 +1,4 @@
+import { RELEASES_URL } from "@/constants/brand";
 import { useSettings } from "@/hooks/useSettings";
 
 import { SettingField } from "@/components/settings/SettingField";
@@ -30,7 +31,7 @@ export function ReleaseChannelSelector() {
         action: {
           label: "Download Stable",
           onClick: () => {
-            ipc.system.openExternalUrl("https://kapable.sh/download");
+            ipc.system.openExternalUrl(RELEASES_URL);
           },
         },
       });

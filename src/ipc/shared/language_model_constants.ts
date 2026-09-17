@@ -1,3 +1,4 @@
+import { upgradeUrl } from "@/constants/brand";
 export const PROVIDERS_THAT_SUPPORT_THINKING: (keyof typeof MODEL_OPTIONS)[] = [
   "google",
   "vertex",
@@ -632,7 +633,7 @@ export const CLOUD_PROVIDERS: Record<
   },
   auto: {
     displayName: "KapAble",
-    websiteUrl: "https://academy.kapable.sh/subscription",
+    websiteUrl: upgradeUrl("/subscription"),
     gatewayPrefix: "kapable/",
   },
   azure: {

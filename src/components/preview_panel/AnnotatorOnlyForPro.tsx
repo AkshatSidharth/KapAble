@@ -1,6 +1,7 @@
 import { Lock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ipc } from "@/ipc/types";
+import { upgradeUrl } from "@/constants/brand";
 
 interface AnnotatorOnlyForProProps {
   onGoBack: () => void;
@@ -8,7 +9,7 @@ interface AnnotatorOnlyForProProps {
 
 export const AnnotatorOnlyForPro = ({ onGoBack }: AnnotatorOnlyForProProps) => {
   const handleGetPro = () => {
-    ipc.system.openExternalUrl("https://kapable.sh/pro");
+    ipc.system.openExternalUrl(upgradeUrl("/pro"));
   };
 
   return (

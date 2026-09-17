@@ -16,6 +16,7 @@ import {
 import { useSettings } from "@/hooks/useSettings";
 import { ipc } from "@/ipc/types";
 import { hasKapableProKey } from "@/lib/schemas";
+import { upgradeUrl } from "@/constants/brand";
 
 export function ProModeSelector() {
   const { settings, updateSettings } = useSettings();
@@ -56,9 +57,9 @@ export function ProModeSelector() {
               <a
                 className="inline-flex items-center justify-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-medium text-primary shadow-sm transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
                 onClick={() => {
-                  ipc.system.openExternalUrl("https://kapable.sh/pro#ai");
+                  ipc.system.openExternalUrl(upgradeUrl("/pro#ai"));
                 }}
-                title="Visit kapable.sh/pro to unlock Pro features"
+                title="Unlock Pro features"
               >
                 Unlock Pro modes
               </a>

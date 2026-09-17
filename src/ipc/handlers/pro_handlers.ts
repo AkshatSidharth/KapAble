@@ -24,6 +24,7 @@ import { getKapableEngineBaseUrl } from "../utils/kapable_engine_url";
 import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 
 import { fetchUserInfo } from "../services/user_budget_service";
+import { hostedServices, upgradeUrl } from "@/constants/brand";
 export {
   UserInfoResponseSchema,
   type UserInfoResponse,
@@ -74,7 +75,7 @@ function validateAudioTranscriptionRequest(input: TranscribeAudioParams) {
 function getSubscriptionStatusUrl() {
   return (
     process.env.KAPABLE_SUBSCRIPTION_STATUS_URL ??
-    "https://academy.kapable.sh/api/desktop/subscription-status"
+    upgradeUrl("/api/desktop/subscription-status")
   );
 }
 
@@ -108,9 +109,22 @@ export function parseBillingActionUrl(value: string) {
       KapableErrorKind.Validation,
     );
   }
+  // A server-supplied URL that the app will open, so it is pinned to the host
+  // of the configured account portal. With no portal configured there is no
+  // trusted host, and every billing action URL is rejected.
+  let expectedHostname: string | undefined;
+  const accountUrl = hostedServices.accountUrl();
+  if (accountUrl) {
+    try {
+      expectedHostname = new URL(accountUrl).hostname;
+    } catch {
+      expectedHostname = undefined;
+    }
+  }
   if (
+    !expectedHostname ||
     url.protocol !== "https:" ||
-    url.hostname !== "academy.kapable.sh" ||
+    url.hostname !== expectedHostname ||
     url.username !== "" ||
     url.password !== "" ||
     url.port !== ""

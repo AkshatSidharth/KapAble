@@ -1,3 +1,4 @@
+import { upgradeUrl } from "@/constants/brand";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Check, Zap, Wand2, Cpu } from "lucide-react";
@@ -19,13 +20,13 @@ export function KapableProTrialDialog({
 
   const handleStartTrial = () => {
     ipc.system.openExternalUrl(
-      `https://academy.kapable.sh/redirect-to-checkout?trialCode=7PRO30&${utmParams}`,
+      upgradeUrl(`/redirect-to-checkout?trialCode=7PRO30&${utmParams}`),
     );
     onClose();
   };
 
   const handleLearnMore = () => {
-    ipc.system.openExternalUrl(`https://www.kapable.sh/pro?${utmParams}`);
+    ipc.system.openExternalUrl(upgradeUrl(`/pro?${utmParams}`));
   };
 
   const features = [

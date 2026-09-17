@@ -226,18 +226,27 @@ equivalents, so each one is unset by default and its feature degrades cleanly
 rather than calling a domain nobody owns. Point them at your own deployment
 with these environment variables:
 
-| Variable                   | Enables                                           |
-| -------------------------- | ------------------------------------------------- |
-| `KAPABLE_ENGINE_URL`       | Managed OpenAI-compatible LLM gateway             |
-| `KAPABLE_API_URL`          | Remote model catalog, MCP catalog, desktop config |
-| `KAPABLE_ACCOUNT_URL`      | Subscription/billing portal and upgrade prompts   |
-| `KAPABLE_OAUTH_URL`        | OAuth broker for Supabase and Neon                |
-| `KAPABLE_LOG_UPLOAD_URL`   | Bug-report log bundle upload                      |
-| `KAPABLE_UPDATE_FEED_URL`  | Electron auto-update feed                         |
-| `VITE_KAPABLE_POSTHOG_KEY` | Product analytics                                 |
+| Variable                     | Enables                                                                                                      | Behaviour when unset                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `KAPABLE_ENGINE_URL`         | Managed OpenAI-compatible LLM gateway                                                                        | Managed-model calls fail with a message naming this variable; bring-your-own-key is unaffected |
+| `KAPABLE_API_URL`            | Model catalog, MCP catalog, desktop config, community templates, default build-approval list, credit balance | Bundled model list, built-in templates only, no auto-approved install scripts                  |
+| `KAPABLE_ACCOUNT_URL`        | Subscription portal                                                                                          | Upgrade banners and Pro promos are hidden; other upgrade links point at this page              |
+| `KAPABLE_OAUTH_URL`          | OAuth broker for Neon (and Supabase unless overridden)                                                       | One-click connect explains that an API key or token can be used instead                        |
+| `KAPABLE_SUPABASE_OAUTH_URL` | Supabase OAuth broker, when separate                                                                         | Falls back to `KAPABLE_OAUTH_URL`                                                              |
+| `KAPABLE_HELP_CHAT_URL`      | In-app help assistant                                                                                        | The assistant reports that it has no endpoint                                                  |
+| `KAPABLE_LOG_UPLOAD_URL`     | Bug-report log bundle upload                                                                                 | The bundle is still built; attach it to an issue by hand                                       |
+| `KAPABLE_UPDATE_FEED_URL`    | Electron auto-update feed                                                                                    | Auto-update stays off, with no background polling                                              |
+| `VITE_KAPABLE_POSTHOG_KEY`   | Product analytics (build time)                                                                               | No analytics client is active and no requests are made                                         |
 
 None of these are needed for the bring-your-own-key path, which is the
 supported way to run KapAble today.
+
+`KAPABLE_LANGUAGE_MODEL_CATALOG_URL`, `KAPABLE_MCP_CATALOG_URL`,
+`KAPABLE_DESKTOP_CONFIG_URL` and `KAPABLE_USER_INFO_URL` override individual
+endpoints and take precedence over `KAPABLE_API_URL`.
+
+They are all declared in one place — [`src/constants/brand.ts`](../src/constants/brand.ts)
+— so adding a hosted feature means adding it there rather than hard-coding a host.
 
 ## Building a desktop app
 

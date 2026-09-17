@@ -6,6 +6,7 @@ import {
   PROMO_MESSAGES,
   shouldShowPromoMessage,
 } from "./PromoMessage";
+import { isManagedPlanConfigured } from "@/constants/brand";
 
 function settingsWithAutoKey(autoKey?: string): UserSettings {
   return {
@@ -34,7 +35,7 @@ describe("pickPromoMessage", () => {
     expect(pickPromoMessage(42)).toBe(pickPromoMessage(42));
   });
 
-  it("weights Pro promos above community tips", () => {
+  it("rotates through every configured promo, weighted", () => {
     const counts = new Map<string, number>();
     for (let seed = 0; seed < 3000; seed++) {
       const message = pickPromoMessage(seed);
@@ -52,8 +53,16 @@ describe("pickPromoMessage", () => {
         communityCount += count;
       }
     }
-    // Pro promos carry 12 of 15 weight → ~80% of impressions.
-    expect(proCount / (proCount + communityCount)).toBeGreaterThan(0.7);
+
+    if (isManagedPlanConfigured()) {
+      // Pro promos carry 12 of 15 weight → ~80% of impressions.
+      expect(proCount / (proCount + communityCount)).toBeGreaterThan(0.7);
+    } else {
+      // No subscription backend: the trial dialog would open a checkout that
+      // does not exist, so only community promos are offered.
+      expect(proCount).toBe(0);
+      expect(communityCount).toBe(3000);
+    }
   });
 });
 

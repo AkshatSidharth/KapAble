@@ -22,6 +22,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { upgradeUrl } from "@/constants/brand";
 
 export function ChatErrorBox({
   onDismiss,
@@ -79,7 +80,9 @@ export function ChatErrorBox({
         {error}
         <span className="ml-1">
           <ExternalLink
-            href="https://kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=free-quota-error"
+            href={upgradeUrl(
+              "/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=free-quota-error",
+            )}
             variant="primary"
           >
             Access with KapAble Pro
@@ -107,7 +110,9 @@ export function ChatErrorBox({
         {error}
         <div className="mt-2 space-y-2 space-x-2">
           <ExternalLink
-            href="https://kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=rate-limit-error"
+            href={upgradeUrl(
+              "/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=rate-limit-error",
+            )}
             variant="primary"
           >
             Upgrade to KapAble Pro
@@ -165,7 +170,9 @@ export function ChatErrorBox({
           : ". To use Build mode, first choose a model other than KapAble Free, then send it again."}
         <div className="mt-2 flex flex-wrap gap-2">
           <ExternalLink
-            href="https://kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=free-agent-quota-exceeded"
+            href={upgradeUrl(
+              "/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=free-agent-quota-exceeded",
+            )}
             variant="primary"
           >
             Upgrade to KapAble Pro
@@ -203,7 +210,9 @@ export function ChatErrorBox({
           model limit.
           {resetText} Switch to paid models.{" "}
           <ExternalLink
-            href="https://academy.kapable.sh/subscription?utm_source=kapable-app&utm_medium=app&utm_campaign=exceeded-budget-error"
+            href={upgradeUrl(
+              "/subscription?utm_source=kapable-app&utm_medium=app&utm_campaign=exceeded-budget-error",
+            )}
             variant="primary"
           >
             Get more AI credits
@@ -223,7 +232,9 @@ export function ChatErrorBox({
           error.includes(AI_STREAMING_ERROR_MESSAGE_PREFIX) &&
           !error.includes("TypeError: terminated") && (
             <ExternalLink
-              href="https://kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=general-error"
+              href={upgradeUrl(
+                "/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=general-error",
+              )}
               variant="primary"
             >
               Upgrade to KapAble Pro

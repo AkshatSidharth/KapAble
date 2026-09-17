@@ -26,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { upgradeUrl } from "@/constants/brand";
 
 export function shouldShowCloudSandboxOption({
   runtimeMode,
@@ -119,9 +120,7 @@ export function RuntimeModeSelector() {
           <button
             type="button"
             className="underline font-medium cursor-pointer text-primary"
-            onClick={() =>
-              ipc.system.openExternalUrl("https://kapable.sh/pro#ai")
-            }
+            onClick={() => ipc.system.openExternalUrl(upgradeUrl("/pro#ai"))}
           >
             Upgrade to Pro
           </button>

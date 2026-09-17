@@ -2,6 +2,7 @@ import { SubscriptionBillingError } from "@/shared/subscription_billing_error";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ChatErrorBox } from "./ChatErrorBox";
+import { upgradeUrl } from "@/constants/brand";
 
 const mocks = vi.hoisted(() => ({
   openExternalUrl: vi.fn(),
@@ -56,8 +57,12 @@ describe("ChatErrorBox Basic Agent quota error", () => {
     expect(screen.getByText(/Your quota resets at/)).toBeTruthy();
 
     fireEvent.click(screen.getByText("Upgrade to KapAble Pro"));
+    // Resolved through brand config rather than asserted as a literal: with no
+    // subscription backend configured this points at the docs instead.
     expect(mocks.openExternalUrl).toHaveBeenCalledWith(
-      "https://kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=free-agent-quota-exceeded",
+      upgradeUrl(
+        "/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=free-agent-quota-exceeded",
+      ),
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Switch to Build" }));
@@ -107,13 +112,13 @@ describe("ChatErrorBox subscription billing errors", () => {
       "OUT_OF_CREDITS",
       "Add credits to continue using your subscription.",
       "Get more credits",
-      "https://academy.kapable.sh/subscription",
+      upgradeUrl("/subscription"),
     ],
     [
       "KEY_REJECTED",
       "Get your current Pro key.",
       "Open membership portal",
-      "https://academy.kapable.sh",
+      upgradeUrl(),
     ],
   ] as const)(
     "offers the right recovery for %s",
@@ -166,7 +171,7 @@ describe("ChatErrorBox exhausted credit notice", () => {
       expect(screen.queryByText("Start new chat")).toBeNull();
       fireEvent.click(screen.getByRole("button", { name: "Get more credits" }));
       expect(mocks.openExternalUrl).toHaveBeenCalledExactlyOnceWith(
-        "https://academy.kapable.sh/subscription",
+        upgradeUrl("/subscription"),
       );
       fireEvent.click(
         screen.getByRole("button", { name: "Dismiss billing notice" }),
@@ -202,7 +207,7 @@ describe("ChatErrorBox legacy rejected Pro key", () => {
         screen.getByRole("button", { name: "Open membership portal" }),
       );
       expect(mocks.openExternalUrl).toHaveBeenCalledExactlyOnceWith(
-        "https://academy.kapable.sh",
+        upgradeUrl(),
       );
       fireEvent.click(
         screen.getByRole("button", { name: "Dismiss billing notice" }),

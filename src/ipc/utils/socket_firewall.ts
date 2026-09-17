@@ -1,3 +1,4 @@
+import { hostedServices } from "@/constants/brand";
 import {
   DEFAULT_PTY_COMMAND_TIMEOUT_MS,
   PtyCommandExecutionError,
@@ -66,9 +67,18 @@ const KAPABLE_AUTO_DENIED_ALLOW_BUILDS_COMMENT = "# kapable-auto-denied";
 const PNPM_IGNORED_BUILDS_ERROR_CODE = "ERR_PNPM_IGNORED_BUILDS";
 const KAPABLE_ALLOW_BUILDS_METADATA_PATTERN =
   /^#\s*(kapable-default-allow-builds-(?:schema|data-version|channel))=(.+)$/;
-const KAPABLE_ALLOW_BUILDS_REMOTE_URL =
-  process.env.KAPABLE_DEFAULT_APPROVE_BUILDS_URL ??
-  "https://api.kapable.sh/v1/default-approve-builds.txt";
+// The curated list of packages whose install scripts are approved by
+// default. Served by a host KapAble does not run, so it is undefined
+// unless configured; callers then fall back to approving nothing
+// automatically, which is the safe direction.
+const KAPABLE_ALLOW_BUILDS_REMOTE_URL = (() => {
+  const override = process.env.KAPABLE_DEFAULT_APPROVE_BUILDS_URL;
+  if (override) return override;
+  const apiBaseUrl = hostedServices.apiBaseUrl();
+  return apiBaseUrl
+    ? `${apiBaseUrl.replace(/\/+$/, "")}/v1/default-approve-builds.txt`
+    : undefined;
+})();
 const KAPABLE_ALLOW_BUILDS_FETCH_TIMEOUT_MS = 5_000;
 export const KAPABLE_ALLOW_BUILDS_CACHE_TTL_MS = 60 * 60 * 1000;
 const KAPABLE_ALLOW_BUILDS_MAX_BYTES = 256 * 1024;
@@ -676,6 +686,12 @@ async function fetchRemoteAllowBuildsSource(
 async function fetchRemoteAllowBuildsSourceFromNetwork(
   fetcher: AllowBuildsTextFetcher,
 ): Promise<AllowBuildsSource | null> {
+  if (!KAPABLE_ALLOW_BUILDS_REMOTE_URL) {
+    // No catalog configured: nothing is approved by default, and the caller
+    // falls back to asking before running an install script.
+    return null;
+  }
+
   const controller = new AbortController();
   const timeout = setTimeout(
     () => controller.abort(),

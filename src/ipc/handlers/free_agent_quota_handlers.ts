@@ -1,3 +1,4 @@
+import { hostedServices } from "@/constants/brand";
 import { db } from "../../db";
 import { messages } from "../../db/schema";
 import { eq } from "drizzle-orm";
@@ -21,7 +22,7 @@ const SERVER_TIME_TIMEOUT_MS = 5000;
 
 /**
  * Fetches the current time from a trusted server to prevent clock manipulation.
- * Uses the HTTP Date header from api.kapable.sh.
+ * Uses the HTTP Date header from the configured API, when there is one.
  * Falls back to local time if the server is unreachable (but logs a warning).
  */
 async function getServerTime(): Promise<number> {
@@ -37,7 +38,16 @@ async function getServerTime(): Promise<number> {
       SERVER_TIME_TIMEOUT_MS,
     );
 
-    const response = await fetch("https://api.kapable.sh/health", {
+    // A trusted clock for quota windows, read from the API's Date header. With
+    // no API configured there is nothing to ask, and the caller falls back to
+    // the local clock.
+    const apiBaseUrl = hostedServices.apiBaseUrl();
+    if (!apiBaseUrl) {
+      clearTimeout(timeoutId);
+      return Date.now();
+    }
+
+    const response = await fetch(`${apiBaseUrl.replace(/\/+$/, "")}/health`, {
       method: "HEAD",
       signal: controller.signal,
     });

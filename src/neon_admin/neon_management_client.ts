@@ -6,6 +6,7 @@ import { IS_TEST_BUILD } from "../ipc/utils/test_utils";
 import { fetchWithRetry } from "../ipc/utils/retryWithRateLimit";
 import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
 import { getNeonErrorMessage } from "./neon_errors";
+import { requireNeonOauthBroker } from "@/constants/brand";
 
 const logger = log.scope("neon_management_client");
 
@@ -51,7 +52,7 @@ async function refreshNeonTokenOnce(): Promise<void> {
     // token refreshes (e.g. running several in-app tests back-to-back) backs
     // off on 429 instead of failing the whole flow.
     const response = await fetchWithRetry(
-      "https://oauth.kapable.sh/api/integrations/neon/refresh",
+      `${requireNeonOauthBroker()}/api/integrations/neon/refresh`,
       {
         method: "POST",
         headers: {

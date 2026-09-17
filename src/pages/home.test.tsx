@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import HomePage from "./home";
+import { upgradeUrl } from "@/constants/brand";
 
 const mocks = vi.hoisted(() => ({
   attachments: [] as any[],
@@ -141,7 +142,9 @@ describe("HomePage first-prompt projection", () => {
     fireEvent.click(screen.getByRole("button", { name: "Upgrade to Pro" }));
 
     expect(mocks.openExternalUrl).toHaveBeenCalledWith(
-      "https://www.kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=home-upgrade-to-pro",
+      upgradeUrl(
+        "/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=home-upgrade-to-pro",
+      ),
     );
   });
 

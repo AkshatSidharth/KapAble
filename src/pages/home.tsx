@@ -33,6 +33,7 @@ import {
   useFirstPromptSend,
 } from "@/first_prompt/FirstPromptProvider";
 import { getHomeDefaultChatMode } from "@/lib/homeChatMode";
+import { upgradeUrl } from "@/constants/brand";
 
 // Adding an export for attachments
 export interface HomeSubmitOptions {
@@ -198,7 +199,9 @@ export default function HomePage() {
                   size="sm"
                   onClick={() =>
                     ipc.system.openExternalUrl(
-                      "https://www.kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=home-upgrade-to-pro",
+                      upgradeUrl(
+                        "/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=home-upgrade-to-pro",
+                      ),
                     )
                   }
                 >

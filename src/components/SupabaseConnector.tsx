@@ -74,6 +74,7 @@ import {
   isSupabaseConnected,
 } from "@/lib/schemas";
 import { showError } from "@/lib/toast";
+import { hostedServices } from "@/constants/brand";
 
 /** A failed create, and whether it left a real project behind. */
 interface CreateError {
@@ -358,8 +359,16 @@ export function SupabaseConnector({ appId }: { appId: number }) {
             fakeProjectId: "fake-project-id",
           });
         } else {
+          const broker = hostedServices.supabaseOauthBrokerUrl();
+          if (!broker) {
+            throw new Error(
+              "One-click Supabase connection needs an OAuth broker. Set " +
+                "KAPABLE_SUPABASE_OAUTH_URL, or add a Supabase access token " +
+                "in Settings instead.",
+            );
+          }
           await ipc.system.openExternalUrl(
-            "https://supabase-oauth.kapable.sh/api/connect-supabase/login",
+            `${broker.replace(/\/+$/, "")}/api/connect-supabase/login`,
           );
         }
       } catch (error) {

@@ -10,6 +10,11 @@ import { useState } from "react";
 import { KeyRound } from "lucide-react";
 import { hasKapableProKey } from "@/lib/schemas";
 import { useSettings } from "@/hooks/useSettings";
+import {
+  hostedServices,
+  isManagedPlanConfigured,
+  upgradeUrl,
+} from "@/constants/brand";
 
 export function ProBanner() {
   const { settings } = useSettings();
@@ -20,6 +25,12 @@ export function ProBanner() {
   });
 
   if (settings && hasKapableProKey(settings)) {
+    return null;
+  }
+
+  // Nothing to upgrade to unless a subscription backend is configured, and the
+  // banner's calls to action would open a checkout that does not exist.
+  if (!isManagedPlanConfigured()) {
     return null;
   }
 
@@ -37,7 +48,7 @@ export function SetupKapableProButton() {
       type="button"
       className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-primary hover:underline"
       onClick={() => {
-        ipc.system.openExternalUrl("https://academy.kapable.sh/settings");
+        ipc.system.openExternalUrl(`${hostedServices.accountUrl()}/settings`);
       }}
     >
       <KeyRound aria-hidden="true" className="size-3.5" />
@@ -53,7 +64,9 @@ export function AiAccessBanner() {
       className="w-full py-2 sm:py-2.5 md:py-3 rounded-lg bg-gradient-to-br from-white via-indigo-50 to-sky-100 dark:from-indigo-700 dark:via-indigo-700 dark:to-indigo-900 flex items-center justify-center relative overflow-hidden ring-1 ring-inset ring-black/5 dark:ring-white/10 shadow-sm cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-[1px]"
       onClick={() => {
         ipc.system.openExternalUrl(
-          "https://www.kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=in-app-banner-ai-access",
+          upgradeUrl(
+            "/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=in-app-banner-ai-access",
+          ),
         );
       }}
     >
@@ -120,7 +133,9 @@ export function SmartContextBanner() {
       className="w-full py-2 sm:py-2.5 md:py-3 rounded-lg bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200 dark:from-emerald-700 dark:via-emerald-700 dark:to-emerald-900 flex items-center justify-center relative overflow-hidden ring-1 ring-inset ring-emerald-900/10 dark:ring-white/10 shadow-sm cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-[1px]"
       onClick={() => {
         ipc.system.openExternalUrl(
-          "https://www.kapable.sh/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=in-app-banner-smart-context",
+          upgradeUrl(
+            "/pro?utm_source=kapable-app&utm_medium=app&utm_campaign=in-app-banner-smart-context",
+          ),
         );
       }}
     >

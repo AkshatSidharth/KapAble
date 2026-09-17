@@ -30,6 +30,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { isKapableProEnabled } from "@/lib/schemas";
 import { queryKeys } from "@/lib/queryKeys";
 import { ProviderIcon } from "./ProviderIcon";
+import { upgradeUrl } from "@/constants/brand";
 
 export function SetupBanner({
   variant = "inline",
@@ -81,7 +82,9 @@ export function SetupBanner({
   const handleKapableProSetupClick = () => {
     posthog.capture("setup-flow:ai-provider-setup:kapable:click");
     ipc.system.openExternalUrl(
-      "https://academy.kapable.sh/redirect-to-checkout?trialCode=7PRO30&utm_source=kapable-app&utm_medium=app&utm_campaign=setup-dialog-v2",
+      upgradeUrl(
+        "/redirect-to-checkout?trialCode=7PRO30&utm_source=kapable-app&utm_medium=app&utm_campaign=setup-dialog-v2",
+      ),
     );
   };
 

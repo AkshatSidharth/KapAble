@@ -46,6 +46,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/queryKeys";
 import { isNeonSupportedFramework } from "@/lib/framework_constants";
 import { getErrorMessage } from "@/lib/errors";
+import { hostedServices } from "@/constants/brand";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -159,8 +160,15 @@ export function NeonConnector({ appId }: { appId: number }) {
         if (settings?.isTestMode) {
           await ipc.neon.fakeConnect();
         } else {
+          const broker = hostedServices.oauthBrokerUrl();
+          if (!broker) {
+            throw new Error(
+              "One-click Neon connection needs an OAuth broker. Set " +
+                "KAPABLE_OAUTH_URL, or add a Neon API key in Settings instead.",
+            );
+          }
           await ipc.system.openExternalUrl(
-            "https://oauth.kapable.sh/api/integrations/neon/login",
+            `${broker.replace(/\/+$/, "")}/api/integrations/neon/login`,
           );
         }
       } catch (error) {

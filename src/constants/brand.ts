@@ -31,6 +31,9 @@ export const ISSUES_URL = `${REPO_URL}/issues`;
 
 export const DEMO_GUIDE_URL = `${REPO_URL}/blob/main/docs/DEMO.md`;
 
+/** Where builds are published, in place of a marketing download page. */
+export const RELEASES_URL = `${REPO_URL}/releases`;
+
 /** Reads an env var, treating blank/whitespace as "not configured". */
 function optionalEnv(name: string): string | undefined {
   const value =
@@ -51,6 +54,14 @@ export const hostedServices = {
   accountUrl: () => optionalEnv("KAPABLE_ACCOUNT_URL"),
   /** OAuth broker used by the Supabase and Neon integrations. */
   oauthBrokerUrl: () => optionalEnv("KAPABLE_OAUTH_URL"),
+  /**
+   * OAuth broker for Supabase specifically. Upstream ran this on a separate
+   * host from the one serving Neon, so it can be pointed somewhere else;
+   * it falls back to the shared broker.
+   */
+  supabaseOauthBrokerUrl: () =>
+    optionalEnv("KAPABLE_SUPABASE_OAUTH_URL") ??
+    optionalEnv("KAPABLE_OAUTH_URL"),
   /** Sink that bug-report log bundles are uploaded to. */
   logUploadUrl: () => optionalEnv("KAPABLE_LOG_UPLOAD_URL"),
   /** Electron update feed. Auto-update stays off until this is set. */
@@ -68,6 +79,96 @@ export const hostedServices = {
  */
 export function isManagedPlanConfigured(): boolean {
   return Boolean(hostedServices.accountUrl());
+}
+
+/**
+ * Where an "upgrade" call to action should send the user.
+ *
+ * With a subscription backend configured this is that portal. Without one,
+ * upgrading is not a thing this build can do, so rather than open a checkout
+ * that does not exist, it explains why — the docs section covering hosted
+ * services. Surfaces that are *only* an upsell should hide themselves with
+ * isManagedPlanConfigured() instead of calling this.
+ *
+ * @param path Path within the account portal, e.g. "/subscription".
+ */
+export function upgradeUrl(path = ""): string {
+  const accountUrl = hostedServices.accountUrl();
+  if (!accountUrl) {
+    return `${DOCS_URL}#hosted-services`;
+  }
+  return `${accountUrl.replace(/\/+$/, "")}${path}`;
+}
+
+/**
+ * The Neon OAuth broker, or a clear error naming what to configure.
+ *
+ * Token refresh has no useful degraded mode — without a broker the stored
+ * refresh token cannot be exchanged — so this throws rather than returning
+ * undefined and letting a fetch fail against a host that does not resolve.
+ */
+export function requireNeonOauthBroker(): string {
+  const broker = hostedServices.oauthBrokerUrl();
+  if (!broker) {
+    throw new Error(
+      "No OAuth broker is configured, so the Neon connection cannot be " +
+        "refreshed. Set KAPABLE_OAUTH_URL, or connect Neon with an API key.",
+    );
+  }
+  return broker.replace(/\/+$/, "");
+}
+
+/** The Supabase OAuth broker, or a clear error naming what to configure. */
+export function requireSupabaseOauthBroker(): string {
+  const broker = hostedServices.supabaseOauthBrokerUrl();
+  if (!broker) {
+    throw new Error(
+      "No OAuth broker is configured, so the Supabase connection cannot be " +
+        "refreshed. Set KAPABLE_SUPABASE_OAUTH_URL, or connect Supabase with " +
+        "an access token.",
+    );
+  }
+  return broker.replace(/\/+$/, "");
+}
+
+/**
+ * Base URL of the hosted help-chat assistant, or a clear error.
+ *
+ * The in-app help bot talks to a gateway upstream operated; there is no
+ * offline equivalent, so this throws with an actionable message rather than
+ * silently failing against a host this fork does not own.
+ */
+export function requireHelpChatUrl(): string {
+  const helpChatUrl = optionalEnv("KAPABLE_HELP_CHAT_URL");
+  if (!helpChatUrl) {
+    throw new Error(
+      "The in-app help assistant needs a hosted endpoint, which this build " +
+        "does not have. Set KAPABLE_HELP_CHAT_URL, or see the docs at " +
+        `${DOCS_URL}.`,
+    );
+  }
+  return helpChatUrl;
+}
+
+/**
+ * Endpoint returning the signed-in account's credit balance, or a clear error.
+ *
+ * Only reached on the managed-plan path, which needs a gateway key; there is
+ * no local answer to "how many credits are left", so this throws rather than
+ * querying a host this fork does not own.
+ */
+export function requireUserInfoUrl(): string {
+  const override = optionalEnv("KAPABLE_USER_INFO_URL");
+  if (override) return override;
+  const apiBaseUrl = hostedServices.apiBaseUrl();
+  if (!apiBaseUrl) {
+    throw new Error(
+      "No account API is configured, so credit balance is unavailable. Set " +
+        "KAPABLE_API_URL, or use a bring-your-own-key provider, which bills " +
+        "through your own provider account.",
+    );
+  }
+  return `${apiBaseUrl.replace(/\/+$/, "")}/v1/user/info`;
 }
 
 /** True when analytics have been explicitly configured for this build. */

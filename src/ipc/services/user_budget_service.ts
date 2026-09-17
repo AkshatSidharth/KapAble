@@ -1,3 +1,4 @@
+import { requireUserInfoUrl } from "@/constants/brand";
 import { Readable } from "node:stream";
 import fetch from "node-fetch";
 import { z } from "zod";
@@ -22,19 +23,16 @@ export async function fetchUserInfo(
   signal?: AbortSignal,
 ): Promise<UserInfoResponse> {
   const timeout = AbortSignal.timeout(10_000);
-  const response = await fetch(
-    process.env.KAPABLE_USER_INFO_URL ?? "https://api.kapable.sh/v1/user/info",
-    {
-      method: "GET",
-      redirect: "error",
-      signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        "Cache-Control": "no-cache",
-      },
+  const response = await fetch(requireUserInfoUrl(), {
+    method: "GET",
+    redirect: "error",
+    signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "Cache-Control": "no-cache",
     },
-  );
+  });
   if (!response.ok) {
     if (response.body instanceof Readable) response.body.destroy();
     throw new UserInfoApiError(response.status);

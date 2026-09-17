@@ -77,6 +77,7 @@ import {
   AUTO_SIDEKICK_MODEL_NAME,
   isAutoSidekickModel,
 } from "@/lib/autoSidekick";
+import { upgradeUrl } from "@/constants/brand";
 
 const SCROLL_AREA_CLASS = "max-h-100 overflow-y-auto scrollbar-on-hover";
 
@@ -90,8 +91,9 @@ const PRO_PILL_CLASS = cn(
   "bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 bg-[length:200%_100%] animate-[shimmer_5s_ease-in-out_infinite] text-white",
 );
 
-const KAPABLE_PRO_UPGRADE_BASE_URL =
-  "https://www.kapable.sh/pro?utm_source=kapable-app&utm_medium=app";
+const KAPABLE_PRO_UPGRADE_BASE_URL = upgradeUrl(
+  "/pro?utm_source=kapable-app&utm_medium=app",
+);
 
 const NAVIGATION_SUBMENU_HOVER_PROPS = {
   openOnHover: true,
@@ -1357,9 +1359,7 @@ export function ModelPicker() {
                     size="sm"
                     className="cursor-pointer w-full bg-indigo-600 hover:bg-indigo-700 text-white hover:text-white border-indigo-600"
                     onClick={() => {
-                      ipc.system.openExternalUrl(
-                        "https://academy.kapable.sh/subscription",
-                      );
+                      ipc.system.openExternalUrl(upgradeUrl("/subscription"));
                       setOpen(false);
                     }}
                   >

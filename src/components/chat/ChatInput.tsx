@@ -130,7 +130,7 @@ import {
   composeChatPrompt,
   hasChatComposerPayload,
 } from "@/lib/serializeChatAnnotations";
-import { upgradeUrl } from "@/constants/brand";
+import { isManagedPlanConfigured, upgradeUrl } from "@/constants/brand";
 
 const showTokenBarAtom = atom(false);
 
@@ -1118,7 +1118,11 @@ export function ChatInput({ chatId }: { chatId?: number }) {
                       : t("voiceToText", "Voice to text")}
                 </TooltipContent>
               </Tooltip>
-            ) : (
+            ) : isManagedPlanConfigured() ? (
+              // The padlocked mic is purely an upsell — it transcribes nothing
+              // and only opens a checkout. Hide it when no subscription backend
+              // is configured, rather than dangling a feature that cannot be
+              // unlocked from this build.
               <Tooltip>
                 <TooltipTrigger
                   render={
@@ -1138,7 +1142,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
                   {t("voiceToTextRequiresPro", "Voice to text (requires Pro)")}
                 </TooltipContent>
               </Tooltip>
-            )}
+            ) : null}
 
             {isStreaming ? (
               // Cancelling is not instant — an in-flight tool has to unwind

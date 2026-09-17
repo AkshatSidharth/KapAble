@@ -182,3 +182,30 @@ it("preserves Pro model and mode preferences when connecting", async () => {
     selectModel: false,
   });
 });
+
+it("drops the Pro trial pitch when no subscription backend is configured", () => {
+  // The test setup points every hosted endpoint at a .test host; clearing the
+  // account URL is what an ordinary bring-your-own-key build looks like.
+  vi.stubEnv("KAPABLE_ACCOUNT_URL", "");
+  setup();
+  expect(screen.queryByText("Start free KapAble Pro trial")).toBeNull();
+  expect(screen.queryByText(/Watch the walkthrough/)).toBeNull();
+  // The provider options it used to sit above are still offered.
+  expect(
+    screen.getByRole("button", { name: "ChatGPT subscription Free" }),
+  ).toBeVisible();
+  expect(screen.getByRole("button", { name: "Other providers" })).toBeVisible();
+  vi.unstubAllEnvs();
+});
+
+it("never offers the walkthrough video, which showed a different product", () => {
+  setup();
+  expect(screen.queryByText(/Watch the walkthrough/)).toBeNull();
+});
+
+it("keeps the Pro trial pitch when a subscription backend is configured", () => {
+  // Counterpart to the test above: proves the absence there comes from the
+  // configuration gate, not from the pitch having been deleted outright.
+  setup();
+  expect(screen.getByText("Start free KapAble Pro trial")).toBeVisible();
+});

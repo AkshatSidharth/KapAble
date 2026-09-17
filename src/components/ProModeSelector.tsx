@@ -16,7 +16,7 @@ import {
 import { useSettings } from "@/hooks/useSettings";
 import { ipc } from "@/ipc/types";
 import { hasKapableProKey } from "@/lib/schemas";
-import { upgradeUrl } from "@/constants/brand";
+import { isManagedPlanConfigured, upgradeUrl } from "@/constants/brand";
 
 export function ProModeSelector() {
   const { settings, updateSettings } = useSettings();
@@ -29,6 +29,13 @@ export function ProModeSelector() {
   };
 
   const hasProKey = settings ? hasKapableProKey(settings) : false;
+
+  // Without a key the popover holds nothing but an "Unlock Pro modes" link and
+  // a switch that cannot be toggled, so with no subscription backend behind it
+  // the whole control is an advert for a checkout this build cannot open.
+  if (!hasProKey && !isManagedPlanConfigured()) {
+    return null;
+  }
 
   return (
     <Popover>

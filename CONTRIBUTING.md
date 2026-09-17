@@ -16,11 +16,19 @@ Non-code contributions are just as welcome: reporting bugs, writing feature requ
 
 KapAble is an Electron app.
 
+**Prerequisites:** Node.js 24 (the `engines` field pins `>=24 <26` and
+`engine-strict` is on, so a different major will refuse to install), git, and a
+C++ toolchain for the native modules `better-sqlite3` and `node-pty`.
+
 **Install dependencies:**
 
 ```sh
 npm install
 ```
+
+`npm install` also downloads an Electron binary, a bundled git for `dugite`,
+and a ripgrep binary for `@vscode/ripgrep`, so the first install needs network
+access.
 
 **Create the userData directory (required for database)**
 
@@ -105,3 +113,29 @@ You can also do local code reviews with the following tools:
 
 - Codex CLI - `codex` -> `/review`
 - Claude Code CLI - `claude` -> `/review`
+
+## Merging changes from upstream Dyad
+
+KapAble is a fork of [Dyad](https://github.com/dyad-sh/dyad). To pull upstream
+changes in, merge them and then re-apply the rebrand:
+
+```sh
+git merge upstream/main
+python3 scripts/rebrand/rebrand.py
+python3 scripts/rebrand/relink_docs.py
+npm run fmt && npm run ts && npm test
+```
+
+Both scripts are idempotent. See
+[`scripts/rebrand/README.md`](./scripts/rebrand/README.md) for what they
+deliberately leave on upstream identifiers, and for the `rebrand:keep` marker
+that exempts a line naming Dyad on purpose.
+
+Afterwards, check that nothing reintroduced a hard-coded hosted endpoint:
+
+```sh
+git grep -n "kapable\.sh"   # should only match comments
+```
+
+Hosted services belong in
+[`src/constants/brand.ts`](./src/constants/brand.ts), not as literals.

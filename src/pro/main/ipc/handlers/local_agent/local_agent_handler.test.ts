@@ -2222,7 +2222,9 @@ describe("handleLocalAgentStream", () => {
             .aiMessagesJson as { messages: unknown[] }
         ).messages,
       );
-      expect(persistedAiMessages).toContain('<kapable-output type=\\"warning\\"');
+      expect(persistedAiMessages).toContain(
+        '<kapable-output type=\\"warning\\"',
+      );
       expect(persistedAiMessages).toContain(
         'message=\\"Supabase function deploy warning\\"',
       );
@@ -5153,7 +5155,10 @@ describe("handleLocalAgentStream", () => {
           yield { type: "text-delta", text: "Partial response" };
           abortController.abort();
           // This will not be processed due to abort
-          throw new KapableError("Simulated abort error", KapableErrorKind.Internal);
+          throw new KapableError(
+            "Simulated abort error",
+            KapableErrorKind.Internal,
+          );
         })(),
         response: Promise.resolve({ messages: [] }),
       };

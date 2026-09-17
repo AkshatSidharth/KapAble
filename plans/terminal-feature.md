@@ -436,7 +436,7 @@ their own machine. But two non-obvious invariants must hold from day 1:
 | Dense output overwhelms IPC                                         | M   | 8ms coalescing buffer in main                                                                            |
 | Per-app PTY UX confusion (toggle is per-chat)                       | M   | Banner shows app name + path; PM-flagged disambiguation                                                  |
 | Runaway resource use (many apps with live PTYs)                     | M   | Hard cap = 5; LRU eviction with toast                                                                    |
-| User loses long-running shell on KapAble quit                          | M   | Document; toast on relaunch if a session was killed                                                      |
+| User loses long-running shell on KapAble quit                       | M   | Document; toast on relaunch if a session was killed                                                      |
 | Drizzle migration on existing user DBs                              | L   | Standard `ALTER ADD COLUMN` with DEFAULT                                                                 |
 | Bundle size cost of xterm + addons (~600KB gzip)                    | L   | `React.lazy` `TerminalPanel`                                                                             |
 | macOS GUI-launch PATH                                               | L   | Already solved via `shellEnvSync()`                                                                      |

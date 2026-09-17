@@ -38,7 +38,10 @@ describe("engineFetch", () => {
         });
       });
 
-    const request = engineFetch({ kapableRequestId: "request-1" }, "/tools/test");
+    const request = engineFetch(
+      { kapableRequestId: "request-1" },
+      "/tools/test",
+    );
     const rejection = expect(request).rejects.toBeInstanceOf(
       EngineFetchTimeoutError,
     );
@@ -64,9 +67,13 @@ describe("engineFetch", () => {
       });
     });
 
-    const request = engineFetch({ kapableRequestId: "request-2" }, "/tools/test", {
-      signal: controller.signal,
-    });
+    const request = engineFetch(
+      { kapableRequestId: "request-2" },
+      "/tools/test",
+      {
+        signal: controller.signal,
+      },
+    );
     const rejection = request.catch((error) => {
       expect(error).toBeInstanceOf(KapableError);
       expect(error).not.toBeInstanceOf(EngineFetchTimeoutError);
@@ -246,9 +253,13 @@ describe("engineFetch", () => {
       });
     });
 
-    const request = engineFetch({ kapableRequestId: "request-5" }, "/tools/test", {
-      signal: controller.signal,
-    });
+    const request = engineFetch(
+      { kapableRequestId: "request-5" },
+      "/tools/test",
+      {
+        signal: controller.signal,
+      },
+    );
     const rejection = expect(request).rejects.toMatchObject({
       kind: KapableErrorKind.UserCancelled,
     });

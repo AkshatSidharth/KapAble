@@ -973,7 +973,10 @@ async function persistPendingWrite({
 async function assertChatOwnsApp(chatId: number, appId: number): Promise<void> {
   const chat = await db.query.chats.findFirst({ where: eq(chats.id, chatId) });
   if (!chat) {
-    throw new KapableError(`Chat ${chatId} not found`, KapableErrorKind.NotFound);
+    throw new KapableError(
+      `Chat ${chatId} not found`,
+      KapableErrorKind.NotFound,
+    );
   }
   if (chat.appId !== appId) {
     throw new KapableError(

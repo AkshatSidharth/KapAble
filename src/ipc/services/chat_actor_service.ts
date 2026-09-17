@@ -129,7 +129,10 @@ export function observeChatSubmissionStopPolicy(chatId: number): number {
     .where(eq(chats.id, chatId))
     .get();
   if (!chat) {
-    throw new KapableError(`Chat ${chatId} not found`, KapableErrorKind.NotFound);
+    throw new KapableError(
+      `Chat ${chatId} not found`,
+      KapableErrorKind.NotFound,
+    );
   }
   return remoteMachineHost
     .localRef(chatStreamDefinition, chatStreamKey(chatId))

@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import { serialize } from "node:v8";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import type { Clock } from "@/state_machines/clock";
 import type { InvocationRef } from "@/state_machines/invocation_ref";
 import { PendingReceiptLedger } from "@/state_machines/pending_receipt_ledger";

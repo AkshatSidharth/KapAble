@@ -11,7 +11,11 @@ import {
   defineCorrelatedEffectHandlers,
   runCorrelatedEffect,
 } from "@/distributed_machines/one_shot_effects";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import {
   IMAGE_GENERATION_MACHINE_ID,
   ImageGenerationIntentEventSchema,
@@ -268,7 +272,10 @@ export const imageGenerationDefinition = defineFrameworkCoveredRemoteMachine({
           intent.job.targetAppId,
         );
         if (!(await appExists(intent.job.targetAppId))) {
-          throw new KapableError("Target app not found", KapableErrorKind.NotFound);
+          throw new KapableError(
+            "Target app not found",
+            KapableErrorKind.NotFound,
+          );
         }
         imageGenerationService.assertAcceptingGenerations(
           intent.job.targetAppId,

@@ -337,7 +337,11 @@ function renderClosedBlock(
     }
     // Hide the standalone result only when its call is on screen to absorb it;
     // an unmatched result still renders on its own.
-    if (callId && block.tag === "kapable-mcp-tool-result" && callIds.has(callId)) {
+    if (
+      callId &&
+      block.tag === "kapable-mcp-tool-result" &&
+      callIds.has(callId)
+    ) {
       return null;
     }
   }
@@ -882,7 +886,9 @@ function renderCustomTag(
       );
 
     case "kapable-enable-nitro":
-      return <KapableEnableNitro state={getState({ isStreaming, inProgress })} />;
+      return (
+        <KapableEnableNitro state={getState({ isStreaming, inProgress })} />
+      );
 
     case "kapable-edit":
       return (
@@ -1024,7 +1030,10 @@ function renderCustomTag(
 
     case "kapable-security-finding":
       return (
-        <KapableSecurityFinding title={attributes.title} level={attributes.level}>
+        <KapableSecurityFinding
+          title={attributes.title}
+          level={attributes.level}
+        >
           {content}
         </KapableSecurityFinding>
       );

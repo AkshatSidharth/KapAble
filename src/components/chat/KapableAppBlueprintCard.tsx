@@ -41,7 +41,9 @@ import { AppBlueprintNameConflictDialog } from "./AppBlueprintNameConflictDialog
 import type { CustomTagState } from "./stateTypes";
 
 function isNameConflictError(error: unknown): boolean {
-  return error instanceof KapableError && error.kind === KapableErrorKind.Conflict;
+  return (
+    error instanceof KapableError && error.kind === KapableErrorKind.Conflict
+  );
 }
 
 interface KapableAppBlueprintCardProps {
@@ -58,9 +60,9 @@ interface KapableAppBlueprintCardProps {
   };
 }
 
-export const KapableAppBlueprintCard: React.FC<KapableAppBlueprintCardProps> = ({
-  node,
-}) => {
+export const KapableAppBlueprintCard: React.FC<
+  KapableAppBlueprintCardProps
+> = ({ node }) => {
   const props = node.properties;
   const chatId = useAtomValue(selectedChatIdAtom);
   const appBlueprintState = useAtomValue(appBlueprintStateAtom);

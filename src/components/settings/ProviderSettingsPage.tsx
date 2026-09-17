@@ -243,7 +243,8 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
 
       const isFirstProviderSetup = !isAnyProviderSetup();
       // Check if this is the first time user is setting up KapAble Pro
-      const isNewKapableProSetup = isKapable && settings && !hasKapableProKey(settings);
+      const isNewKapableProSetup =
+        isKapable && settings && !hasKapableProKey(settings);
 
       const settingsUpdate: Partial<UserSettings> = {
         providerSettings: {

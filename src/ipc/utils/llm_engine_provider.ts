@@ -209,7 +209,9 @@ export function createKapableEngine(
         if ("kapableMentionedApps" in parsedBody) {
           delete parsedBody.kapableMentionedApps;
         }
-        const kapableSmartContextMode = getKapableOption("kapableSmartContextMode");
+        const kapableSmartContextMode = getKapableOption(
+          "kapableSmartContextMode",
+        );
         if ("kapableSmartContextMode" in parsedBody) {
           delete parsedBody.kapableSmartContextMode;
         }
@@ -305,7 +307,9 @@ export function createKapableEngine(
     modelId: ExampleChatModelId,
     chatParams: ChatParams,
   ) => {
-    const createModel = (kapableProviderOptions?: KapableEngineProviderOptions) => {
+    const createModel = (
+      kapableProviderOptions?: KapableEngineProviderOptions,
+    ) => {
       const provider = createAnthropic({
         authToken: getKapableEngineApiKey(options.apiKey),
         baseURL,
@@ -337,7 +341,9 @@ export function createKapableEngine(
           callOptions,
         ),
       doStream: (callOptions) =>
-        createModel(getKapableProviderOptions(callOptions)).doStream(callOptions),
+        createModel(getKapableProviderOptions(callOptions)).doStream(
+          callOptions,
+        ),
     } satisfies LanguageModel;
 
     const defaultObjectGenerationMode = (

@@ -17,7 +17,11 @@ import {
   RateLimitError,
   retryWithRateLimit,
 } from "../ipc/utils/retryWithRateLimit";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { enqueueSupabaseDeploy } from "./supabase_deploy_queue";
 
 const fsPromises = fs.promises;

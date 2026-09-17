@@ -41,7 +41,7 @@ export const PortalMigrate = ({ appId }: PortalMigrateProps) => {
 
   const openDocs = () => {
     ipc.system.openExternalUrl(
-      "https://www.kapable.sh/docs/templates/portal#create-a-database-migration",
+      "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#templates",
     );
   };
 

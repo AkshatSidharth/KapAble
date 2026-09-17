@@ -127,7 +127,14 @@ export const SETTINGS_SEARCH_INDEX: SearchableSettingItem[] = [
     label: "Customize Apps Folder",
     description:
       "Set the top-level folder that KapAble will store new applications in",
-    keywords: ["customize", "apps", "path", "folder", "directory", "kapable-apps"],
+    keywords: [
+      "customize",
+      "apps",
+      "path",
+      "folder",
+      "directory",
+      "kapable-apps",
+    ],
     sectionId: SECTION_IDS.general,
     sectionLabel: "General",
   },

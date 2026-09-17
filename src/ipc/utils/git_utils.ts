@@ -17,7 +17,11 @@ import { safeJoin } from "./path_utils";
 import { ensureLibcurlShimOnLinux } from "./linux_libcurl_shim";
 import { getPathEnvKey } from "./path_env";
 import type { UncommittedFile, UncommittedFileStatus } from "@/ipc/types";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { GIT_ERROR_CODES, type GitErrorCode } from "@/shared/git_error_codes";
 import {
   isDotenvFilePath,
@@ -41,7 +45,9 @@ const GIT_STATE_FINGERPRINT_MAX_UNTRACKED_PATHS = 10_000;
 let didReportGitLaunchFailure = false;
 
 function isUserVisibleGitPath(filePath: string) {
-  return !filePath.startsWith(".kapable/") && filePath !== "pnpm-workspace.yaml";
+  return (
+    !filePath.startsWith(".kapable/") && filePath !== "pnpm-workspace.yaml"
+  );
 }
 
 function isAgentGitPatchVisiblePath(filePath: string) {
@@ -1871,7 +1877,10 @@ export async function gitPush({
     if (result.exitCode !== 0) {
       const errorMsg = result.stderr.toString() || result.stdout.toString();
       throw classifyGitOperationError(
-        new KapableError(`Git push failed: ${errorMsg}`, KapableErrorKind.Conflict),
+        new KapableError(
+          `Git push failed: ${errorMsg}`,
+          KapableErrorKind.Conflict,
+        ),
         [GIT_ERROR_CODES.NON_FAST_FORWARD, GIT_ERROR_CODES.DIVERGENT_BRANCHES],
       );
     }
@@ -2020,7 +2029,10 @@ export async function gitLogNative(
   const logResult = await execGit(logArgs, path);
 
   if (logResult.exitCode !== 0) {
-    throw new KapableError(logResult.stderr.toString(), KapableErrorKind.Conflict);
+    throw new KapableError(
+      logResult.stderr.toString(),
+      KapableErrorKind.Conflict,
+    );
   }
 
   const output = logResult.stdout.toString().trim();

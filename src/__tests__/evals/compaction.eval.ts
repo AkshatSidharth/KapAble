@@ -30,7 +30,11 @@ if (!process.env.KAPABLE_PRO_API_KEY && process.env.KAPABLE_PRO_KEY) {
   process.env.KAPABLE_PRO_API_KEY = process.env.KAPABLE_PRO_KEY;
 }
 
-import { GPT_5_4, getEvalModel, hasKapableProKey } from "./helpers/get_eval_model";
+import {
+  GPT_5_4,
+  getEvalModel,
+  hasKapableProKey,
+} from "./helpers/get_eval_model";
 import {
   loadFixtures,
   loadSpecs,

@@ -106,7 +106,8 @@ function createManagedNodeInstallCancelledError(): KapableError {
 
 function isManagedNodeInstallCancelledError(error: unknown): boolean {
   return (
-    error instanceof KapableError && error.kind === KapableErrorKind.UserCancelled
+    error instanceof KapableError &&
+    error.kind === KapableErrorKind.UserCancelled
   );
 }
 

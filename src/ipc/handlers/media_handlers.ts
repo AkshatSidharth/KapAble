@@ -109,7 +109,10 @@ async function withMediaLock<T>(
 
 function assertSafeFileName(fileName: string): void {
   if (!fileName || fileName.trim().length === 0) {
-    throw new KapableError("File name is required", KapableErrorKind.Validation);
+    throw new KapableError(
+      "File name is required",
+      KapableErrorKind.Validation,
+    );
   }
 
   if (fileName !== path.basename(fileName)) {
@@ -131,7 +134,10 @@ function assertSafeBaseName(baseName: string): string {
   const trimmed = baseName.trim();
 
   if (!trimmed) {
-    throw new KapableError("New image name is required", KapableErrorKind.Validation);
+    throw new KapableError(
+      "New image name is required",
+      KapableErrorKind.Validation,
+    );
   }
 
   if (
@@ -323,7 +329,10 @@ export function registerMediaHandlers() {
 
         const sourcePath = getMediaFilePath(sourceAppPath, params.fileName);
         if (!fs.existsSync(sourcePath)) {
-          throw new KapableError("Media file not found", KapableErrorKind.NotFound);
+          throw new KapableError(
+            "Media file not found",
+            KapableErrorKind.NotFound,
+          );
         }
 
         await ensureKapableGitignored(targetAppPath);

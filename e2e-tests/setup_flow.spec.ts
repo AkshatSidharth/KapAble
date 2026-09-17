@@ -331,7 +331,9 @@ testSetup.describe("Setup Flow", () => {
         timeout: Timeout.EXTRA_LONG,
       });
       await expect(po.page.getByRole("dialog")).not.toBeVisible();
-      await expect(po.page.getByText("Welcome to KapAble Pro!")).not.toBeVisible();
+      await expect(
+        po.page.getByText("Welcome to KapAble Pro!"),
+      ).not.toBeVisible();
       await expectSelectedApp(po);
       await expectLocalAgentMode(po, "Agent");
     },
@@ -454,7 +456,9 @@ async function seedFakeModelSelection(po: PageObject) {
   }, po.fakeLlmPort);
 }
 
-async function triggerKapableProReturnDeepLink(electronApp: ElectronApplication) {
+async function triggerKapableProReturnDeepLink(
+  electronApp: ElectronApplication,
+) {
   await electronApp.evaluate(({ app }) => {
     app.emit(
       "open-url",

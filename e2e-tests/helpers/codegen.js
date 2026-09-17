@@ -14,7 +14,8 @@ const { _electron: electron } = require("playwright");
       "--enable-logging",
       "--user-data-dir=/tmp/kapable-e2e-tests",
     ],
-    executablePath: "../../out/kapable-darwin-arm64/kapable.app/Contents/MacOS/kapable",
+    executablePath:
+      "../../out/kapable-darwin-arm64/kapable.app/Contents/MacOS/kapable",
   });
   const context = await browser.context();
   await context.route("**/*", (route) => route.continue());

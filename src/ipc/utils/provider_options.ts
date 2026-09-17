@@ -51,10 +51,12 @@ export function getProviderOptions({
       kapableSmartContextMode: smartContextMode,
       kapableFiles: versionedFiles ? undefined : files,
       kapableVersionedFiles: versionedFiles,
-      kapableMentionedApps: mentionedAppsCodebases.map(({ files, appName }) => ({
-        appName,
-        files,
-      })),
+      kapableMentionedApps: mentionedAppsCodebases.map(
+        ({ files, appName }) => ({
+          appName,
+          files,
+        }),
+      ),
     },
     openai: {
       reasoningSummary: "auto",

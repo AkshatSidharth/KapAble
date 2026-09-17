@@ -280,7 +280,7 @@ function SecurityHeader({
                   aria-label="Open Security Review documentation"
                   onClick={() =>
                     ipc.system.openExternalUrl(
-                      "https://www.kapable.sh/docs/guides/security-review",
+                      "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#security-review",
                     )
                   }
                 />

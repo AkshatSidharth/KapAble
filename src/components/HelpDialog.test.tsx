@@ -967,7 +967,9 @@ describe("HelpDialog disclosures", () => {
         ).disabled,
       ).toBe(false),
     );
-    expect(screen.queryByAltText("Screenshot of the KapAble window")).toBeNull();
+    expect(
+      screen.queryByAltText("Screenshot of the KapAble window"),
+    ).toBeNull();
   });
 
   it("asks main again on a retry rather than assuming the clipboard", async () => {
@@ -1215,7 +1217,9 @@ describe("HelpDialog disclosures", () => {
     fireEvent.click(screen.getByText("reopen-help"));
 
     await waitFor(() =>
-      expect(screen.queryByAltText("Screenshot of the KapAble window")).toBeNull(),
+      expect(
+        screen.queryByAltText("Screenshot of the KapAble window"),
+      ).toBeNull(),
     );
     // It must not simply vanish between one visit and the next.
     expect(mocks.showError).toHaveBeenCalledWith(
@@ -1266,7 +1270,9 @@ describe("HelpDialog disclosures", () => {
     submit();
 
     await waitFor(() =>
-      expect(screen.queryByAltText("Screenshot of the KapAble window")).toBeNull(),
+      expect(
+        screen.queryByAltText("Screenshot of the KapAble window"),
+      ).toBeNull(),
     );
   });
 
@@ -1303,7 +1309,9 @@ describe("HelpDialog disclosures", () => {
     );
 
     await waitFor(() =>
-      expect(screen.queryByAltText("Screenshot of the KapAble window")).toBeNull(),
+      expect(
+        screen.queryByAltText("Screenshot of the KapAble window"),
+      ).toBeNull(),
     );
   });
 
@@ -1684,7 +1692,9 @@ describe("HelpDialog screenshot", () => {
     await addScreenshot();
 
     fireEvent.click(screen.getByRole("button", { name: /Remove/ }));
-    expect(screen.queryByAltText("Screenshot of the KapAble window")).toBeNull();
+    expect(
+      screen.queryByAltText("Screenshot of the KapAble window"),
+    ).toBeNull();
 
     submit();
     await waitFor(() => expect(mocks.openExternalUrl).toHaveBeenCalled());
@@ -1707,7 +1717,9 @@ describe("HelpDialog screenshot", () => {
     fireEvent.click(screen.getByRole("button", { name: "Back" }));
     fireEvent.click(await screen.findByText("Report a Bug"));
 
-    expect(screen.queryByAltText("Screenshot of the KapAble window")).toBeNull();
+    expect(
+      screen.queryByAltText("Screenshot of the KapAble window"),
+    ).toBeNull();
 
     fireEvent.change(await screen.findByLabelText(/What happened/), {
       target: { value: "a different problem" },
@@ -1739,7 +1751,9 @@ describe("HelpDialog screenshot", () => {
     await waitFor(() =>
       expect(screen.getByLabelText(/What happened/)).toBeTruthy(),
     );
-    expect(screen.queryByAltText("Screenshot of the KapAble window")).toBeNull();
+    expect(
+      screen.queryByAltText("Screenshot of the KapAble window"),
+    ).toBeNull();
   });
 
   it("leaves the screenshot button usable after a discarded capture", async () => {
@@ -2131,7 +2145,9 @@ describe("HelpDialog screenshot", () => {
 
     // The image is gone from main, so the form must not keep offering it.
     await waitFor(() =>
-      expect(screen.queryByAltText("Screenshot of the KapAble window")).toBeNull(),
+      expect(
+        screen.queryByAltText("Screenshot of the KapAble window"),
+      ).toBeNull(),
     );
   });
 
@@ -2186,7 +2202,9 @@ describe("HelpDialog screenshot", () => {
 
     // The mirror of the failed-restore case: a succeeded restore also drops
     // the image in main, and must not take a newer report's with it.
-    expect(screen.getByAltText("Screenshot of the KapAble window")).toBeTruthy();
+    expect(
+      screen.getByAltText("Screenshot of the KapAble window"),
+    ).toBeTruthy();
     expect(mocks.showError).not.toHaveBeenCalledWith(
       "Your screenshot could no longer be restored, so it was removed from this report.",
     );
@@ -2229,7 +2247,9 @@ describe("HelpDialog screenshot", () => {
 
     // The failed restore belongs to a report that is gone; the screenshot on
     // screen belongs to the one being written now.
-    expect(screen.getByAltText("Screenshot of the KapAble window")).toBeTruthy();
+    expect(
+      screen.getByAltText("Screenshot of the KapAble window"),
+    ).toBeTruthy();
   });
 
   it("clears a capture flag stranded by a report that ended", async () => {

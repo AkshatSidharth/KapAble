@@ -130,7 +130,10 @@ function toIso(unixSeconds: number): string {
 function notFound(): KapableError {
   // Missing and cross-app IDs are indistinguishable by design — no
   // cross-app existence disclosure.
-  return new KapableError("Chat or message not found", KapableErrorKind.NotFound);
+  return new KapableError(
+    "Chat or message not found",
+    KapableErrorKind.NotFound,
+  );
 }
 
 function buildReadChatXml(params: {

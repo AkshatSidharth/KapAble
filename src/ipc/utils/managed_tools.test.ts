@@ -46,7 +46,9 @@ describe("sanitizePathEnv", () => {
   });
 
   it("can clear a missing-directory verdict when an install creates that directory", () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "kapable-path-cache-"));
+    const tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "kapable-path-cache-"),
+    );
     const binDir = path.join(tempDir, "managed-bin");
 
     try {

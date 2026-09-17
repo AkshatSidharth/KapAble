@@ -83,7 +83,11 @@ import { readTestScreenshotDataUrl } from "../utils/test_screenshot";
 import { isRecordingActive } from "../services/recording_registry";
 import { readSettings } from "@/main/settings";
 import { resolveNodeModulePackageJsonPathSync } from "../../../shared/node_module_resolution";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 
 const logger = log.scope("tests_handlers");
 
@@ -1658,9 +1662,13 @@ export async function runAppTestsWithIsolation({
     // routes it by kind instead of counting it as unclassified.
     throw isKapableError(error)
       ? error
-      : new KapableError(finalResult.infraError!.message, KapableErrorKind.Internal, {
-          cause: error,
-        });
+      : new KapableError(
+          finalResult.infraError!.message,
+          KapableErrorKind.Internal,
+          {
+            cause: error,
+          },
+        );
   } finally {
     // Before the finished event: the renderer drops the native view as soon as
     // it sees the run go idle, and a still-standing claim would downgrade that

@@ -16,7 +16,10 @@ export function registerSecurityHandlers() {
     securityContracts.getLatestSecurityReview,
     async (_, appId) => {
       if (!appId) {
-        throw new KapableError("App ID is required", KapableErrorKind.Validation);
+        throw new KapableError(
+          "App ID is required",
+          KapableErrorKind.Validation,
+        );
       }
 
       // Query for the most recent message with security findings

@@ -51,7 +51,9 @@ describe("listFilesTool", () => {
       path.join(testDir, "node_modules", "pkg", "index.js"),
       "dependency",
     );
-    await fs.promises.mkdir(path.join(testDir, ".kapable"), { recursive: true });
+    await fs.promises.mkdir(path.join(testDir, ".kapable"), {
+      recursive: true,
+    });
     await fs.promises.writeFile(
       path.join(testDir, ".kapable", "snapshot.json"),
       "{}",

@@ -4,6 +4,7 @@ import {
   McpCatalogEntrySchema,
   type McpCatalogEntry,
 } from "@/ipc/types/mcp_catalog";
+import { hostedServices } from "@/constants/brand";
 
 const logger = log.scope("remote_mcp_catalog");
 
@@ -12,7 +13,7 @@ const DEFAULT_CACHE_TTL_MS = 60 * 60 * 1000;
 const MAX_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const FAILURE_CACHE_TTL_MS = 30 * 1000;
 
-function getRemoteMcpCatalogUrl() {
+function getRemoteMcpCatalogUrl(): string | undefined {
   if (process.env.KAPABLE_MCP_CATALOG_URL) {
     return process.env.KAPABLE_MCP_CATALOG_URL;
   }
@@ -21,7 +22,12 @@ function getRemoteMcpCatalogUrl() {
     return `http://localhost:${process.env.FAKE_LLM_PORT}/api/mcp-catalog`;
   }
 
-  return "https://api.kapable.sh/v1/mcp-catalog";
+  // KapAble does not host a catalog service. Undefined here means "no
+  // catalog", which getRemoteMcpCatalog already treats as a normal state.
+  const apiBaseUrl = hostedServices.apiBaseUrl();
+  return apiBaseUrl
+    ? `${apiBaseUrl.replace(/\/+$/, "")}/v1/mcp-catalog`
+    : undefined;
 }
 
 // The envelope is parsed strictly but entries are validated one by
@@ -63,7 +69,11 @@ async function fetchRemoteMcpCatalog(): Promise<{
   entries: McpCatalogEntry[];
   expiresAt: number;
 }> {
-  const response = await fetch(getRemoteMcpCatalogUrl(), {
+  const catalogUrl = getRemoteMcpCatalogUrl();
+  if (!catalogUrl) {
+    throw new Error("No MCP catalog endpoint is configured");
+  }
+  const response = await fetch(catalogUrl, {
     signal: AbortSignal.timeout(REMOTE_MCP_CATALOG_TIMEOUT_MS),
   });
   if (!response.ok) {

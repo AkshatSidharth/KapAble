@@ -1082,7 +1082,9 @@ export function ModelPicker() {
               <span>{providerDisplayName}</span>
               {provider?.type === "cloud" &&
                 !provider?.secondary &&
-                kapableProEnabled && <span className={PRO_PILL_CLASS}>Pro</span>}
+                kapableProEnabled && (
+                  <span className={PRO_PILL_CLASS}>Pro</span>
+                )}
               {provider?.type === "custom" && (
                 <span className={cn(PILL_CLASS, "bg-amber-500 text-white")}>
                   Custom
@@ -1696,9 +1698,9 @@ export function ModelPicker() {
                   Unlock {unlockTarget?.model.displayName} with KapAble Pro
                 </DialogTitle>
                 <DialogDescription>
-                  KapAble Pro gives you {unlockTarget?.model.displayName} and every
-                  other leading AI model with one subscription — no API keys
-                  needed.
+                  KapAble Pro gives you {unlockTarget?.model.displayName} and
+                  every other leading AI model with one subscription — no API
+                  keys needed.
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col gap-3">

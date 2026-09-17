@@ -29,7 +29,11 @@ async function expectFileContent(
 
 test("edit code", async ({ po }) => {
   await po.setUp({ autoApprove: true });
-  const editedFilePath = path.join("src", "components", "made-with-kapable.tsx");
+  const editedFilePath = path.join(
+    "src",
+    "components",
+    "made-with-kapable.tsx",
+  );
   await po.sendPrompt("foo");
   const appPath = await po.appManagement.getCurrentAppPath();
 

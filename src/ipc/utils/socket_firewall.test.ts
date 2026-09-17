@@ -411,7 +411,9 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
   });
 
   it("writes project pnpm-workspace.yaml atomically", async () => {
-    const tempDir = await mkdtemp(path.join(os.tmpdir(), "kapable-pnpm-config-"));
+    const tempDir = await mkdtemp(
+      path.join(os.tmpdir(), "kapable-pnpm-config-"),
+    );
     try {
       await expect(
         ensurePnpmAllowBuildsConfigured({
@@ -445,7 +447,9 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
   });
 
   it("writes a valid fetched remote list", async () => {
-    const tempDir = await mkdtemp(path.join(os.tmpdir(), "kapable-pnpm-remote-"));
+    const tempDir = await mkdtemp(
+      path.join(os.tmpdir(), "kapable-pnpm-remote-"),
+    );
     const remoteAllowBuildsText = [
       "# kapable-default-allow-builds-schema=v1",
       "# kapable-default-allow-builds-data-version=2026-05-21.2",
@@ -558,7 +562,9 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
         }),
       ).resolves.toEqual({ changed: true, promotedPackages: [] });
 
-      dateNowSpy.mockReturnValue(startMs + KAPABLE_ALLOW_BUILDS_CACHE_TTL_MS + 1);
+      dateNowSpy.mockReturnValue(
+        startMs + KAPABLE_ALLOW_BUILDS_CACHE_TTL_MS + 1,
+      );
 
       await expect(
         ensurePnpmAllowBuildsConfigured({
@@ -619,7 +625,9 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
   });
 
   it("falls back to the bundled local list when no remote block exists", async () => {
-    const tempDir = await mkdtemp(path.join(os.tmpdir(), "kapable-pnpm-local-"));
+    const tempDir = await mkdtemp(
+      path.join(os.tmpdir(), "kapable-pnpm-local-"),
+    );
     try {
       await expect(
         ensurePnpmAllowBuildsConfigured({
@@ -689,7 +697,9 @@ describe("updatePnpmAllowBuildsConfigContent", () => {
   });
 
   it("promotes tagged denials when the allow-list later includes the package", async () => {
-    const tempDir = await mkdtemp(path.join(os.tmpdir(), "kapable-pnpm-promote-"));
+    const tempDir = await mkdtemp(
+      path.join(os.tmpdir(), "kapable-pnpm-promote-"),
+    );
     const configPath = path.join(tempDir, "pnpm-workspace.yaml");
     const promotedAllowBuildsText = [
       "# kapable-default-allow-builds-schema=v1",

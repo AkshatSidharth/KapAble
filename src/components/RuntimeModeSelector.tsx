@@ -119,7 +119,9 @@ export function RuntimeModeSelector() {
           <button
             type="button"
             className="underline font-medium cursor-pointer text-primary"
-            onClick={() => ipc.system.openExternalUrl("https://kapable.sh/pro#ai")}
+            onClick={() =>
+              ipc.system.openExternalUrl("https://kapable.sh/pro#ai")
+            }
           >
             Upgrade to Pro
           </button>

@@ -34,7 +34,8 @@ function getAvailableUpgrades(): Omit<AppUpgrade, "isNeeded">[] {
       title: "Enable select component to edit",
       description:
         "Installs the KapAble component tagger Vite plugin and its dependencies.",
-      manualUpgradeUrl: "https://kapable.sh/docs/upgrades/select-component",
+      manualUpgradeUrl:
+        "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#upgrades",
     },
     {
       id: "capacitor",
@@ -42,7 +43,7 @@ function getAvailableUpgrades(): Omit<AppUpgrade, "isNeeded">[] {
       description:
         "Adds Capacitor to your app lets it run on iOS and Android in addition to the web.",
       manualUpgradeUrl:
-        "https://kapable.sh/docs/guides/mobile-app#upgrade-your-app",
+        "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#upgrades",
     },
     {
       id: "pnpm-version-migration",
@@ -51,7 +52,8 @@ function getAvailableUpgrades(): Omit<AppUpgrade, "isNeeded">[] {
         `This app has legacy pnpm metadata. KapAble already runs pnpm ${managedPnpmMajor}, ` +
         "which writes a lockfile format older pnpm versions can't read. This updates the " +
         `packageManager pin and the lockfile together so everything matches pnpm ${managedPnpmMajor}.`,
-      manualUpgradeUrl: "https://kapable.sh/docs/upgrades/pnpm-migration",
+      manualUpgradeUrl:
+        "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#upgrades",
     },
   ];
 }
@@ -214,7 +216,10 @@ export function registerAppUpgradeHandlers() {
       { appId, upgradeId }: { appId: number; upgradeId: string },
     ) => {
       if (!upgradeId) {
-        throw new KapableError("upgradeId is required", KapableErrorKind.Validation);
+        throw new KapableError(
+          "upgradeId is required",
+          KapableErrorKind.Validation,
+        );
       }
 
       const app = await getApp(appId);

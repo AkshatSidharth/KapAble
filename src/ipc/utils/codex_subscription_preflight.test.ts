@@ -116,7 +116,10 @@ describe("BYO subscription preflight through the actual provider", () => {
         new NodeResponse("untrusted upstream detail", { status }),
       );
       await expect(run()).rejects.toMatchObject({
-        kind: status === 402 ? KapableErrorKind.Precondition : KapableErrorKind.Auth,
+        kind:
+          status === 402
+            ? KapableErrorKind.Precondition
+            : KapableErrorKind.Auth,
         code: status === 402 ? "OUT_OF_CREDITS" : "KEY_REJECTED",
       });
       expect(fetch).not.toHaveBeenCalled();

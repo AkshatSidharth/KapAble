@@ -11,7 +11,11 @@ describe("reading a failure off an error", () => {
 
     expect(
       sshFailureOf(
-        new SshError("unreachable", "nothing answered", KapableErrorKind.External),
+        new SshError(
+          "unreachable",
+          "nothing answered",
+          KapableErrorKind.External,
+        ),
       ),
     ).toBe("unreachable");
     expect(

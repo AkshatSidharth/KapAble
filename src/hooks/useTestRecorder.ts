@@ -407,7 +407,10 @@ export function useTestRecorder({
         };
         timer = setTimeout(finish, RECORDER_FLUSH_TIMEOUT_MS);
         recorderFlushRef.current = { appId: targetAppId, requestId, finish };
-        postToIframe({ type: "flush-kapable-recorder", token, requestId }, origin);
+        postToIframe(
+          { type: "flush-kapable-recorder", token, requestId },
+          origin,
+        );
       });
     },
     [postToIframe, previewOrigin, settleRecorderFlush],

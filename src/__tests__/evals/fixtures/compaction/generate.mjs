@@ -35,7 +35,8 @@ const MAX_TOKENS = Number(argValue("--max", "210000"));
 const FORCE = argv.includes("--force");
 
 const API_KEY = process.env.KAPABLE_PRO_API_KEY || process.env.KAPABLE_PRO_KEY;
-const ENGINE_URL = process.env.KAPABLE_ENGINE_URL || "https://engine.kapable.sh/v1";
+const ENGINE_URL =
+  process.env.KAPABLE_ENGINE_URL || "https://engine.kapable.sh/v1";
 const MODEL = process.env.CMPGEN_MODEL || "gpt-5.6-sol";
 
 if (!SPEC_PATH) fail("Missing --spec <path>");

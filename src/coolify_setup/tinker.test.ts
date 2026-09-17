@@ -224,7 +224,9 @@ describe("runTinker", () => {
       env: { KAPABLE_SECRET: "p@ssw0rd-+=" },
     });
 
-    expect(session.calls[0].command).toContain("-e KAPABLE_SECRET='p@ssw0rd-+='");
+    expect(session.calls[0].command).toContain(
+      "-e KAPABLE_SECRET='p@ssw0rd-+='",
+    );
     // The value stays out of the script, so it never meets PHP's parser too.
     expect(session.calls[0].input).not.toContain("p@ssw0rd");
   });

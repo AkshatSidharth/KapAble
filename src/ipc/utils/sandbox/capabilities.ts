@@ -161,7 +161,10 @@ function assertSandboxGuestPath(
   options?: { allowDotenvFile?: boolean },
 ): void {
   if (!guestPath || typeof guestPath !== "string") {
-    throw new KapableError("File path is required.", KapableErrorKind.Validation);
+    throw new KapableError(
+      "File path is required.",
+      KapableErrorKind.Validation,
+    );
   }
   if (path.isAbsolute(guestPath) || /^[A-Za-z]:[/\\]/.test(guestPath)) {
     throw new KapableError(

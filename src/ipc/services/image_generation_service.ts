@@ -17,7 +17,11 @@ import { eq } from "drizzle-orm";
 import fs from "node:fs";
 import path from "node:path";
 import log from "electron-log";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { getKapableEngineBaseUrl } from "../utils/kapable_engine_url";
 import { ensureKapableGitignored } from "../handlers/gitignoreUtils";
 
@@ -174,19 +178,22 @@ export class ImageGenerationService {
 
     let response: Response;
     try {
-      response = await fetch(`${getKapableEngineBaseUrl()}/images/generations`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-          "X-KapAble-Request-Id": requestId,
+      response = await fetch(
+        `${getKapableEngineBaseUrl()}/images/generations`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+            "X-KapAble-Request-Id": requestId,
+          },
+          body: JSON.stringify({
+            prompt: fullPrompt,
+            model: "kapable/image-gen",
+          }),
+          signal: controller.signal,
         },
-        body: JSON.stringify({
-          prompt: fullPrompt,
-          model: "kapable/image-gen",
-        }),
-        signal: controller.signal,
-      });
+      );
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
         throw new KapableError(
@@ -245,7 +252,10 @@ export class ImageGenerationService {
     } else if (imageData.url) {
       const imageUrl = new URL(imageData.url);
       if (imageUrl.protocol !== "https:") {
-        throw new KapableError("Image URL must use HTTPS", KapableErrorKind.External);
+        throw new KapableError(
+          "Image URL must use HTTPS",
+          KapableErrorKind.External,
+        );
       }
       const downloadTimeoutSignal = AbortSignal.timeout(
         IMAGE_GENERATION_TIMEOUT_MS,
@@ -312,7 +322,10 @@ export class ImageGenerationService {
           where: eq(apps.id, params.targetAppId),
         });
         if (!currentApp) {
-          throw new KapableError("Target app not found", KapableErrorKind.NotFound);
+          throw new KapableError(
+            "Target app not found",
+            KapableErrorKind.NotFound,
+          );
         }
         const resolvedAppPath = getKapableAppPath(currentApp.path);
         await ensureKapableGitignored(resolvedAppPath);

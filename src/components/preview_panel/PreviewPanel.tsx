@@ -374,7 +374,8 @@ const NODE_POLL_INTERVAL_MS = 4000;
 
 function isManagedNodeInstallCancelError(error: unknown) {
   return (
-    error instanceof KapableError && error.kind === KapableErrorKind.UserCancelled
+    error instanceof KapableError &&
+    error.kind === KapableErrorKind.UserCancelled
   );
 }
 
@@ -535,7 +536,8 @@ function PreviewNodeRequirement({
                     Installing Node.js
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-foreground/80">
-                    KapAble is setting up a private Node.js runtime for previews.
+                    KapAble is setting up a private Node.js runtime for
+                    previews.
                   </p>
                   <div className="mt-4">
                     <div className="h-2 overflow-hidden rounded-full bg-(--background-darker)">

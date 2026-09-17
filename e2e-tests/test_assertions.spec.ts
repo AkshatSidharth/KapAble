@@ -96,7 +96,9 @@ testSkipIfWindows(
       .locator('[data-testid^="kapable-test-assertions-text-"]')
       .first()
       .click();
-    const editor = card.locator('[data-testid^="kapable-test-assertions-edit-"]');
+    const editor = card.locator(
+      '[data-testid^="kapable-test-assertions-edit-"]',
+    );
     await editor.fill("The name field keeps the typed value");
     await editor.press("Enter");
     await expect(assertions.first()).toContainText("Code written on approve");
@@ -111,7 +113,9 @@ testSkipIfWindows(
     // the recorded steps and an assertion. Its filename comes from the name the
     // AI proposed, slugified — no "recorded test" placeholder anywhere.
     const specFileName = "recorded-type-ada-into-the-name.spec.ts";
-    await po.page.getByTestId("kapable-test-assertions-open-file-button").click();
+    await po.page
+      .getByTestId("kapable-test-assertions-open-file-button")
+      .click();
     // The spec shows up twice in the Code tab (file tree + editor breadcrumb),
     // so pin to the first rather than tripping strict mode.
     await expect(
@@ -174,7 +178,9 @@ testSkipIfWindows(
     // Close the card without generating anything. The tool is parked on it, so
     // this resumes the turn, which says its piece and ends — no test file, and
     // nothing left to wait for.
-    await expect(po.page.getByTestId("kapable-test-assertions-card")).toBeVisible({
+    await expect(
+      po.page.getByTestId("kapable-test-assertions-card"),
+    ).toBeVisible({
       timeout: Timeout.LONG,
     });
     await po.page.getByTestId("kapable-test-assertions-discard-button").click();

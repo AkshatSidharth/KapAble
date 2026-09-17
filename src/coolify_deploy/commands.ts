@@ -2,7 +2,11 @@ import { and, eq } from "drizzle-orm";
 import log from "electron-log";
 import { db } from "@/db";
 import { apps, coolifyAppConnections } from "@/db/schema";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { getClient, readConnection, readConnectionState } from "./store";
 import { readSettings } from "@/main/settings";
 import { getKapableAppPath } from "@/paths/paths";
@@ -73,7 +77,10 @@ export interface DeployResult {
 
 function throwIfAborted(signal: AbortSignal): void {
   if (signal.aborted) {
-    throw new KapableError("Deployment cancelled.", KapableErrorKind.UserCancelled);
+    throw new KapableError(
+      "Deployment cancelled.",
+      KapableErrorKind.UserCancelled,
+    );
   }
 }
 
@@ -108,7 +115,10 @@ async function githubFetch(
 
 function githubError(err: unknown, signal: AbortSignal): KapableError {
   if (signal.aborted) {
-    return new KapableError("Deployment cancelled.", KapableErrorKind.UserCancelled);
+    return new KapableError(
+      "Deployment cancelled.",
+      KapableErrorKind.UserCancelled,
+    );
   }
   const timedOut = err instanceof Error && err.name === "TimeoutError";
   return new KapableError(

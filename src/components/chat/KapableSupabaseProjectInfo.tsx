@@ -11,6 +11,8 @@ interface KapableSupabaseProjectInfoProps {
   children: React.ReactNode;
 }
 
-export function KapableSupabaseProjectInfo(props: KapableSupabaseProjectInfoProps) {
+export function KapableSupabaseProjectInfo(
+  props: KapableSupabaseProjectInfoProps,
+) {
   return <KapableDbProjectInfo provider="Supabase" {...props} />;
 }

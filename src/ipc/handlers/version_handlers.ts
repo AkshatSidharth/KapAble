@@ -1286,7 +1286,10 @@ export function registerVersionHandlers() {
 
         const targetIndex = chat.messages.findIndex((m) => m.id === messageId);
         if (targetIndex === -1) {
-          throw new KapableError("Message not found", KapableErrorKind.NotFound);
+          throw new KapableError(
+            "Message not found",
+            KapableErrorKind.NotFound,
+          );
         }
 
         const messagesBefore = chat.messages
@@ -1487,7 +1490,10 @@ export function registerVersionHandlers() {
             (m) => m.id === messageId,
           );
           if (latestTargetIndex === -1) {
-            throw new KapableError("Message not found", KapableErrorKind.NotFound);
+            throw new KapableError(
+              "Message not found",
+              KapableErrorKind.NotFound,
+            );
           }
 
           const latestTargetTurnOutcome = await getRestoreTargetTurnOutcome({

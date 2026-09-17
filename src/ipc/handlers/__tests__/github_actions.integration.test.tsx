@@ -202,7 +202,9 @@ describe("GitHub connector actions (integration)", () => {
     ].join("\n");
     const runSpy = vi
       .spyOn(githubOpsService, "run")
-      .mockRejectedValueOnce(new KapableError(pushError, KapableErrorKind.Conflict));
+      .mockRejectedValueOnce(
+        new KapableError(pushError, KapableErrorKind.Conflict),
+      );
 
     fireEvent.click(
       within(connectedRepo).getByRole("button", { name: "Sync to GitHub" }),
@@ -221,7 +223,9 @@ describe("GitHub connector actions (integration)", () => {
       within(connectedRepo)
         .getByRole("link", { name: "See troubleshooting guide" })
         .getAttribute("href"),
-    ).toBe("https://www.kapable.sh/docs/integrations/github#troubleshooting");
+    ).toBe(
+      "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#github",
+    );
     expect(
       within(connectedRepo).getByRole("button", { name: "Copy" }),
     ).toBeTruthy();

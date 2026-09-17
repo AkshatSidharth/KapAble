@@ -39,7 +39,7 @@ export function PrivacyBanner() {
             type="button"
             onClick={() => {
               ipc.system.openExternalUrl(
-                "https://kapable.sh/docs/policies/privacy-policy",
+                "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#privacy-and-telemetry",
               );
             }}
             className="font-medium text-blue-600 hover:underline dark:text-blue-400"

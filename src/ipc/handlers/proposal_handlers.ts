@@ -177,7 +177,8 @@ const getProposalHandler = async (
           getKapableSearchReplaceTags(messageContent);
         const proposalRenameFiles = getKapableRenameTags(messageContent);
         const proposalDeleteFiles = getKapableDeleteTags(messageContent);
-        const proposalExecuteSqlQueries = getKapableExecuteSqlTags(messageContent);
+        const proposalExecuteSqlQueries =
+          getKapableExecuteSqlTags(messageContent);
         const packagesAdded = getKapableAddDependencyTags(messageContent);
 
         const filesChanged = [
@@ -272,7 +273,9 @@ const getProposalHandler = async (
         }
 
         // Check for command tags and add corresponding actions
-        const commandTags = getKapableCommandTags(latestAssistantMessage.content);
+        const commandTags = getKapableCommandTags(
+          latestAssistantMessage.content,
+        );
         if (commandTags.includes("rebuild")) {
           actions.push({
             id: "rebuild",

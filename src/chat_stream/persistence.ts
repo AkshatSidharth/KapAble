@@ -774,7 +774,10 @@ export function markIntentAccepted(
   if (!intentId) return;
   const record = recordFor(intentId);
   if (!record) {
-    throw new KapableError("Chat turn intent not found", KapableErrorKind.NotFound);
+    throw new KapableError(
+      "Chat turn intent not found",
+      KapableErrorKind.NotFound,
+    );
   }
   record.acceptance = "message-accepted";
   record.recovery = "started";
@@ -1036,7 +1039,10 @@ export function markIntentTerminal(
     if (intent.owner?.kind === "user-input-follow-up") {
       return loadChatQueue(database, intent.chatId);
     }
-    throw new KapableError("Chat turn intent not found", KapableErrorKind.NotFound);
+    throw new KapableError(
+      "Chat turn intent not found",
+      KapableErrorKind.NotFound,
+    );
   }
   const aggregate = queueFor(record.chatId);
   const originalAggregate = {

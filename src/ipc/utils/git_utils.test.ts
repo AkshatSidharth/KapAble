@@ -682,7 +682,9 @@ describe("getGitUncommittedFiles", () => {
     repoDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "git-utils-"));
 
     await runGit(repoDir, ["init"]);
-    await fs.promises.mkdir(path.join(repoDir, ".kapable"), { recursive: true });
+    await fs.promises.mkdir(path.join(repoDir, ".kapable"), {
+      recursive: true,
+    });
     await fs.promises.writeFile(
       path.join(repoDir, "pnpm-workspace.yaml"),
       'packages: ["."]\n',
@@ -702,7 +704,9 @@ describe("getGitUncommittedFiles", () => {
     repoDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "git-utils-"));
 
     await runGit(repoDir, ["init"]);
-    await fs.promises.mkdir(path.join(repoDir, ".kapable"), { recursive: true });
+    await fs.promises.mkdir(path.join(repoDir, ".kapable"), {
+      recursive: true,
+    });
     await fs.promises.writeFile(
       path.join(repoDir, "pnpm-workspace.yaml"),
       'packages: ["."]\n',

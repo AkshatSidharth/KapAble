@@ -386,7 +386,8 @@ describe("executeAddDependency", () => {
       packages: ["react"],
       message: {
         id: 1,
-        content: '<kapable-add-dependency packages="react"></kapable-add-dependency>',
+        content:
+          '<kapable-add-dependency packages="react"></kapable-add-dependency>',
       } as any,
       appPath: "/tmp/app",
     });
@@ -443,7 +444,8 @@ describe("executeAddDependency", () => {
       packages: ["react"],
       message: {
         id: 1,
-        content: '<kapable-add-dependency packages="react"></kapable-add-dependency>',
+        content:
+          '<kapable-add-dependency packages="react"></kapable-add-dependency>',
       } as any,
       appPath: "/tmp/app",
     });

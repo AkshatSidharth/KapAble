@@ -63,7 +63,8 @@ export async function resolveSubscriptionModel(
       KapableErrorKind.External,
     );
   if (subscriptionAuto) {
-    if (account.error) throw new KapableError(account.error, KapableErrorKind.Auth);
+    if (account.error)
+      throw new KapableError(account.error, KapableErrorKind.Auth);
     const name = getSubscriptionDefaultModel(
       account.models,
       "planType" in account ? account.planType : undefined,
@@ -83,6 +84,7 @@ export async function resolveSubscriptionModel(
     };
   }
   if (!usesChatGPTSubscription(model, settings, account)) return fallback;
-  if (account.error) throw new KapableError(account.error, KapableErrorKind.Auth);
+  if (account.error)
+    throw new KapableError(account.error, KapableErrorKind.Auth);
   return { ...identity, connection: "subscription" };
 }

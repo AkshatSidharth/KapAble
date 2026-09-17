@@ -135,7 +135,10 @@ export function registerAppCollectionHandlers() {
           .where(eq(appCollections.id, id))
           .get();
         if (!existingCollection) {
-          throw new KapableError("Collection not found", KapableErrorKind.NotFound);
+          throw new KapableError(
+            "Collection not found",
+            KapableErrorKind.NotFound,
+          );
         }
         tx.update(appCollections)
           .set({ name: trimmed, updatedAt: new Date() })
@@ -190,7 +193,10 @@ export function registerAppCollectionHandlers() {
         .where(eq(appCollections.id, id))
         .get();
       if (!existingCollection) {
-        throw new KapableError("Collection not found", KapableErrorKind.NotFound);
+        throw new KapableError(
+          "Collection not found",
+          KapableErrorKind.NotFound,
+        );
       }
       tx.update(apps)
         .set({ collectionId: null })
@@ -212,7 +218,10 @@ export function registerAppCollectionHandlers() {
           .where(eq(appCollections.id, collectionId))
           .get();
         if (!existingCollection) {
-          throw new KapableError("Collection not found", KapableErrorKind.NotFound);
+          throw new KapableError(
+            "Collection not found",
+            KapableErrorKind.NotFound,
+          );
         }
       }
       tx.update(apps)

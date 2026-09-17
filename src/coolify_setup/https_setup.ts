@@ -121,7 +121,9 @@ export function urlHost(host: string): string {
  * environment under a test build so parallel workers do not have to share it.
  */
 function dashboardPort(): number {
-  const override = IS_TEST_BUILD ? process.env.KAPABLE_E2E_DASHBOARD_PORT : null;
+  const override = IS_TEST_BUILD
+    ? process.env.KAPABLE_E2E_DASHBOARD_PORT
+    : null;
   return override ? Number(override) : 8000;
 }
 

@@ -24,7 +24,9 @@ export class SubscriptionBillingError extends KapableError {
   constructor(readonly code: SubscriptionBillingErrorCode) {
     super(
       SUBSCRIPTION_BILLING_ERRORS[code].message,
-      code === "KEY_REJECTED" ? KapableErrorKind.Auth : KapableErrorKind.Precondition,
+      code === "KEY_REJECTED"
+        ? KapableErrorKind.Auth
+        : KapableErrorKind.Precondition,
     );
   }
 

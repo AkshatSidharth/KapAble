@@ -10,7 +10,11 @@ import {
   buildSandboxCapabilitiesWithObserver,
 } from "@/ipc/utils/sandbox/capabilities";
 import { SANDBOX_SCRIPT_SOURCE_LIMIT_BYTES } from "@/ipc/utils/sandbox/limits";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { sendTelemetryEvent } from "@/ipc/utils/telemetry";
 import { KAPABLE_MEDIA_DIR_NAME } from "@/ipc/utils/media_path_utils";
 import { readSettings } from "@/main/settings";

@@ -78,7 +78,10 @@ export function registerShellHandlers() {
   handle("show-item-in-folder", async (_event, fullPath: string) => {
     // Validate that a path was provided
     if (!fullPath) {
-      throw new KapableError("No file path provided.", KapableErrorKind.External);
+      throw new KapableError(
+        "No file path provided.",
+        KapableErrorKind.External,
+      );
     }
 
     shell.showItemInFolder(fullPath);
@@ -87,7 +90,10 @@ export function registerShellHandlers() {
 
   handle("open-file-path", async (_event, fullPath: string) => {
     if (!fullPath) {
-      throw new KapableError("No file path provided.", KapableErrorKind.External);
+      throw new KapableError(
+        "No file path provided.",
+        KapableErrorKind.External,
+      );
     }
 
     // Security: only allow opening files within .kapable/media subdirectories.

@@ -31,7 +31,10 @@ export function registerDependencyHandlers() {
       });
 
       if (!chat) {
-        throw new KapableError(`Chat ${chatId} not found`, KapableErrorKind.NotFound);
+        throw new KapableError(
+          `Chat ${chatId} not found`,
+          KapableErrorKind.NotFound,
+        );
       }
 
       // Get the app using the appId from the chat

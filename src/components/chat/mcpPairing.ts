@@ -27,7 +27,10 @@ export function buildMcpPairing(blocks: Block[]): McpPairing {
     if (b.kind !== "custom-tag") continue;
     const callId = b.attributes["call-id"];
     if (!callId) continue;
-    if (b.tag !== "kapable-mcp-tool-call" && b.tag !== "kapable-mcp-tool-result") {
+    if (
+      b.tag !== "kapable-mcp-tool-call" &&
+      b.tag !== "kapable-mcp-tool-result"
+    ) {
       continue;
     }
     pairing ??= { resultByCallId: new Map(), callIds: new Set() };

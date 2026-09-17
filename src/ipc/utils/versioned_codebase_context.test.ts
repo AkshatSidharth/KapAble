@@ -27,7 +27,8 @@ vi.mock("electron-log", () => ({
 describe("parseFilesFromMessage", () => {
   describe("kapable-read tags", () => {
     it("should parse a single kapable-read tag", () => {
-      const input = '<kapable-read path="src/components/Button.tsx"></kapable-read>';
+      const input =
+        '<kapable-read path="src/components/Button.tsx"></kapable-read>';
       const result = parseFilesFromMessage(input);
       expect(result).toEqual(["src/components/Button.tsx"]);
     });
@@ -522,7 +523,8 @@ describe("processChatMessagesWithVersionedFiles", () => {
       const chatMessages: ModelMessage[] = [
         {
           role: "assistant",
-          content: 'File here: <kapable-read path="src/no-commit.ts"></kapable-read>',
+          content:
+            'File here: <kapable-read path="src/no-commit.ts"></kapable-read>',
           // No providerOptions
         },
         {
@@ -726,7 +728,8 @@ src/file3.ts
       const chatMessages: ModelMessage[] = [
         {
           role: "assistant",
-          content: 'Error file: <kapable-read path="src/error.ts"></kapable-read>',
+          content:
+            'Error file: <kapable-read path="src/error.ts"></kapable-read>',
           providerOptions: {
             "kapable-engine": {
               sourceCommitHash: "commit1",
@@ -814,7 +817,8 @@ src/missing.ts
         },
         {
           role: "assistant",
-          content: 'Here it is: <kapable-read path="src/file1.ts"></kapable-read>',
+          content:
+            'Here it is: <kapable-read path="src/file1.ts"></kapable-read>',
           providerOptions: {
             "kapable-engine": {
               sourceCommitHash: "commit1",
@@ -893,7 +897,8 @@ src/missing.ts
       const chatMessages: ModelMessage[] = [
         {
           role: "assistant",
-          content: 'Old version: <kapable-read path="src/old.ts"></kapable-read>',
+          content:
+            'Old version: <kapable-read path="src/old.ts"></kapable-read>',
           providerOptions: {
             "kapable-engine": {
               sourceCommitHash: "abc123",

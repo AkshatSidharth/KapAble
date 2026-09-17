@@ -13,7 +13,10 @@ export function useCheckProblems(appId: number | null) {
     queryKey: queryKeys.problems.byApp({ appId }),
     queryFn: async (): Promise<ProblemReport> => {
       if (!appId) {
-        throw new KapableError("App ID is required", KapableErrorKind.Validation);
+        throw new KapableError(
+          "App ID is required",
+          KapableErrorKind.Validation,
+        );
       }
       return ipc.misc.checkProblems({ appId });
     },

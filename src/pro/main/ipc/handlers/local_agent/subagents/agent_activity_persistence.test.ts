@@ -47,7 +47,8 @@ describe("sub-agent activity persistence", () => {
           toolCallId: "call-grep",
           toolName: "grep",
           status: "completed",
-          presentationXml: '<kapable-grep query="auth">src/auth.ts:1</kapable-grep>',
+          presentationXml:
+            '<kapable-grep query="auth">src/auth.ts:1</kapable-grep>',
           inputJson: { query: "auth" },
           outputText: "src/auth.ts:1:export function authenticate()",
           completedAt: new Date(),

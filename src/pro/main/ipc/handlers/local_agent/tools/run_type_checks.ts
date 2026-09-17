@@ -186,7 +186,10 @@ export const runTypeChecksTool: ToolDefinition<
     try {
       problemReport = await runTypeScriptCheck({ appPath: ctx.appPath });
     } catch (error) {
-      if (!isKapableError(error) || error.kind !== KapableErrorKind.Precondition) {
+      if (
+        !isKapableError(error) ||
+        error.kind !== KapableErrorKind.Precondition
+      ) {
         throw error;
       }
 

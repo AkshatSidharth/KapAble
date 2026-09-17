@@ -815,7 +815,7 @@ describe("writeSettings", () => {
       expect.objectContaining({
         action: {
           label: "Read restore docs",
-          url: "https://www.kapable.sh/docs/guides/migrate-restore#restoring-settings-from-backup",
+          url: "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#backup-and-restore",
         },
         message: expect.not.stringContaining("https://"),
       }),

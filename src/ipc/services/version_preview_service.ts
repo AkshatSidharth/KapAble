@@ -145,7 +145,10 @@ export class VersionPreviewService {
         }
         const appPath = getKapableAppPath(app.path);
         if (!fs.existsSync(path.join(appPath, ".git"))) {
-          throw new KapableError("Not a git repository", KapableErrorKind.External);
+          throw new KapableError(
+            "Not a git repository",
+            KapableErrorKind.External,
+          );
         }
         const branch = await gitCurrentBranch({ path: appPath });
         return { branch: branch && branch !== NO_BRANCH ? branch : null };
@@ -170,7 +173,10 @@ export class VersionPreviewService {
         }
         const appPath = getKapableAppPath(app.path);
         if (!fs.existsSync(path.join(appPath, ".git"))) {
-          throw new KapableError("Not a git repository", KapableErrorKind.External);
+          throw new KapableError(
+            "Not a git repository",
+            KapableErrorKind.External,
+          );
         }
         const [branch, headOid, uncommittedFiles] = await Promise.all([
           gitCurrentBranch({ path: appPath }),

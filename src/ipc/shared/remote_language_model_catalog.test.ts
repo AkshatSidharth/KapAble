@@ -137,7 +137,9 @@ describe("remote language model catalog", () => {
     await mod.getBuiltinLanguageModelCatalog();
     expect(fetchCalls).toBe(1);
 
-    const beforeOpenAi = await mod.resolveBuiltinModelAlias("kapable/auto/openai");
+    const beforeOpenAi = await mod.resolveBuiltinModelAlias(
+      "kapable/auto/openai",
+    );
     const beforeAnthropic = await mod.resolveBuiltinModelAlias(
       "kapable/auto/anthropic",
     );
@@ -169,7 +171,9 @@ describe("remote language model catalog", () => {
     expect(preserved.source).toBe("remote");
     expect(fetchCalls).toBe(2);
 
-    const afterOpenAi = await mod.resolveBuiltinModelAlias("kapable/auto/openai");
+    const afterOpenAi = await mod.resolveBuiltinModelAlias(
+      "kapable/auto/openai",
+    );
     const afterAnthropic = await mod.resolveBuiltinModelAlias(
       "kapable/auto/anthropic",
     );

@@ -277,9 +277,11 @@ describe("KapableMarkdownParser closed-block render counts", () => {
   // separators on the markdown-side of the constants so each constant
   // matches the closed Block's content string verbatim.
   const MD1 = "First paragraph content.\n\n";
-  const TAG1 = '<kapable-status title="S1" state="finished">ok</kapable-status>';
+  const TAG1 =
+    '<kapable-status title="S1" state="finished">ok</kapable-status>';
   const MD2 = "\n\nSecond paragraph content.\n\n";
-  const TAG2 = '<kapable-status title="S2" state="finished">ok</kapable-status>';
+  const TAG2 =
+    '<kapable-status title="S2" state="finished">ok</kapable-status>';
   const MD3 = "\n\nThird paragraph content.";
   const FULL = MD1 + TAG1 + MD2 + TAG2 + MD3;
 
@@ -355,9 +357,11 @@ describe("KapableMarkdownParser parser-cache perf metrics", () => {
   });
 
   const MD1 = "First paragraph content goes here.\n\n";
-  const TAG1 = '<kapable-status title="S1" state="finished">ok</kapable-status>';
+  const TAG1 =
+    '<kapable-status title="S1" state="finished">ok</kapable-status>';
   const MD2 = "\n\nSecond paragraph content goes here.\n\n";
-  const TAG2 = '<kapable-status title="S2" state="finished">ok</kapable-status>';
+  const TAG2 =
+    '<kapable-status title="S2" state="finished">ok</kapable-status>';
   const MD3 = "\n\nThird paragraph content goes here.";
   const FULL = MD1 + TAG1 + MD2 + TAG2 + MD3;
 

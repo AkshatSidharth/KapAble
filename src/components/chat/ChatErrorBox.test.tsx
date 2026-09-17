@@ -191,7 +191,9 @@ describe("ChatErrorBox legacy rejected Pro key", () => {
           onStartNewChat={vi.fn()}
         />,
       );
-      expect(screen.getByText("Your KapAble Pro key was rejected")).toBeTruthy();
+      expect(
+        screen.getByText("Your KapAble Pro key was rejected"),
+      ).toBeTruthy();
       expect(screen.getByText("Get your current Pro key.")).toBeTruthy();
       expect(screen.queryByText("Upgrade to KapAble Pro")).toBeNull();
       expect(screen.queryByText("Start new chat")).toBeNull();

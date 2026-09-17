@@ -130,7 +130,10 @@ test("live Codex subscription through KapAble", async ({ po, electronApp }) => {
           },
         });
       },
-      { chatId, model: process.env.KAPABLE_LIVE_SUBSCRIPTION_MODEL ?? "gpt-5.4" },
+      {
+        chatId,
+        model: process.env.KAPABLE_LIVE_SUBSCRIPTION_MODEL ?? "gpt-5.4",
+      },
     );
     await electronApp.evaluate(async ({ app, BrowserWindow }) => {
       const path = await import("node:path");

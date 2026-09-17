@@ -55,7 +55,10 @@ describe("assistantTrace", () => {
 
   it("skips string content (the fallback that may embed tool output)", () => {
     const parsed: ModelMessage[] = [
-      { role: "assistant", content: "<kapable-write>secret</kapable-write> plain" },
+      {
+        role: "assistant",
+        content: "<kapable-write>secret</kapable-write> plain",
+      },
     ];
     expect(assistantTrace(parsed)).toBe("");
   });

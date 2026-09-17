@@ -41,7 +41,9 @@ vi.mock("electron", () => ({
     on: vi.fn(),
   },
   app: {
-    getPath: vi.fn(() => path.join(os.tmpdir(), "kapable-app-naming-user-data")),
+    getPath: vi.fn(() =>
+      path.join(os.tmpdir(), "kapable-app-naming-user-data"),
+    ),
     getAppPath: vi.fn(() => process.cwd()),
   },
   dialog: { showOpenDialog: vi.fn() },

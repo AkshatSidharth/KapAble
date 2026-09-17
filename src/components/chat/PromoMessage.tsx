@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useChatMessageCount } from "@/hooks/useChatMessages";
 import { useChatStreamState } from "@/hooks/useChatStream";
 import { isStreamActive } from "@/chat_stream/transition";
+import { DOCS_URL, isManagedPlanConfigured, REPO_URL } from "@/constants/brand";
 
 export interface PromoMessageConfig {
   /** Stable id used for the promo_click event and UTM attribution. */
@@ -25,7 +26,12 @@ export interface PromoMessageConfig {
   weight: number;
 }
 
-export const PROMO_MESSAGES: PromoMessageConfig[] = [
+/**
+ * Promos for the managed plan. Every one of these opens the trial dialog,
+ * which needs a subscription backend, so they are only offered when one is
+ * configured (see src/constants/brand.ts).
+ */
+const MANAGED_PLAN_PROMO_MESSAGES: PromoMessageConfig[] = [
   {
     id: "pro-trial",
     text: "Build more with KapAble Pro — free for 7 days.",
@@ -75,28 +81,33 @@ export const PROMO_MESSAGES: PromoMessageConfig[] = [
     target: { type: "trial-dialog" },
     weight: 3,
   },
+];
+
+/**
+ * Promos that always apply. Upstream also promoted a subreddit and an X
+ * account; both belonged to Dyad, so they are not carried over rather than rebrand:keep
+ * pointed at communities KapAble does not have.
+ */
+const COMMUNITY_PROMO_MESSAGES: PromoMessageConfig[] = [
   {
     id: "github-star",
     text: "Enjoying KapAble? Star us on GitHub.",
     cta: "Star on GitHub",
-    target: { type: "url", url: "https://github.com/AkshatSidharth/KapAble" },
+    target: { type: "url", url: REPO_URL },
     weight: 1,
   },
   {
-    id: "reddit",
-    text: "Join 4000+ builders in the KapAble subreddit.",
-    cta: "Join r/dyadbuilders",
-    target: { type: "url", url: "https://www.reddit.com/r/dyadbuilders/" },
+    id: "docs",
+    text: "New to KapAble? The docs cover models, integrations and troubleshooting.",
+    cta: "Read the docs",
+    target: { type: "url", url: DOCS_URL },
     weight: 1,
-  },
-  {
-    id: "follow-x",
-    text: "Follow KapAble on X for build tips and release updates.",
-    cta: "Follow @kapable_sh",
-    target: { type: "url", url: "https://x.com/dyad_sh" },
-    weight: 0.5,
   },
 ];
+
+export const PROMO_MESSAGES: PromoMessageConfig[] = isManagedPlanConfigured()
+  ? [...MANAGED_PLAN_PROMO_MESSAGES, ...COMMUNITY_PROMO_MESSAGES]
+  : COMMUNITY_PROMO_MESSAGES;
 
 const SHOW_PROMO_DEV_CYCLE =
   (import.meta as { env?: { MODE?: string } }).env?.MODE === "development";

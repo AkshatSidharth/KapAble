@@ -53,7 +53,10 @@ function validateAudioTranscriptionRequest(input: TranscribeAudioParams) {
     trimmedFilename === "." ||
     trimmedFilename === ".."
   ) {
-    throw new KapableError("Invalid audio filename", KapableErrorKind.Validation);
+    throw new KapableError(
+      "Invalid audio filename",
+      KapableErrorKind.Validation,
+    );
   }
 
   if (
@@ -100,7 +103,10 @@ export function parseBillingActionUrl(value: string) {
   try {
     url = new URL(value);
   } catch {
-    throw new KapableError("Invalid billing action URL", KapableErrorKind.Validation);
+    throw new KapableError(
+      "Invalid billing action URL",
+      KapableErrorKind.Validation,
+    );
   }
   if (
     url.protocol !== "https:" ||
@@ -109,7 +115,10 @@ export function parseBillingActionUrl(value: string) {
     url.password !== "" ||
     url.port !== ""
   ) {
-    throw new KapableError("Invalid billing action URL", KapableErrorKind.Validation);
+    throw new KapableError(
+      "Invalid billing action URL",
+      KapableErrorKind.Validation,
+    );
   }
   return url.toString();
 }

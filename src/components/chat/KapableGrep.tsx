@@ -86,7 +86,10 @@ export const KapableGrep: React.FC<KapableGrepProps> = ({ children, node }) => {
           <KapableStateIndicator state="pending" pendingLabel="Searching..." />
         )}
         {aborted && (
-          <KapableStateIndicator state="aborted" abortedLabel="Did not finish" />
+          <KapableStateIndicator
+            state="aborted"
+            abortedLabel="Did not finish"
+          />
         )}
         <div className="ml-auto">
           <KapableExpandIcon isExpanded={isContentVisible} />

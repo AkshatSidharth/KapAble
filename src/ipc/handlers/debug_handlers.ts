@@ -550,7 +550,10 @@ export function registerDebugHandlers() {
     const image = await win.capturePage();
     // Validate image
     if (!image || image.isEmpty()) {
-      throw new KapableError(SCREENSHOT_ERRORS.emptyImage, KapableErrorKind.External);
+      throw new KapableError(
+        SCREENSHOT_ERRORS.emptyImage,
+        KapableErrorKind.External,
+      );
     }
     // Write the image to the clipboard
     clipboard.writeImage(image);

@@ -1535,7 +1535,9 @@ describe("useTestRecorder", () => {
 
     expect(stopRecordingMock).toHaveBeenCalledWith({ appId: 1 });
     expect(
-      iframe.posted.some((message: any) => message?.type === "kapable-auth-login"),
+      iframe.posted.some(
+        (message: any) => message?.type === "kapable-auth-login",
+      ),
     ).toBe(false);
     expect(result.current.phase).toBe("idle");
   });

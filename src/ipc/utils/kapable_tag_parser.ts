@@ -94,7 +94,8 @@ export function getKapableCopyTags(fullResponse: string): {
   to: string;
   description?: string;
 }[] {
-  const kapableCopyRegex = /<kapable-copy([^>]*?)(?:>([\s\S]*?)<\/kapable-copy>|\/>)/gi;
+  const kapableCopyRegex =
+    /<kapable-copy([^>]*?)(?:>([\s\S]*?)<\/kapable-copy>|\/>)/gi;
   const fromRegex = /from="([^"]+)"/;
   const toRegex = /to="([^"]+)"/;
   const descriptionRegex = /description="([^"]+)"/;

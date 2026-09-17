@@ -20,7 +20,11 @@ import {
   Loader2,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { KapableCard, KapableCardHeader, KapableBadge } from "./KapableCardPrimitives";
+import {
+  KapableCard,
+  KapableCardHeader,
+  KapableBadge,
+} from "./KapableCardPrimitives";
 import { getCompletedIntegrationProvider } from "./kapableAddIntegrationUtils";
 import { ipc } from "@/ipc/types";
 import { usePostHog } from "posthog-js/react";
@@ -258,7 +262,10 @@ export const KapableAddIntegration: React.FC<KapableAddIntegrationProps> = ({
   ) {
     return (
       <KapableCard accentColor="green" state="finished">
-        <KapableCardHeader icon={<CheckCircle2 size={15} />} accentColor="green">
+        <KapableCardHeader
+          icon={<CheckCircle2 size={15} />}
+          accentColor="green"
+        >
           <KapableBadge color="green">
             {t("integrations.databaseSetup.integrationComplete")}
           </KapableBadge>

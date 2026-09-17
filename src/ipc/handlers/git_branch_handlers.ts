@@ -81,7 +81,10 @@ export async function handleFetchFromGithub(
   const settings = readSettings();
   const accessToken = settings.githubAccessToken?.value;
   if (!accessToken) {
-    throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+    throw new KapableError(
+      "Not authenticated with GitHub.",
+      KapableErrorKind.Auth,
+    );
   }
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
   if (!app || !app.githubOrg || !app.githubRepo) {
@@ -407,7 +410,8 @@ async function withAppGitOp<T>(
     },
     async () => {
       const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
-      if (!app) throw new KapableError("App not found", KapableErrorKind.NotFound);
+      if (!app)
+        throw new KapableError("App not found", KapableErrorKind.NotFound);
       const appPath = getKapableAppPath(app.path);
 
       if (isGitMergeInProgress({ path: appPath })) {
@@ -554,7 +558,10 @@ export async function handlePullFromGithub(
   const settings = readSettings();
   const accessToken = settings.githubAccessToken?.value;
   if (!accessToken) {
-    throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+    throw new KapableError(
+      "Not authenticated with GitHub.",
+      KapableErrorKind.Auth,
+    );
   }
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
   if (!app || !app.githubOrg || !app.githubRepo) {

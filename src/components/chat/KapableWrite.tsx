@@ -75,7 +75,10 @@ export const KapableWrite: React.FC<KapableWriteProps> = ({
           <KapableStateIndicator state="pending" pendingLabel="Writing..." />
         )}
         {aborted && (
-          <KapableStateIndicator state="aborted" abortedLabel="Did not finish" />
+          <KapableStateIndicator
+            state="aborted"
+            abortedLabel="Did not finish"
+          />
         )}
         <div className="ml-auto flex items-center gap-1">
           {!inProgress && (

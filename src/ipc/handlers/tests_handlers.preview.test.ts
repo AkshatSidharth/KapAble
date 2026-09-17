@@ -75,7 +75,12 @@ import { buildWindowsCommandInvocation } from "../utils/windows_command";
 const PROXY_URL = "http://localhost:42101/";
 const CDP_ENDPOINT = "http://127.0.0.1:51234";
 const CDP_TOKEN = "test-preview-token";
-const APP_PATH = path.join(os.tmpdir(), "kapable-tests-preview", "apps", "my-app");
+const APP_PATH = path.join(
+  os.tmpdir(),
+  "kapable-tests-preview",
+  "apps",
+  "my-app",
+);
 
 function runAppTestsCore(options: RunAppTestsCoreOptions) {
   return runAppTestsCoreWithoutToken({

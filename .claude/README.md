@@ -6,8 +6,8 @@ This directory contains Claude Code configuration for the KapAble project.
 
 Skills are invoked with `/kapable:<skill>`. Available skills:
 
-| Skill                              | Description                                              | Uses                                            |
-| ---------------------------------- | -------------------------------------------------------- | ----------------------------------------------- |
+| Skill                                 | Description                                              | Uses                                            |
+| ------------------------------------- | -------------------------------------------------------- | ----------------------------------------------- |
 | `/kapable:plan-to-issue`              | Convert a plan to a GitHub issue                         | -                                               |
 | `/kapable:fix-issue`                  | Fix a GitHub issue                                       | `pr-push`                                       |
 | `/kapable:pr-fix`                     | Fix PR issues from CI failures or review comments        | `pr-fix:comments`, `pr-fix:ci`                  |
@@ -22,4 +22,4 @@ Skills are invoked with `/kapable:<skill>`. Available skills:
 | `/kapable:pr-screencast`              | Record visual demo of PR feature                         | -                                               |
 | `/kapable:feedback-to-issues`         | Turn customer feedback into GitHub issues                | -                                               |
 | `/kapable:promote-beta-to-stable`     | Promote latest pre-release to stable release             | -                                               |
-| `/remember-learnings`              | Capture session learnings into AGENTS.md/rules           | -                                               |
+| `/remember-learnings`                 | Capture session learnings into AGENTS.md/rules           | -                                               |

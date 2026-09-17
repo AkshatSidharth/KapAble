@@ -42,7 +42,10 @@ export const KapableCopy: React.FC<KapableCopyProps> = ({ children, node }) => {
             <KapableStateIndicator state="pending" pendingLabel="Copying..." />
           )}
           {state === "aborted" && (
-            <KapableStateIndicator state="aborted" abortedLabel="Did not finish" />
+            <KapableStateIndicator
+              state="aborted"
+              abortedLabel="Did not finish"
+            />
           )}
           {state === "finished" && (
             <KapableStateIndicator state="finished" finishedLabel="Copied" />

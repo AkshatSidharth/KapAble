@@ -8,7 +8,10 @@ export function useSecurityReview(appId: number | null) {
     queryKey: queryKeys.securityReview.byApp({ appId }),
     queryFn: async () => {
       if (!appId) {
-        throw new KapableError("App ID is required", KapableErrorKind.Validation);
+        throw new KapableError(
+          "App ID is required",
+          KapableErrorKind.Validation,
+        );
       }
       return ipc.security.getLatestSecurityReview(appId);
     },

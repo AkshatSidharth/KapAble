@@ -6,7 +6,7 @@ labels: "add-template"
 assignees: ""
 ---
 
-If you'd like to add a template to KapAble Hub, follow the [Add Template guide](https://kapable.sh/docs/templates/add-template).
+If you'd like to add a template to KapAble Hub, follow the [Add Template guide](https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#templates).
 
 **Template name:**
 

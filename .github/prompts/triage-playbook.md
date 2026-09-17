@@ -6,7 +6,7 @@ and cite the entry id in `playbookMatch`. If nothing matches, say so with
 `"playbookMatch": null` so the team can add an entry.
 
 Links you may use in reporter-facing text: https://www.kapable.sh/download,
-https://www.kapable.sh/docs/..., https://nodejs.org, https://www.githubstatus.com,
+https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md/..., https://nodejs.org, https://www.githubstatus.com,
 https://status.supabase.com, and issues or PRs in this repository. No other links.
 
 ---
@@ -148,7 +148,7 @@ incident, otherwise `needs_info`.
 
 **Tell the reporter:** check https://www.githubstatus.com. If there are
 uncommitted changes, click **Review & commit** first, then try again. Point to
-https://www.kapable.sh/docs/integrations/github#troubleshooting.
+https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#github.
 
 **Source:** #3959, #4318, #3406, #3398. Verified on 1.12.0.
 
@@ -277,7 +277,7 @@ specific model or provider.
 **Assessment:** `feature_request`
 
 **Tell the reporter:** add it as a custom model, see
-https://www.kapable.sh/docs/guides/ai-models/custom-models. New built-in providers
+https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#custom-and-local-models. New built-in providers
 are only added when there is clear demand.
 
 **Source:** #4425, #4322, #4293.

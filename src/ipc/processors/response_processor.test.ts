@@ -152,7 +152,8 @@ describe("processFullResponseActions add dependency errors", () => {
     } as any);
     vi.mocked(db.query.messages.findFirst).mockResolvedValue({
       id: 1,
-      content: '<kapable-add-dependency packages="react"></kapable-add-dependency>',
+      content:
+        '<kapable-add-dependency packages="react"></kapable-add-dependency>',
     } as any);
   });
 

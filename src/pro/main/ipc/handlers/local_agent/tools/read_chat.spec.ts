@@ -278,7 +278,8 @@ describe("readChatTool.execute", () => {
     const summary = harness.insertMessage({
       chatId,
       role: "assistant",
-      content: "<kapable-compaction>summary of earlier work</kapable-compaction>",
+      content:
+        "<kapable-compaction>summary of earlier work</kapable-compaction>",
       createdAt: 19_000,
       isCompactionSummary: true,
     });

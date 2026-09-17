@@ -138,7 +138,9 @@ export const TitleBar = () => {
             </TooltipTrigger>
             <TooltipContent>{displayText}</TooltipContent>
           </Tooltip>
-          {isKapablePro && <KapableProButton isKapableProEnabled={isKapableProEnabled} />}
+          {isKapablePro && (
+            <KapableProButton isKapableProEnabled={isKapableProEnabled} />
+          )}
         </div>
 
         <div className="flex-1 min-w-0 overflow-hidden self-end">

@@ -233,7 +233,8 @@ async function restorePackageManagerCache() {
   if (originalTestInstallPnpmVersion === undefined) {
     delete process.env.KAPABLE_TEST_INSTALL_PNPM_VERSION;
   } else {
-    process.env.KAPABLE_TEST_INSTALL_PNPM_VERSION = originalTestInstallPnpmVersion;
+    process.env.KAPABLE_TEST_INSTALL_PNPM_VERSION =
+      originalTestInstallPnpmVersion;
   }
 
   if (originalDefaultApproveBuildsUrl === undefined) {
@@ -416,7 +417,9 @@ testSkipIfWindows(
     });
     const pnpmWorkspaceConfig = await fs.readFile(pnpmWorkspacePath, "utf8");
     expect(pnpmWorkspaceConfig).toContain("minimumReleaseAge: 1440");
-    expect(pnpmWorkspaceConfig).toContain("# kapable-default-allow-builds begin");
+    expect(pnpmWorkspaceConfig).toContain(
+      "# kapable-default-allow-builds begin",
+    );
     expect(pnpmWorkspaceConfig).toContain(
       "# kapable-default-allow-builds-schema=v1",
     );

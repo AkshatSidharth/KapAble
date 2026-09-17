@@ -10,7 +10,10 @@ import {
 const h = vi.hoisted(() => ({
   settings: {} as Record<string, unknown>,
   written: [] as Array<Record<string, unknown>>,
-  serverKey: { publicKey: "ssh-ed25519 AAAAPUB kapable", privateKey: "PRIVATE" },
+  serverKey: {
+    publicKey: "ssh-ed25519 AAAAPUB kapable",
+    privateKey: "PRIVATE",
+  },
   setupResult: null as unknown,
   setupError: null as unknown,
   lastSetupOptions: null as Record<string, unknown> | null,
@@ -408,7 +411,10 @@ describe("run", () => {
     // Its seeder resolves the domain. Finding out afterwards costs the whole
     // install and leaves an instance with no account on it.
     await expect(
-      call("coolify-setup:run", { ...TARGET, adminEmail: "admin@kapable.test" }),
+      call("coolify-setup:run", {
+        ...TARGET,
+        adminEmail: "admin@kapable.test",
+      }),
     ).rejects.toMatchObject({ kind: "validation" });
   });
 

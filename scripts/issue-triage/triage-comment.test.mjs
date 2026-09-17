@@ -26,14 +26,14 @@ const baseTriage = {
 
 test("sanitizeText strips HTML, foreign mentions, and disallowed links", () => {
   const input =
-    "Hi <b>@reporter</b>, ping @wwwillchen and see https://evil.example/x and https://www.kapable.sh/download. Also [docs](https://example.com/docs) and [notes](https://www.kapable.sh/docs/releases/1.13.0) cc support@kapable.sh";
+    "Hi <b>@reporter</b>, ping @wwwillchen and see https://evil.example/x and https://www.kapable.sh/download. Also [docs](https://example.com/docs) and [notes](https://github.com/AkshatSidharth/KapAble/releases/tag/v1.13.0) cc support@kapable.sh";
   const output = sanitizeText(input, {
     author: "reporter",
     repository: "AkshatSidharth/KapAble",
   });
   assert.equal(
     output,
-    "Hi @reporter, ping wwwillchen and see [link removed] and https://www.kapable.sh/download. Also docs and [notes](https://www.kapable.sh/docs/releases/1.13.0) cc support@kapable.sh",
+    "Hi @reporter, ping wwwillchen and see [link removed] and https://www.kapable.sh/download. Also docs and [notes](https://github.com/AkshatSidharth/KapAble/releases/tag/v1.13.0) cc support@kapable.sh",
   );
 });
 
@@ -97,7 +97,7 @@ test("normalizeTriage accepts a version-shaped fixedIn when releases are unknown
   );
   assert.deepEqual(triage.fixedIn, {
     version: "1.13.0",
-    url: "https://www.kapable.sh/docs/releases/1.13.0",
+    url: "https://github.com/AkshatSidharth/KapAble/releases/tag/v1.13.0",
   });
 });
 
@@ -234,7 +234,7 @@ test("composeComment offers the existing route on feature requests", () => {
       labels: ["feature request"],
       assessment: "feature_request",
       steps: [
-        "You can add it today as a custom model: https://www.kapable.sh/docs/guides/ai-models/custom-models",
+        "You can add it today as a custom model: https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#custom-and-local-models",
       ],
       developerNotes: "- Third provider request this month.",
       playbookMatch: "model-missing-or-new-provider",

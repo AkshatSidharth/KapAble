@@ -258,7 +258,8 @@ Final words.`;
   });
 
   it("handles a closing-tag that doesn't match the open tag as content", () => {
-    const content = '<kapable-write path="a.ts">foo</kapable-edit>still</kapable-write>';
+    const content =
+      '<kapable-write path="a.ts">foo</kapable-edit>still</kapable-write>';
     const { blocks } = parseFullMessage(content);
     expect(blocks).toHaveLength(1);
     expect(blocks[0]).toMatchObject({
@@ -307,13 +308,19 @@ trailing`;
 
   it("resets when content shrinks (resync)", () => {
     let state = initialParserState();
-    state = advanceParser(state, '<kapable-write path="a.ts">old</kapable-write>');
+    state = advanceParser(
+      state,
+      '<kapable-write path="a.ts">old</kapable-write>',
+    );
     expect(getParserBlocks(state)).toHaveLength(1);
     state = advanceParser(state, "<kapable-write");
     // Resync caused full reparse — synthesized markdown for partial tag.
     const blocks = getParserBlocks(state);
     expect(blocks.length).toBeGreaterThanOrEqual(0);
-    state = advanceParser(state, '<kapable-write path="b.ts">new</kapable-write>');
+    state = advanceParser(
+      state,
+      '<kapable-write path="b.ts">new</kapable-write>',
+    );
     const finalBlocks = getParserBlocks(state);
     expect(finalBlocks).toHaveLength(1);
     if (finalBlocks[0].kind !== "custom-tag")

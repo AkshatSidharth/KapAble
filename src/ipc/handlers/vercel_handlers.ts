@@ -120,7 +120,10 @@ async function getDefaultTeamId(token: string): Promise<string> {
       return data.teams[0].id;
     }
 
-    throw new KapableError("No teams found for this user", KapableErrorKind.NotFound);
+    throw new KapableError(
+      "No teams found for this user",
+      KapableErrorKind.NotFound,
+    );
   } catch (error) {
     logger.error("Error getting default team ID:", error);
     throw new KapableError(
@@ -232,7 +235,10 @@ async function handleListVercelProjects(): Promise<VercelProject[]> {
     const settings = readSettings();
     const accessToken = settings.vercelAccessToken?.value;
     if (!accessToken) {
-      throw new KapableError("Not authenticated with Vercel.", KapableErrorKind.Auth);
+      throw new KapableError(
+        "Not authenticated with Vercel.",
+        KapableErrorKind.Auth,
+      );
     }
 
     const response = await getVercelProjects(accessToken);
@@ -305,7 +311,10 @@ async function handleCreateProject(
   const settings = readSettings();
   const accessToken = settings.vercelAccessToken?.value;
   if (!accessToken) {
-    throw new KapableError("Not authenticated with Vercel.", KapableErrorKind.Auth);
+    throw new KapableError(
+      "Not authenticated with Vercel.",
+      KapableErrorKind.Auth,
+    );
   }
 
   try {
@@ -325,7 +334,9 @@ async function handleCreateProject(
     }
 
     // Detect the framework from the app's directory
-    const detectedFramework = await detectFramework(getKapableAppPath(app.path));
+    const detectedFramework = await detectFramework(
+      getKapableAppPath(app.path),
+    );
 
     logger.info(
       `Detected framework: ${detectedFramework || "none detected"} for app at ${app.path}`,
@@ -436,7 +447,10 @@ async function handleConnectToExistingProject(
     const settings = readSettings();
     const accessToken = settings.vercelAccessToken?.value;
     if (!accessToken) {
-      throw new KapableError("Not authenticated with Vercel.", KapableErrorKind.Auth);
+      throw new KapableError(
+        "Not authenticated with Vercel.",
+        KapableErrorKind.Auth,
+      );
     }
 
     logger.info(
@@ -490,7 +504,10 @@ async function handleGetVercelDeployments(
     const settings = readSettings();
     const accessToken = settings.vercelAccessToken?.value;
     if (!accessToken) {
-      throw new KapableError("Not authenticated with Vercel.", KapableErrorKind.Auth);
+      throw new KapableError(
+        "Not authenticated with Vercel.",
+        KapableErrorKind.Auth,
+      );
     }
 
     const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });

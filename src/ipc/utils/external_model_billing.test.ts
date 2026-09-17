@@ -63,7 +63,9 @@ it.each(["local", "byok"] as const)(
       outputTokens: 50,
     });
     expect(String(init?.body)).not.toContain("private");
-    expect(init?.headers).toMatchObject({ Authorization: "Bearer kapable-key" });
+    expect(init?.headers).toMatchObject({
+      Authorization: "Bearer kapable-key",
+    });
   },
 );
 it("reports streamed usage once and uses resolved model attribution", async () => {

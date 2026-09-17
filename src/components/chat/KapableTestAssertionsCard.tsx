@@ -58,10 +58,9 @@ function ReceiptShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const KapableTestAssertionsCard: React.FC<KapableTestAssertionsCardProps> = ({
-  node,
-  children,
-}) => {
+export const KapableTestAssertionsCard: React.FC<
+  KapableTestAssertionsCardProps
+> = ({ node, children }) => {
   const rawPayload = useMemo(() => toText(children), [children]);
   const payload = useMemo(
     () => parseAssertionsPayload(rawPayload),

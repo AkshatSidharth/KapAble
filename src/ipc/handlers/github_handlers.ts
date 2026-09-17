@@ -534,7 +534,10 @@ async function handleListGithubRepos(): Promise<
     const settings = readSettings();
     const accessToken = settings.githubAccessToken?.value;
     if (!accessToken) {
-      throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+      throw new KapableError(
+        "Not authenticated with GitHub.",
+        KapableErrorKind.Auth,
+      );
     }
 
     // Fetch user's repositories
@@ -578,7 +581,10 @@ async function handleGetRepoBranches(
     const settings = readSettings();
     const accessToken = settings.githubAccessToken?.value;
     if (!accessToken) {
-      throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+      throw new KapableError(
+        "Not authenticated with GitHub.",
+        KapableErrorKind.Auth,
+      );
     }
 
     // Fetch repository branches
@@ -678,7 +684,10 @@ export async function handleCreateRepo(
   const settings = readSettings();
   const accessToken = settings.githubAccessToken?.value;
   if (!accessToken) {
-    throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+    throw new KapableError(
+      "Not authenticated with GitHub.",
+      KapableErrorKind.Auth,
+    );
   }
   // If org is empty, create for the authenticated user
   let owner = org;
@@ -783,7 +792,10 @@ export async function handleConnectToExistingRepo(
     const settings = readSettings();
     const accessToken = settings.githubAccessToken?.value;
     if (!accessToken) {
-      throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+      throw new KapableError(
+        "Not authenticated with GitHub.",
+        KapableErrorKind.Auth,
+      );
     }
 
     // Verify the repository exists and user has access
@@ -842,7 +854,10 @@ export async function handlePushToGithub(
   const settings = readSettings();
   const accessToken = settings.githubAccessToken?.value;
   if (!accessToken) {
-    throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+    throw new KapableError(
+      "Not authenticated with GitHub.",
+      KapableErrorKind.Auth,
+    );
   }
 
   // Get app info from DB
@@ -930,7 +945,10 @@ export async function handleRebaseFromGithub(
   const settings = readSettings();
   const accessToken = settings.githubAccessToken?.value;
   if (!accessToken) {
-    throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+    throw new KapableError(
+      "Not authenticated with GitHub.",
+      KapableErrorKind.Auth,
+    );
   }
   const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
   if (!app || !app.githubOrg || !app.githubRepo) {
@@ -1005,7 +1023,10 @@ async function handleListCollaborators(
     const settings = readSettings();
     const accessToken = settings.githubAccessToken?.value;
     if (!accessToken) {
-      throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+      throw new KapableError(
+        "Not authenticated with GitHub.",
+        KapableErrorKind.Auth,
+      );
     }
 
     const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
@@ -1053,7 +1074,10 @@ async function handleInviteCollaborator(
     // Validate username
     const trimmedUsername = username.trim();
     if (!trimmedUsername) {
-      throw new KapableError("Username cannot be empty.", KapableErrorKind.External);
+      throw new KapableError(
+        "Username cannot be empty.",
+        KapableErrorKind.External,
+      );
     }
     if (trimmedUsername.length > 39) {
       throw new KapableError(
@@ -1080,7 +1104,10 @@ async function handleInviteCollaborator(
     const settings = readSettings();
     const accessToken = settings.githubAccessToken?.value;
     if (!accessToken) {
-      throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+      throw new KapableError(
+        "Not authenticated with GitHub.",
+        KapableErrorKind.Auth,
+      );
     }
 
     const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });
@@ -1128,7 +1155,10 @@ async function handleRemoveCollaborator(
     const settings = readSettings();
     const accessToken = settings.githubAccessToken?.value;
     if (!accessToken) {
-      throw new KapableError("Not authenticated with GitHub.", KapableErrorKind.Auth);
+      throw new KapableError(
+        "Not authenticated with GitHub.",
+        KapableErrorKind.Auth,
+      );
     }
 
     const app = await db.query.apps.findFirst({ where: eq(apps.id, appId) });

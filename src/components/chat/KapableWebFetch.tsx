@@ -17,7 +17,10 @@ interface KapableWebFetchProps {
   };
 }
 
-export const KapableWebFetch: FC<KapableWebFetchProps> = ({ children, node }) => {
+export const KapableWebFetch: FC<KapableWebFetchProps> = ({
+  children,
+  node,
+}) => {
   const state = node?.properties?.state as CustomTagState;
 
   return (

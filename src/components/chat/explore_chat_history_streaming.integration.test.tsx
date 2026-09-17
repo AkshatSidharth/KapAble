@@ -131,7 +131,9 @@ describe("explore_chat_history streaming preview", () => {
     expect(
       screen.getByText("Exploring chat history… (1 search, 1 read)"),
     ).toBeTruthy();
-    expect(screen.getAllByTestId("kapable-explore-chat-history")).toHaveLength(1);
+    expect(screen.getAllByTestId("kapable-explore-chat-history")).toHaveLength(
+      1,
+    );
 
     finishSubagent();
     await act(async () => {

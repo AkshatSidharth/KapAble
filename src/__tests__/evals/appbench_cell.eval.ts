@@ -155,7 +155,10 @@ async function json(url: string, init?: RequestInit) {
   > | null = null;
 
   beforeAll(async () => {
-    expect(process.env.KAPABLE_PRO_API_KEY, "KAPABLE_PRO_KEY required").toBeTruthy();
+    expect(
+      process.env.KAPABLE_PRO_API_KEY,
+      "KAPABLE_PRO_KEY required",
+    ).toBeTruthy();
     // Preflight: neon-sim + engine proxy must be up.
     await json(`${SIM}/__sim/state`);
     await fetch(`${PROXY}/healthz`).then((r) => {

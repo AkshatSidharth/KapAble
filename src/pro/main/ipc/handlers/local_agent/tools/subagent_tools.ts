@@ -1,6 +1,10 @@
 import { z } from "zod";
 import type { ToolSet } from "ai";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import type { SubagentThreadSummary } from "@/ipc/types";
 import { getErrorMessage } from "@/lib/errors";
 
@@ -349,7 +353,9 @@ const threadIdsSchema = z.object({ thread_ids: z.array(z.string()).min(1) });
 
 function canUseAdvancedSubagentTools(ctx: AgentContext): boolean {
   return Boolean(
-    ctx.isKapablePro && ctx.canUseAdvancedSubagentTools && !ctx.subagentThreadId,
+    ctx.isKapablePro &&
+    ctx.canUseAdvancedSubagentTools &&
+    !ctx.subagentThreadId,
   );
 }
 

@@ -315,7 +315,9 @@ export async function connectSsh(
     run(command, { input, onOutput, signal, timeoutMs } = {}) {
       return new Promise<SshResult>((resolve, reject) => {
         if (signal?.aborted) {
-          reject(new KapableError("Cancelled.", KapableErrorKind.UserCancelled));
+          reject(
+            new KapableError("Cancelled.", KapableErrorKind.UserCancelled),
+          );
           return;
         }
         let timer: ReturnType<typeof setTimeout> | undefined;
@@ -330,7 +332,9 @@ export async function connectSsh(
           cancelled = true;
           stopListening();
           openStream?.close();
-          reject(new KapableError("Cancelled.", KapableErrorKind.UserCancelled));
+          reject(
+            new KapableError("Cancelled.", KapableErrorKind.UserCancelled),
+          );
         };
         signal?.addEventListener("abort", onAbort, { once: true });
         const stopListening = () => {

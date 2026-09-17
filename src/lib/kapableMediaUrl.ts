@@ -1,7 +1,10 @@
 /**
  * Builds a kapable-media:// protocol URL for serving media files in Electron.
  */
-export function buildKapableMediaUrl(appPath: string, fileName: string): string {
+export function buildKapableMediaUrl(
+  appPath: string,
+  fileName: string,
+): string {
   return `kapable-media://media/${encodeURIComponent(appPath)}/.kapable/media/${encodeURIComponent(fileName)}`;
 }
 

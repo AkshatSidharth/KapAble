@@ -256,15 +256,15 @@ This maps cleanly to the existing `appUrlAtom` which already stores both `appUrl
 
 ## Risks & Mitigations
 
-| Risk                                                                          | Likelihood | Impact | Mitigation                                                                                                          |
-| ----------------------------------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
-| KapAble Engine dependency — if Engine is down, cloud sandboxes are broken        | Medium     | High   | Monitoring, clear error messages ("KapAble cloud services temporarily unavailable"), fallback to local mode suggestion |
-| Orphaned sandboxes consuming KapAble's cloud resources                           | High       | High   | Auto-hibernate after 15 min, max 1 concurrent sandbox, startup reconciliation, graceful teardown on quit            |
-| Proxy server complexity increases (HTTPS remote target, script injection)     | Medium     | Medium | Incremental upgrade to existing proxy, thorough testing of script injection with remote content                     |
-| User confusion between cloud sandbox (preview) and Vercel Deploy (production) | Medium     | Medium | Clear labeling in UI, note in Publish panel, distinct icons                                                         |
-| File sync failures leave preview showing stale content                        | Medium     | Medium | Surface sync failures as `app:output` stderr messages, "Fix with AI" flow still works                               |
-| Pro subscription expires during active sandbox                                | Low        | Medium | Graceful teardown with clear message, fall back to local mode                                                       |
-| Vercel Sandbox SDK rate limits or API changes                                 | Low        | High   | Abstract behind provider interface, monitor API usage, maintain relationship with Vercel                            |
+| Risk                                                                          | Likelihood | Impact | Mitigation                                                                                                             |
+| ----------------------------------------------------------------------------- | ---------- | ------ | ---------------------------------------------------------------------------------------------------------------------- |
+| KapAble Engine dependency — if Engine is down, cloud sandboxes are broken     | Medium     | High   | Monitoring, clear error messages ("KapAble cloud services temporarily unavailable"), fallback to local mode suggestion |
+| Orphaned sandboxes consuming KapAble's cloud resources                        | High       | High   | Auto-hibernate after 15 min, max 1 concurrent sandbox, startup reconciliation, graceful teardown on quit               |
+| Proxy server complexity increases (HTTPS remote target, script injection)     | Medium     | Medium | Incremental upgrade to existing proxy, thorough testing of script injection with remote content                        |
+| User confusion between cloud sandbox (preview) and Vercel Deploy (production) | Medium     | Medium | Clear labeling in UI, note in Publish panel, distinct icons                                                            |
+| File sync failures leave preview showing stale content                        | Medium     | Medium | Surface sync failures as `app:output` stderr messages, "Fix with AI" flow still works                                  |
+| Pro subscription expires during active sandbox                                | Low        | Medium | Graceful teardown with clear message, fall back to local mode                                                          |
+| Vercel Sandbox SDK rate limits or API changes                                 | Low        | High   | Abstract behind provider interface, monitor API usage, maintain relationship with Vercel                               |
 
 ## Open Questions
 
@@ -275,18 +275,18 @@ This maps cleanly to the existing `appUrlAtom` which already stores both `appUrl
 
 ## Decision Log
 
-| Decision                                           | Reasoning                                                                                                                                                                                               |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Vercel Sandbox SDK** as the first cloud provider | Real-time file sync and instant rebuilds. Existing Vercel relationship. SDK purpose-built for interactive development.                                                                                  |
-| **Proxy through localhost** for iframe preview     | Preserves all Pro features (component selector, visual editing, console capture) via script injection. Trade-off: proxied URL isn't directly shareable, but "Copy link" button provides the direct URL. |
-| **KapAble Pro feature** (KapAble manages infrastructure) | Simplifies UX (no Vercel account setup needed), controls costs, creates Pro upsell opportunity. Requires KapAble Engine for sandbox management.                                                            |
-| **Shareable URLs in MVP**                          | Highest-value, lowest-effort differentiator of cloud mode. "Copy link" button is ~10 lines of code.                                                                                                     |
-| **Global runtime mode for v1**                     | Consistent with existing Docker mode. Simpler data model and UI. Per-app override deferred to v2.                                                                                                       |
-| **In-memory sandbox state for MVP**                | Sandboxes are ephemeral. No DB migration needed. Revisit if sandboxes need to survive restarts.                                                                                                         |
-| **`mode` string union over boolean flags**         | `mode: "host" \| "docker" \| "cloud"` is cleaner than `isDocker` + `isCloud` boolean flags. Easier to extend.                                                                                           |
-| **Cloud mode is opt-in, not default**              | Local mode remains default for all users including Pro. Cloud mode is slower for iteration and requires internet.                                                                                       |
-| **Batch file sync per AI turn**                    | Avoids thundering herd of 5-20 individual uploads during multi-file AI responses. Reduces API calls and prevents mid-batch rebuilds.                                                                    |
-| **Auto-hibernate after 15 min**                    | Prevents orphaned sandboxes from running up KapAble's cloud costs. Balance between convenience and cost control.                                                                                           |
+| Decision                                                 | Reasoning                                                                                                                                                                                               |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Vercel Sandbox SDK** as the first cloud provider       | Real-time file sync and instant rebuilds. Existing Vercel relationship. SDK purpose-built for interactive development.                                                                                  |
+| **Proxy through localhost** for iframe preview           | Preserves all Pro features (component selector, visual editing, console capture) via script injection. Trade-off: proxied URL isn't directly shareable, but "Copy link" button provides the direct URL. |
+| **KapAble Pro feature** (KapAble manages infrastructure) | Simplifies UX (no Vercel account setup needed), controls costs, creates Pro upsell opportunity. Requires KapAble Engine for sandbox management.                                                         |
+| **Shareable URLs in MVP**                                | Highest-value, lowest-effort differentiator of cloud mode. "Copy link" button is ~10 lines of code.                                                                                                     |
+| **Global runtime mode for v1**                           | Consistent with existing Docker mode. Simpler data model and UI. Per-app override deferred to v2.                                                                                                       |
+| **In-memory sandbox state for MVP**                      | Sandboxes are ephemeral. No DB migration needed. Revisit if sandboxes need to survive restarts.                                                                                                         |
+| **`mode` string union over boolean flags**               | `mode: "host" \| "docker" \| "cloud"` is cleaner than `isDocker` + `isCloud` boolean flags. Easier to extend.                                                                                           |
+| **Cloud mode is opt-in, not default**                    | Local mode remains default for all users including Pro. Cloud mode is slower for iteration and requires internet.                                                                                       |
+| **Batch file sync per AI turn**                          | Avoids thundering herd of 5-20 individual uploads during multi-file AI responses. Reduces API calls and prevents mid-batch rebuilds.                                                                    |
+| **Auto-hibernate after 15 min**                          | Prevents orphaned sandboxes from running up KapAble's cloud costs. Balance between convenience and cost control.                                                                                        |
 
 ---
 

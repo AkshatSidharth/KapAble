@@ -357,7 +357,10 @@ export class PtySessionManager {
   ): SerializedTerminalSession {
     const session = this.findAuthorizedSession(sessionId, sender);
     if (!session) {
-      throw new KapableError("Terminal session not found", KapableErrorKind.NotFound);
+      throw new KapableError(
+        "Terminal session not found",
+        KapableErrorKind.NotFound,
+      );
     }
     if (sender) {
       const subscriber = session.subscribers.get(sender.id);

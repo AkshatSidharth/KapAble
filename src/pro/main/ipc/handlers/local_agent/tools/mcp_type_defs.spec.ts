@@ -342,7 +342,9 @@ describe("buildMcpCapabilityMap", () => {
     );
     const xmls = vi.mocked(ctx.onXmlComplete).mock.calls.map((c) => c[0]);
     expect(xmls.some((x) => x.startsWith("<kapable-mcp-tool-call"))).toBe(true);
-    expect(xmls.some((x) => x.startsWith("<kapable-mcp-tool-result"))).toBe(true);
+    expect(xmls.some((x) => x.startsWith("<kapable-mcp-tool-result"))).toBe(
+      true,
+    );
   });
 
   it("tracks direct MCP execution until the host call settles", async () => {
@@ -464,7 +466,9 @@ describe("buildMcpCapabilityMap", () => {
       rejection = e;
     }
     expect(rejection).toBeInstanceOf(KapableError);
-    expect((rejection as KapableError).kind).toBe(KapableErrorKind.UserCancelled);
+    expect((rejection as KapableError).kind).toBe(
+      KapableErrorKind.UserCancelled,
+    );
     expect((rejection as KapableError).message).toBe(
       "User declined running tool srv__hello",
     );

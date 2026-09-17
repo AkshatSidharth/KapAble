@@ -61,7 +61,10 @@ export const KapableEdit: React.FC<KapableEditProps> = ({
           <KapableStateIndicator state="pending" pendingLabel="Editing..." />
         )}
         {aborted && (
-          <KapableStateIndicator state="aborted" abortedLabel="Did not finish" />
+          <KapableStateIndicator
+            state="aborted"
+            abortedLabel="Did not finish"
+          />
         )}
         <div className="ml-auto flex items-center gap-1">
           <KapableBadge color="sky">Turbo Edit</KapableBadge>

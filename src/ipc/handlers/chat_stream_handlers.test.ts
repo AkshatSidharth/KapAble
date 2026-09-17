@@ -425,7 +425,9 @@ describe("processStreamChunks", () => {
 
 describe("getKapableAddDependencyTags", () => {
   it("should return an empty array when no kapable-add-dependency tags are found", () => {
-    const result = getKapableAddDependencyTags("No kapable-add-dependency tags here");
+    const result = getKapableAddDependencyTags(
+      "No kapable-add-dependency tags here",
+    );
     expect(result).toEqual([]);
   });
 
@@ -1074,7 +1076,10 @@ describe("processFullResponse", () => {
   it("should handle file system errors gracefully", async () => {
     // Set up the mock to throw an error on mkdirSync
     vi.mocked(fs.mkdirSync).mockImplementationOnce(() => {
-      throw new KapableError("Mock filesystem error", KapableErrorKind.Internal);
+      throw new KapableError(
+        "Mock filesystem error",
+        KapableErrorKind.Internal,
+      );
     });
 
     const response = `<kapable-write path="src/error-file.js">This will fail</kapable-write>`;
@@ -1519,7 +1524,9 @@ const component = <Component />;
   it("should handle malformed kapable tags gracefully", () => {
     const text = `Before <kapable-write path="file.js">unclosed tag After`;
     const result = removeKapableTags(text);
-    expect(result).toBe('Before <kapable-write path="file.js">unclosed tag After');
+    expect(result).toBe(
+      'Before <kapable-write path="file.js">unclosed tag After',
+    );
   });
 
   it("should handle kapable tags with special characters in content", () => {

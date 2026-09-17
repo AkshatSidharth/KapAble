@@ -53,7 +53,10 @@ export const KapableLogs: React.FC<KapableLogsProps> = ({ children, node }) => {
           <KapableStateIndicator state="pending" pendingLabel="Reading..." />
         )}
         {aborted && (
-          <KapableStateIndicator state="aborted" abortedLabel="Did not finish" />
+          <KapableStateIndicator
+            state="aborted"
+            abortedLabel="Did not finish"
+          />
         )}
         <div className="ml-auto">
           <KapableExpandIcon isExpanded={isContentVisible} />

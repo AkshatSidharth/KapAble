@@ -101,7 +101,11 @@ import { apps, coolifyAppConnections } from "@/db/schema";
 import { setupHandlerTestHarness } from "@/testing/handler_test_harness";
 import type { HandlerTestHarness } from "@/testing/handler_test_harness";
 import { createFakeClock, type FakeClock } from "@/state_machines/testing";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { runDeployPipeline, type DeployReporter } from "./commands";
 
 const POLL_INTERVAL_MS = 5_000;

@@ -1081,7 +1081,9 @@ describe("budget exhaustion", () => {
       expect(onError).toHaveBeenCalledExactlyOnceWith({ error: errors[0] });
       expect(errors[0]).toMatchObject({ message });
       if (type === "throw") {
-        expect(errors[0]).toMatchObject({ kind: KapableErrorKind.Precondition });
+        expect(errors[0]).toMatchObject({
+          kind: KapableErrorKind.Precondition,
+        });
       }
     },
   );

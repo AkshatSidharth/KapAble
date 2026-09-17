@@ -21,11 +21,13 @@ describe("call-time model service URLs", () => {
   });
 
   it("reads KAPABLE_ENGINE_URL when called", () => {
-    delete process.env.KAPABLE_ENGINE_URL;
-    expect(getKapableEngineBaseUrl()).toBe("https://engine.kapable.sh/v1");
-
     process.env.KAPABLE_ENGINE_URL = "http://127.0.0.1:4321/v1";
     expect(getKapableEngineBaseUrl()).toBe("http://127.0.0.1:4321/v1");
+  });
+
+  it("throws instead of defaulting to a host KapAble does not run", () => {
+    delete process.env.KAPABLE_ENGINE_URL;
+    expect(() => getKapableEngineBaseUrl()).toThrow(/KAPABLE_ENGINE_URL/);
   });
 
   it("reads LM_STUDIO_BASE_URL_FOR_TESTING when called", () => {

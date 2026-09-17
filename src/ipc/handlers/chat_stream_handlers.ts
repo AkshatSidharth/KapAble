@@ -64,7 +64,11 @@ import type {
   ChatStreamStartPayload,
   ChatStreamTransportEndPayload,
 } from "@/chat_stream/protocol";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import {
   CodebaseFile,
   extractCodebase,
@@ -1398,7 +1402,10 @@ export function registerChatStreamHandlers() {
               sizeBytes: stat.size,
               createdAt: new Date().toISOString(),
             });
-            const mediaUrl = buildKapableMediaUrl(chat.app.path, media.fileName);
+            const mediaUrl = buildKapableMediaUrl(
+              chat.app.path,
+              media.fileName,
+            );
             mediaDisplayInfo += buildKapableAttachmentTag({
               name: media.fileName,
               type: media.mimeType,
@@ -1483,7 +1490,10 @@ You may update the plan at \`${planPath}\` to mark your progress.`;
           let componentSnippet = "[component snippet not available]";
           try {
             const componentFileContent = await readFile(
-              path.join(getKapableAppPath(chat.app.path), component.relativePath),
+              path.join(
+                getKapableAppPath(chat.app.path),
+                component.relativePath,
+              ),
               "utf8",
             );
             const lines = componentFileContent.split(/\r?\n/);
@@ -2108,7 +2118,9 @@ ${componentSnippet}
           );
         }
 
-        const aiRules = await readAiRules(getKapableAppPath(updatedChat.app.path));
+        const aiRules = await readAiRules(
+          getKapableAppPath(updatedChat.app.path),
+        );
 
         // Get theme prompt for the app (null themeId means "no theme")
         const themePrompt = await getThemePromptById(updatedChat.app.themeId);
@@ -3185,7 +3197,9 @@ This conversation includes one or more image attachments. When the user uploads 
       return req.chatId;
     } catch (error) {
       logger.error("Error calling LLM:", error);
-      const errorMessage = isKapableError(error) ? error.message : String(error);
+      const errorMessage = isKapableError(error)
+        ? error.message
+        : String(error);
       const rendererError =
         error instanceof SubscriptionBillingError
           ? error.serialize()
@@ -3471,7 +3485,9 @@ function escapeKapableTags(text: string): string {
   // and are mishandled by:
   // 1. FE markdown parser
   // 2. Main process response processor
-  return text.replace(/<kapable/g, "＜kapable").replace(/<\/kapable/g, "＜/kapable");
+  return text
+    .replace(/<kapable/g, "＜kapable")
+    .replace(/<\/kapable/g, "＜/kapable");
 }
 
 const CODEBASE_PROMPT_PREFIX = "This is my codebase.";

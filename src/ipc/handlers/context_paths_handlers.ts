@@ -33,7 +33,10 @@ export function registerContextPathsHandlers() {
       }
 
       if (!app.path) {
-        throw new KapableError("App path not set", KapableErrorKind.Precondition);
+        throw new KapableError(
+          "App path not set",
+          KapableErrorKind.Precondition,
+        );
       }
       const appPath = getKapableAppPath(app.path);
 

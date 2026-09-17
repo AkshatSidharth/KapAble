@@ -249,7 +249,9 @@ describe("proxy worker cookie rewriting", () => {
     const escapedToken = "token&lt;&amp;&quot;boundary";
     expect(body).toContain(`data-kapable-auth-token="${escapedToken}"`);
     expect(body).toContain(`data-kapable-recorder-token="${escapedToken}"`);
-    expect(body).not.toContain(`data-kapable-auth-token="${authBootstrapToken}"`);
+    expect(body).not.toContain(
+      `data-kapable-auth-token="${authBootstrapToken}"`,
+    );
     expect(body).not.toContain(
       `data-kapable-recorder-token="${authBootstrapToken}"`,
     );

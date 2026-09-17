@@ -8,7 +8,7 @@ assignees: ""
 
 <!--
 We recommend filing bugs from the app because it automatically includes logs and system info!
-https://www.kapable.sh/docs/help#report-a-bug
+https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#reporting-a-bug
 
 Please fill in all fields in English.
 -->

@@ -1933,8 +1933,8 @@ function EnableTestingScreen({
         Enable testing for this app
       </h3>
       <p className="text-sm text-muted-foreground max-w-sm mb-5">
-        Let KapAble write and run end-to-end tests that drive your app like a real
-        user. Tests are a starting point you can review, edit, and re-run.
+        Let KapAble write and run end-to-end tests that drive your app like a
+        real user. Tests are a starting point you can review, edit, and re-run.
       </p>
 
       {/* Data-safety warning, scaled to how well runs are isolated for this

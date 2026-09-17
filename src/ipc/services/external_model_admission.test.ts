@@ -4,7 +4,10 @@ import { Response as NodeResponse } from "node-fetch";
 import type { LanguageModelV3 } from "@ai-sdk/provider";
 import type { UserSettings } from "@/lib/schemas";
 import { KapableErrorKind } from "@/errors/kapable_error";
-const mocks = vi.hoisted(() => ({ credits: vi.fn(), key: "checked-kapable-key" }));
+const mocks = vi.hoisted(() => ({
+  credits: vi.fn(),
+  key: "checked-kapable-key",
+}));
 vi.mock("node-fetch", async (importOriginal) => ({
   ...(await importOriginal<typeof import("node-fetch")>()),
   default: mocks.credits,

@@ -31,7 +31,11 @@ import {
   SUPABASE_PROJECT_CREATED_BUT_UNLINKED,
   supabaseContracts,
 } from "../types/supabase";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { assertNoNeonProject } from "../utils/neon_utils";
 import { runOAuthReturnExchange } from "./connection_flow_handlers";
 import { IS_TEST_BUILD } from "../utils/test_utils";

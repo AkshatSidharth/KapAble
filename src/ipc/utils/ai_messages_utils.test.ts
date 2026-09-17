@@ -737,7 +737,9 @@ describe("parseAiMessagesJson", () => {
       const result = parseAiMessagesJson(msg);
       const part = (result[0].content as any[])[0];
       expect(part.providerOptions.openai).toBeUndefined();
-      expect(part.providerOptions["kapable-engine"]).toEqual({ someFlag: true });
+      expect(part.providerOptions["kapable-engine"]).toEqual({
+        someFlag: true,
+      });
     });
 
     it("should not modify string content messages", () => {

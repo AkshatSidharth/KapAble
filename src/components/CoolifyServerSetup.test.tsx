@@ -729,9 +729,12 @@ describe("when the user stops it", () => {
     // and reporting it says something went wrong while the screen says
     // nothing did.
     h.run.mockRejectedValue(
-      Object.assign(new KapableError("Cancelled.", KapableErrorKind.UserCancelled), {
-        code: SETUP_MACHINE_REPORTED,
-      }),
+      Object.assign(
+        new KapableError("Cancelled.", KapableErrorKind.UserCancelled),
+        {
+          code: SETUP_MACHINE_REPORTED,
+        },
+      ),
     );
     const user = userEvent.setup();
     renderPanel();

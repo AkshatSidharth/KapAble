@@ -41,7 +41,8 @@ import { IssueForm } from "./IssueForm";
 import { ScreenshotField } from "./ScreenshotField";
 import { ReportDisclosures } from "./ReportDisclosures";
 
-const UPLOAD_URL_ENDPOINT = "https://upload-logs.kapable.sh/generate-upload-url";
+const UPLOAD_URL_ENDPOINT =
+  "https://upload-logs.kapable.sh/generate-upload-url";
 
 /**
  * How long the dialog gets to leave the screen before the capture. Its close
@@ -847,7 +848,9 @@ export function HelpDialog() {
           <Button
             variant="outline"
             onClick={() =>
-              ipc.system.openExternalUrl("https://www.kapable.sh/docs")
+              ipc.system.openExternalUrl(
+                "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md",
+              )
             }
             className="w-full py-6 bg-(--background-lightest)"
           >

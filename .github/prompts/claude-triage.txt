@@ -39,7 +39,7 @@ CURRENT_VERSION: {{CURRENT_VERSION}}
 {{RELEASE_INDEX}}
 ```
 
-Release notes for a version live at `https://www.kapable.sh/docs/releases/<version>`.
+Release notes for a version live at `https://github.com/AkshatSidharth/KapAble/releases/tag/v<version>`.
 `gh release view v<version>` lists the pull requests in that release; use it to
 confirm a fix shipped before you say so.
 

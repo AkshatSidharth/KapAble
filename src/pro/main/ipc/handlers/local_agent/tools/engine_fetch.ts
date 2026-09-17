@@ -72,7 +72,10 @@ export async function engineFetch(
   const apiKey = settings.providerSettings?.auto?.apiKey?.value;
 
   if (!apiKey) {
-    throw new KapableError("KapAble Pro API key is required", KapableErrorKind.Auth);
+    throw new KapableError(
+      "KapAble Pro API key is required",
+      KapableErrorKind.Auth,
+    );
   }
 
   const {

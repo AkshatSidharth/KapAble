@@ -135,7 +135,11 @@ if (values["dry-run"]) {
   process.exit(0);
 }
 
-if (matrix.length > 0 && authMode === "kapable-pro" && !process.env.KAPABLE_PRO_KEY) {
+if (
+  matrix.length > 0 &&
+  authMode === "kapable-pro" &&
+  !process.env.KAPABLE_PRO_KEY
+) {
   throw new Error(
     "KAPABLE_PRO_KEY must be set in .env for KapAble Engine benchmark runs",
   );

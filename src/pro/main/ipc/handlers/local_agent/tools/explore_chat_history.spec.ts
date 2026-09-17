@@ -63,10 +63,14 @@ describe("exploreChatHistoryTool contract", () => {
   it("is enabled only for KapAble Pro contexts", () => {
     expect(exploreChatHistoryTool.isEnabled).toBeDefined();
     expect(
-      exploreChatHistoryTool.isEnabled!(makeAgentContext({ isKapablePro: true })),
+      exploreChatHistoryTool.isEnabled!(
+        makeAgentContext({ isKapablePro: true }),
+      ),
     ).toBe(true);
     expect(
-      exploreChatHistoryTool.isEnabled!(makeAgentContext({ isKapablePro: false })),
+      exploreChatHistoryTool.isEnabled!(
+        makeAgentContext({ isKapablePro: false }),
+      ),
     ).toBe(false);
   });
 });

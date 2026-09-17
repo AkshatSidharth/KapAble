@@ -1,4 +1,8 @@
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { IS_TEST_BUILD } from "@/ipc/utils/test_utils";
 import { retryWithRateLimit } from "@/ipc/utils/retryWithRateLimit";
 import { renderTestDatabaseSchema } from "@/lib/test_database_schema";
@@ -88,7 +92,7 @@ export async function getPublishableKey({
   // generated client as `undefined`.
   if (!publishableKey?.api_key) {
     throw new KapableError(
-      "KapAble couldn't find a publishable key for this Supabase project. It may be paused or connected through the wrong Supabase account. Resume the project in Supabase, or reconnect the correct project in KapAble. See https://kapable.sh/docs/integrations/supabase#no-publishable-keys",
+      "KapAble couldn't find a publishable key for this Supabase project. It may be paused or connected through the wrong Supabase account. Resume the project in Supabase, or reconnect the correct project in KapAble. See https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#supabase",
       KapableErrorKind.NotFound,
     );
   }

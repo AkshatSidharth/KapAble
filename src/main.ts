@@ -14,6 +14,7 @@ import * as path from "node:path";
 import { randomUUID } from "node:crypto";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { hostedServices } from "@/constants/brand";
 import { registerIpcHandlers } from "./ipc/ipc_host";
 import dotenv from "dotenv";
 import { updateElectronApp, UpdateSourceType } from "update-electron-app";
@@ -159,7 +160,11 @@ import {
   restorableVisibleEntity,
   type WindowSessionDescriptor,
 } from "./window_infrastructure/main/window_session";
-import { KapableError, KapableErrorKind, isKapableError } from "./errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "./errors/kapable_error";
 import {
   formatErrorBanner,
   formatExitBanner,
@@ -612,13 +617,24 @@ export async function onReady() {
     managed_node_version: managedNodeVersion,
   });
 
-  logger.info("Auto-update enabled=", settings.enableAutoUpdate);
-  if (settings.enableAutoUpdate) {
+  // KapAble does not operate an update feed. Upstream Dyad pointed this at its rebrand:keep
+  // own api.kapable.sh host; leaving that rebranded would have the updater poll a
+  // domain this fork does not own every 60 minutes and log an error each time.
+  // Set KAPABLE_UPDATE_FEED_URL to your own Electron update service to turn
+  // auto-update back on.
+  const updateFeedBaseUrl = hostedServices.updateFeedUrl();
+  logger.info(
+    "Auto-update enabled=",
+    settings.enableAutoUpdate,
+    "feed configured=",
+    Boolean(updateFeedBaseUrl),
+  );
+  if (settings.enableAutoUpdate && updateFeedBaseUrl) {
     // Technically we could just pass the releaseChannel directly to the host,
     // but this is more explicit and falls back to stable if there's an unknown
     // release channel.
     const postfix = settings.releaseChannel === "beta" ? "beta" : "stable";
-    const host = `https://api.kapable.sh/v1/update/${postfix}`;
+    const host = `${updateFeedBaseUrl.replace(/\/+$/, "")}/${postfix}`;
     logger.info("Auto-update release channel=", postfix);
     // update-electron-app logs updater errors at info level, which the
     // warn-filtered bug-report logs drop — leaving only the orphaned stack
@@ -860,7 +876,10 @@ const createWindow = ({
   rendererLoad: Promise<void>;
 } => {
   if (isAppQuitting) {
-    throw new KapableError("KapAble is shutting down", KapableErrorKind.Precondition);
+    throw new KapableError(
+      "KapAble is shutting down",
+      KapableErrorKind.Precondition,
+    );
   }
 
   // Create the browser window.
@@ -1356,7 +1375,9 @@ protocol.registerSchemesAsPrivileged([
 // A cold-start protocol URL arrives in argv before any renderer is ready.
 // Queue it in both production and E2E builds; the latter skips only the
 // singleton lock so parallel test processes can coexist.
-const initialDeepLink = process.argv.find((arg) => arg.startsWith("kapable://"));
+const initialDeepLink = process.argv.find((arg) =>
+  arg.startsWith("kapable://"),
+);
 if (initialDeepLink) {
   deepLinkQueue.handle(initialDeepLink);
 }

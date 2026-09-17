@@ -112,7 +112,9 @@ describe("local_agent_prompt", () => {
     expect(prompt).not.toContain(
       '<kapable-command type="rebuild"></kapable-command>',
     );
-    expect(prompt).toContain('<kapable-command type="refresh"></kapable-command>');
+    expect(prompt).toContain(
+      '<kapable-command type="refresh"></kapable-command>',
+    );
     expect(prompt).toContain(
       "selecting **Clear Cache** to clear cookies, local storage, service workers, and cached data",
     );

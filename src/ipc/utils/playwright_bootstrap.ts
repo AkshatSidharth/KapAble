@@ -1551,7 +1551,10 @@ export async function ensurePlaywrightBootstrap({
       timeoutMs: 5 * 60 * 1000,
     });
     if (installDep.aborted) {
-      throw new KapableError("Test setup cancelled.", KapableErrorKind.Precondition);
+      throw new KapableError(
+        "Test setup cancelled.",
+        KapableErrorKind.Precondition,
+      );
     }
     if (installDep.code !== 0) {
       throw new KapableError(
@@ -1635,7 +1638,10 @@ export async function ensurePlaywrightBootstrap({
       timeoutMs: 10 * 60 * 1000,
     });
     if (installBrowser.aborted) {
-      throw new KapableError("Test setup cancelled.", KapableErrorKind.Precondition);
+      throw new KapableError(
+        "Test setup cancelled.",
+        KapableErrorKind.Precondition,
+      );
     }
     if (installBrowser.code !== 0) {
       throw new KapableError(

@@ -594,7 +594,9 @@ describe("parseMinidumpBuffer", () => {
 
   it("extracts the debug identity from a pdb70 CodeView record", () => {
     const dump = buildMinidump({
-      modules: [{ base: 0x400000n, size: 0x1000, name: "C:\\app\\kapable.exe" }],
+      modules: [
+        { base: 0x400000n, size: 0x1000, name: "C:\\app\\kapable.exe" },
+      ],
       cvRecord: {
         kind: "pdb70",
         // Little endian GUID fields print big endian, so bytes

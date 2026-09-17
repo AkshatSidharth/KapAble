@@ -180,9 +180,13 @@ describe("generateDeployKeyPair", () => {
   it.skipIf(!hasSshKeygen)("stores the comment where OpenSSH finds it", () => {
     const keyPath = keyFile("commented");
     fs.mkdirSync(path.dirname(keyPath), { recursive: true });
-    fs.writeFileSync(keyPath, generateDeployKeyPair("kapable-deploy").privateKey, {
-      mode: 0o600,
-    });
+    fs.writeFileSync(
+      keyPath,
+      generateDeployKeyPair("kapable-deploy").privateKey,
+      {
+        mode: 0o600,
+      },
+    );
 
     const derived = execFileSync("ssh-keygen", ["-y", "-f", keyPath], {
       encoding: "utf8",

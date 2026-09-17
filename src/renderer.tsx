@@ -110,16 +110,40 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
+// KapAble ships with analytics switched off. Upstream Dyad hard-coded its own rebrand:keep
+// PostHog project key here, so an opted-in KapAble user would have reported
+// into a project this fork does not own. Supply VITE_KAPABLE_POSTHOG_KEY at
+// build time to send analytics to your own project instead.
+//
+// With no key configured the client is still constructed — PostHogProvider and
+// the posthog.capture() call sites throughout the app expect one — but it is
+// opted out of capturing and has remote config disabled, so it issues no
+// network requests. before_send below is a second, independent stop.
+// @ts-ignore - import.meta.env is provided by Vite; see the `debug` line below.
+const posthogProjectKey = import.meta.env.VITE_KAPABLE_POSTHOG_KEY as
+  | string
+  | undefined;
+const analyticsEnabled = Boolean(posthogProjectKey);
+
 const posthogClient = posthog.init(
-  "phc_5Vxx0XT8Ug3eWROhP6mm4D6D2DgIIKT232q4AKxC2ab",
+  posthogProjectKey ?? "phc-kapable-analytics-disabled",
   {
-    api_host: "https://us.i.posthog.com",
+    api_host:
+      // @ts-ignore - import.meta.env is provided by Vite.
+      (import.meta.env.VITE_KAPABLE_POSTHOG_HOST as string | undefined) ??
+      "https://us.i.posthog.com",
+    opt_out_capturing_by_default: !analyticsEnabled,
+    advanced_disable_decide: !analyticsEnabled,
     // @ts-ignore
     debug: import.meta.env.MODE === "development",
     autocapture: false,
     capture_exceptions: true,
     capture_pageview: false,
     before_send: (event) => {
+      if (!analyticsEnabled) {
+        // No analytics project configured for this build.
+        return null;
+      }
       if (!isTelemetryOptedIn()) {
         console.debug("Telemetry not opted in, skipping event");
         return null;

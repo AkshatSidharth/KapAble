@@ -280,7 +280,11 @@ describe("SubscriptionStatusBanner", () => {
   });
 
   it.each([
-    ["pt-BR", "Sua assinatura do KapAble Pro está pausada.", "Retomar assinatura"],
+    [
+      "pt-BR",
+      "Sua assinatura do KapAble Pro está pausada.",
+      "Retomar assinatura",
+    ],
     ["zh-CN", "您的 KapAble Pro 订阅已暂停。", "恢复订阅"],
   ])("renders localized copy in %s", async (language, text, action) => {
     await i18n.changeLanguage(language);

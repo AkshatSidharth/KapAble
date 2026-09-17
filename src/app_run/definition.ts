@@ -11,7 +11,11 @@ import {
 } from "@/distributed_machines/operation_registry";
 import type { RequestId } from "@/distributed_machines/request_identity";
 import { defineRuntimeRemoteIntentContract } from "@/distributed_machines/remote_intent_contract";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { addLog } from "@/lib/log_store";
 import { appRuntimeService } from "@/ipc/services/app_runtime_service";
 import { REMOTE_MACHINE_PROTOCOL_VERSION } from "@/distributed_machines/remote_protocol";

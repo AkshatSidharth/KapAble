@@ -137,7 +137,9 @@ describe("mergeWindowsPathSegments", () => {
         "C:\\kapable\\managed;C:\\Windows\\system32",
         "C:\\Windows\\system32;C:\\Program Files\\nodejs",
       ),
-    ).toBe("C:\\kapable\\managed;C:\\Windows\\system32;C:\\Program Files\\nodejs");
+    ).toBe(
+      "C:\\kapable\\managed;C:\\Windows\\system32;C:\\Program Files\\nodejs",
+    );
   });
 
   it("dedupes case-insensitively and ignores trailing slashes", () => {

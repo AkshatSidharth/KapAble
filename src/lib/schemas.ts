@@ -722,7 +722,8 @@ export function getEffectiveDefaultChatMode(
  */
 export function isBasicAgentMode(settings: UserSettings): boolean {
   return (
-    !isKapableProEnabled(settings) && settings.selectedChatMode === "local-agent"
+    !isKapableProEnabled(settings) &&
+    settings.selectedChatMode === "local-agent"
   );
 }
 

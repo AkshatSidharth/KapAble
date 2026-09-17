@@ -692,7 +692,10 @@ describe("runServerSetup", () => {
     await expect(
       run(server, {
         onCredentialsBuilt: () => {
-          throw new KapableError("nowhere to keep it", KapableErrorKind.External);
+          throw new KapableError(
+            "nowhere to keep it",
+            KapableErrorKind.External,
+          );
         },
       }).promise,
     ).rejects.toThrow(/nowhere to keep it/);

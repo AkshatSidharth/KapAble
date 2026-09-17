@@ -87,7 +87,7 @@ function PackageManagerWarningBannerContent({
   const handleOpenDocs = () => {
     void ipc.system.openExternalUrl(
       isPnpmMigrationWarning
-        ? "https://kapable.sh/docs/upgrades/pnpm-migration"
+        ? "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#upgrades"
         : "https://pnpm.io/installation",
     );
   };

@@ -12,7 +12,9 @@ interface KapableEnableNitroProps {
   state?: CustomTagState;
 }
 
-export const KapableEnableNitro: React.FC<KapableEnableNitroProps> = ({ state }) => {
+export const KapableEnableNitro: React.FC<KapableEnableNitroProps> = ({
+  state,
+}) => {
   const isPending = state === "pending";
   const isAborted = state === "aborted";
   const headline = isPending

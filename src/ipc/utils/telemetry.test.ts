@@ -132,7 +132,9 @@ describe("shouldFilterTelemetryException", () => {
       ),
     ).toBe(false);
     expect(
-      shouldFilterTelemetryException(new KapableError("?", KapableErrorKind.Unknown)),
+      shouldFilterTelemetryException(
+        new KapableError("?", KapableErrorKind.Unknown),
+      ),
     ).toBe(false);
   });
 });

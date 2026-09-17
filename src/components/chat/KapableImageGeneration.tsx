@@ -76,7 +76,10 @@ export const KapableImageGeneration: React.FC<KapableImageGenerationProps> = ({
       >
         <div className="flex items-start">
           <div className="flex-1 min-w-0">
-            <KapableCardHeader icon={<ImageIcon size={15} />} accentColor="violet">
+            <KapableCardHeader
+              icon={<ImageIcon size={15} />}
+              accentColor="violet"
+            >
               <KapableBadge color="violet">Image Generation</KapableBadge>
               {!isExpanded && prompt && (
                 <span className="text-sm text-muted-foreground italic truncate">

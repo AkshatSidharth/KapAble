@@ -79,7 +79,10 @@ function getVercelAccessToken(): string {
   const settings = readSettings();
   const accessToken = settings.vercelAccessToken?.value;
   if (!accessToken) {
-    throw new KapableError("Not authenticated with Vercel.", KapableErrorKind.Auth);
+    throw new KapableError(
+      "Not authenticated with Vercel.",
+      KapableErrorKind.Auth,
+    );
   }
   return accessToken;
 }

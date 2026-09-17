@@ -72,7 +72,9 @@ it.each(["loading", "free", "pro"])(
       ).not.toBeInTheDocument();
     }
     if (state === "pro") {
-      expect(screen.getByText(/Uses up to 1.5 KapAble Pro credits/)).toBeVisible();
+      expect(
+        screen.getByText(/Uses up to 1.5 KapAble Pro credits/),
+      ).toBeVisible();
     } else {
       expect(
         screen.queryByText(/Uses up to 1.5 KapAble Pro credits/),

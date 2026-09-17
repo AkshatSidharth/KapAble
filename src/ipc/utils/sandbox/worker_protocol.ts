@@ -1,4 +1,8 @@
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import type { SandboxHostCallName } from "./capabilities";
 import type { SandboxRunResult } from "./execution";
 

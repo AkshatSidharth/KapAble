@@ -9,7 +9,11 @@ import {
   refreshSupabaseToken,
 } from "./supabase_management_client";
 import { hasSupabaseCredentialsForOrganization } from "../lib/schemas";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { readSettings } from "@/main/settings";
 import { SUPABASE_PROJECT_CREATED_BUT_UNLINKED } from "@/ipc/types/supabase";
 

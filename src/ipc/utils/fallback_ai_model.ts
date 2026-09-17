@@ -443,7 +443,10 @@ class FallbackModel implements LanguageModelV3 {
       );
     }
     if (model.specificationVersion !== "v3") {
-      throw new KapableError("Model is not a v3 model", KapableErrorKind.External);
+      throw new KapableError(
+        "Model is not a v3 model",
+        KapableErrorKind.External,
+      );
     }
     return model;
   }

@@ -137,7 +137,10 @@ ${summary}
     });
 
     if (!chat || !chat.app) {
-      throw new KapableError("Chat or app not found.", KapableErrorKind.NotFound);
+      throw new KapableError(
+        "Chat or app not found.",
+        KapableErrorKind.NotFound,
+      );
     }
 
     const appId = chat.app.id;

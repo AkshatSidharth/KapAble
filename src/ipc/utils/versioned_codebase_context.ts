@@ -40,7 +40,8 @@ export function parseFilesFromMessage(content: string): string[] {
   const matches: TagMatch[] = [];
 
   // Parse <kapable-read path="$filePath"></kapable-read>
-  const kapableReadRegex = /<kapable-read\s+path="([^"]+)"[^>]*><\/kapable-read>/gs;
+  const kapableReadRegex =
+    /<kapable-read\s+path="([^"]+)"[^>]*><\/kapable-read>/gs;
   let match: RegExpExecArray | null;
   while ((match = kapableReadRegex.exec(content)) !== null) {
     const filePath = normalizePath(match[1].trim());

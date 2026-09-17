@@ -148,7 +148,8 @@ const ignore = (file: string) => {
 
 const isEndToEndTestBuild = process.env.E2E_TEST_BUILD === "true";
 const isWindowsSigningEnabled = process.env.WINDOWS_SIGN === "true";
-const shouldSkipNativeRebuild = process.env.KAPABLE_SKIP_NATIVE_REBUILD === "true";
+const shouldSkipNativeRebuild =
+  process.env.KAPABLE_SKIP_NATIVE_REBUILD === "true";
 const nativeRebuildModules = [
   "better-sqlite3",
   "node-pty",

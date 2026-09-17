@@ -11,7 +11,10 @@ export function useCreateApp() {
   const mutation = useMutation<CreateAppResult, Error, CreateAppParams>({
     mutationFn: async (params: CreateAppParams) => {
       if (!params.name.trim()) {
-        throw new KapableError("App name is required", KapableErrorKind.Validation);
+        throw new KapableError(
+          "App name is required",
+          KapableErrorKind.Validation,
+        );
       }
 
       return ipc.app.createApp(params);

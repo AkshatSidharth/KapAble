@@ -90,7 +90,7 @@ const CRASH_SENTINEL_FILE = "session.lock";
 const RENDERER_CRASH_FILE = "renderer-crash.json";
 const SETTINGS_FILE = "user-settings.json";
 const RESTORE_SETTINGS_DOCS_URL =
-  "https://www.kapable.sh/docs/guides/migrate-restore#restoring-settings-from-backup";
+  "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#backup-and-restore";
 let initialLoadIsFirstSession = false;
 
 export function setInitialLoadIsFirstSession(value: boolean): void {

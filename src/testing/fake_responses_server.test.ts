@@ -13,7 +13,9 @@ describe("fake Responses API routing", () => {
   let dumpDir: string;
 
   beforeAll(async () => {
-    dumpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kapable-responses-test-"));
+    dumpDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "kapable-responses-test-"),
+    );
     vi.stubEnv("FAKE_LLM_DUMP_DIR", dumpDir);
     vi.stubEnv("FAKE_LLM_QUIET", "1");
     server = await startFakeLlmServer();

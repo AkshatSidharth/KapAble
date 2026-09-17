@@ -1,5 +1,6 @@
 import log from "electron-log";
 import { z } from "zod";
+import { hostedServices } from "@/constants/brand";
 
 const logger = log.scope("remote_desktop_config");
 
@@ -28,16 +29,25 @@ let remoteDesktopConfigCache: RemoteDesktopConfigCacheEntry | null = null;
 let remoteDesktopConfigFetchPromise: Promise<RemoteDesktopConfig | null> | null =
   null;
 
-function getRemoteDesktopConfigUrl() {
+function getRemoteDesktopConfigUrl(): string | undefined {
   if (process.env.KAPABLE_DESKTOP_CONFIG_URL) {
     return process.env.KAPABLE_DESKTOP_CONFIG_URL;
   }
 
-  return "https://api.kapable.sh/v1/desktop-config";
+  // KapAble serves no remote desktop config; callers fall back to local
+  // defaults when this is undefined.
+  const apiBaseUrl = hostedServices.apiBaseUrl();
+  return apiBaseUrl
+    ? `${apiBaseUrl.replace(/\/+$/, "")}/v1/desktop-config`
+    : undefined;
 }
 
 async function fetchRemoteDesktopConfig(): Promise<RemoteDesktopConfig | null> {
-  const response = await fetch(getRemoteDesktopConfigUrl(), {
+  const configUrl = getRemoteDesktopConfigUrl();
+  if (!configUrl) {
+    return null;
+  }
+  const response = await fetch(configUrl, {
     signal: AbortSignal.timeout(REMOTE_DESKTOP_CONFIG_TIMEOUT_MS),
   });
 

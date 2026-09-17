@@ -571,8 +571,8 @@ export function CoolifyConnector({ appId }: { appId: number | null }) {
           <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
             <p>
               This address is not encrypted, so anything on the network between
-              you and the server can read what KapAble sends over it. That is not
-              only the API token: deploying also uploads the SSH private key
+              you and the server can read what KapAble sends over it. That is
+              not only the API token: deploying also uploads the SSH private key
               Coolify uses to clone your repository, and your database
               connection string with its password. Giving Coolify a domain and
               certificate avoids this.
@@ -705,8 +705,8 @@ export function CoolifyConnector({ appId }: { appId: number | null }) {
 
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted-foreground">
-            KapAble cannot tell when servers or projects change in Coolify, so this
-            list is cached. Refresh after adding one.
+            KapAble cannot tell when servers or projects change in Coolify, so
+            this list is cached. Refresh after adding one.
           </p>
           {/* Outside the error card: rotating a token or moving to another
               instance must not require breaking discovery first. */}

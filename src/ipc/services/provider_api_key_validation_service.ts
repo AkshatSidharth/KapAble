@@ -3,7 +3,11 @@ import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { streamText, type LanguageModel } from "ai";
 import log from "electron-log";
 
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import type { ProviderApiKeyValidationProvider } from "@/ipc/types";
 import { readEffectiveSettings } from "@/main/settings";
 import {
@@ -49,7 +53,10 @@ export async function validateProviderApiKey({
   const providerDisplayName = PROVIDER_DISPLAY_NAMES[provider];
 
   if (!normalizedApiKey) {
-    throw new KapableError("API Key cannot be empty.", KapableErrorKind.Validation);
+    throw new KapableError(
+      "API Key cannot be empty.",
+      KapableErrorKind.Validation,
+    );
   }
 
   const invalidCharacter = findInvalidProviderApiKeyCharacter(normalizedApiKey);

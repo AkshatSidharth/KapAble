@@ -240,7 +240,7 @@ export function normalizeTriage(
     }
     fixedIn = {
       version,
-      url: `https://www.kapable.sh/docs/releases/${version}`,
+      url: `https://github.com/AkshatSidharth/KapAble/releases/tag/v${version}`,
     };
   }
   if (assessment === "fixed_in_release" && !fixedIn) {

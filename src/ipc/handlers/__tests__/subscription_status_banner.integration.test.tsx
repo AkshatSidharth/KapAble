@@ -22,7 +22,8 @@ describe("subscription status banner (integration)", () => {
         JSON.stringify({
           alert: "subscription_paused",
           effectiveAt: "2026-08-03T00:00:00.000Z",
-          actionUrl: "https://academy.kapable.sh/subscription?source=integration",
+          actionUrl:
+            "https://academy.kapable.sh/subscription?source=integration",
         }),
       );
     });
@@ -57,7 +58,8 @@ describe("subscription status banner (integration)", () => {
     if (previousSubscriptionStatusUrl === undefined) {
       delete process.env.KAPABLE_SUBSCRIPTION_STATUS_URL;
     } else {
-      process.env.KAPABLE_SUBSCRIPTION_STATUS_URL = previousSubscriptionStatusUrl;
+      process.env.KAPABLE_SUBSCRIPTION_STATUS_URL =
+        previousSubscriptionStatusUrl;
     }
   });
 

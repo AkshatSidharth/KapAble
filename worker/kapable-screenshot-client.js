@@ -136,7 +136,10 @@
       }
       throw new Error("html-to-image library not found");
     } catch (error) {
-      console.error("[kapable-screenshot] Failed to capture screenshot:", error);
+      console.error(
+        "[kapable-screenshot] Failed to capture screenshot:",
+        error,
+      );
       throw error;
     }
   }

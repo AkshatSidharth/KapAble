@@ -256,7 +256,9 @@ export class Settings {
       .filter({ hasText: /^KapableNeeds Setup$/ })
       .nth(1)
       .click();
-    await this.page.getByRole("textbox", { name: "Set KapAble API Key" }).click();
+    await this.page
+      .getByRole("textbox", { name: "Set KapAble API Key" })
+      .click();
     await this.page
       .getByRole("textbox", { name: "Set KapAble API Key" })
       .fill("testkapablekey");

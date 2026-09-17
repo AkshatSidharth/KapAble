@@ -49,7 +49,10 @@ export const KapableSearchChats: React.FC<KapableSearchChatsProps> = ({
       isExpanded={isContentVisible}
       data-testid="kapable-search-chats"
     >
-      <KapableCardHeader icon={<MessagesSquare size={15} />} accentColor="violet">
+      <KapableCardHeader
+        icon={<MessagesSquare size={15} />}
+        accentColor="violet"
+      >
         <KapableBadge color="violet">{t("searchChatsTool.badge")}</KapableBadge>
         <span className="font-medium text-sm text-foreground truncate">
           {`"${query}"`}

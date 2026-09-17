@@ -4,10 +4,10 @@ import type {
   WindowOpenHandlerResponse,
 } from "electron";
 
-const RELEASE_NOTES_ORIGINS = new Set([
-  "https://kapable.sh",
-  "https://www.kapable.sh",
-]);
+// Release notes are served from the GitHub releases page (see
+// release_note_handlers.ts), so that is the only origin trusted to open a
+// window from a release-notes referrer.
+const RELEASE_NOTES_ORIGINS = new Set(["https://github.com"]);
 const RESERVED_FRAME_NAMES = new Set([
   "_parent",
   "_self",

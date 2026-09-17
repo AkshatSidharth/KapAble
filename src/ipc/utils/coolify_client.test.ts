@@ -83,7 +83,10 @@ describe("setEnv", () => {
 describe("registerPrivateKey", () => {
   it("reuses an existing key with the same name", async () => {
     const fetchMock = mockFetch([
-      { status: 200, body: '[{"uuid":"k1","name":"kapable_deploy_o_r","id":7}]' },
+      {
+        status: 200,
+        body: '[{"uuid":"k1","name":"kapable_deploy_o_r","id":7}]',
+      },
     ]);
     const result = await client().registerPrivateKey({
       name: "kapable_deploy_o_r",

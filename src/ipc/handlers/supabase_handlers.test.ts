@@ -326,7 +326,9 @@ describe("Supabase handlers", () => {
     it("marks a create that could not be linked with a stable code", async () => {
       insertApp();
       vi.spyOn(harness.db, "update").mockImplementationOnce(() => {
-        throw new Error("SQLITE_BUSY: /home/someone/.kapable/sqlite.db is locked");
+        throw new Error(
+          "SQLITE_BUSY: /home/someone/.kapable/sqlite.db is locked",
+        );
       });
 
       const thrown = await harness

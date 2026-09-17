@@ -113,7 +113,7 @@ export function ChatErrorBox({
             Upgrade to KapAble Pro
           </ExternalLink>
 
-          <ExternalLink href="https://kapable.sh/docs/help/ai-rate-limit">
+          <ExternalLink href="https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#ai-rate-limits">
             Troubleshooting guide
           </ExternalLink>
         </div>
@@ -158,8 +158,8 @@ export function ChatErrorBox({
     return (
       <ChatErrorContainer onDismiss={onDismiss}>
         You have used all {messagesLimit} free Basic Agent messages for today.
-        {resetText} This message was not sent. Upgrade to KapAble Pro for unlimited
-        Agent access
+        {resetText} This message was not sent. Upgrade to KapAble Pro for
+        unlimited Agent access
         {onSwitchToBuildMode
           ? ", or switch this chat to Build mode and send it again."
           : ". To use Build mode, first choose a model other than KapAble Free, then send it again."}
@@ -199,8 +199,8 @@ export function ChatErrorBox({
     return (
       <ChatErrorContainer onDismiss={onDismiss}>
         <span>
-          You have reached the {freeModelMessagesLimit}-message KapAble Free model
-          limit.
+          You have reached the {freeModelMessagesLimit}-message KapAble Free
+          model limit.
           {resetText} Switch to paid models.{" "}
           <ExternalLink
             href="https://academy.kapable.sh/subscription?utm_source=kapable-app&utm_medium=app&utm_campaign=exceeded-budget-error"
@@ -243,7 +243,7 @@ export function ChatErrorBox({
             </TooltipContent>
           </Tooltip>
         )}
-        <ExternalLink href="https://www.kapable.sh/docs/faq">
+        <ExternalLink href="https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#faq">
           Read docs
         </ExternalLink>
       </div>

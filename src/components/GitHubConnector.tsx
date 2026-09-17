@@ -74,11 +74,11 @@ interface LinkedGitHubRepo {
 function GitHubTroubleshootingLink({ className = "" }: { className?: string }) {
   return (
     <a
-      href="https://www.kapable.sh/docs/integrations/github#troubleshooting"
+      href="https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#github"
       onClick={(event) => {
         event.preventDefault();
         ipc.system.openExternalUrl(
-          "https://www.kapable.sh/docs/integrations/github#troubleshooting",
+          "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md#github",
         );
       }}
       className={`cursor-pointer text-blue-600 hover:underline dark:text-blue-400 ${className}`}

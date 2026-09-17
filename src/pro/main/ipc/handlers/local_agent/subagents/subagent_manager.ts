@@ -12,7 +12,11 @@ import {
   chats,
   messages,
 } from "@/db/schema";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { getModelClient } from "@/ipc/utils/get_model_client";
 import { getAiHeaders, getProviderOptions } from "@/ipc/utils/provider_options";
 import { withLock } from "@/ipc/utils/lock_utils";
@@ -2173,7 +2177,10 @@ async function getThread(threadId: string) {
     where: eq(agentThreads.id, threadId),
   });
   if (!thread)
-    throw new KapableError("Sub-agent thread not found.", KapableErrorKind.NotFound);
+    throw new KapableError(
+      "Sub-agent thread not found.",
+      KapableErrorKind.NotFound,
+    );
   return thread;
 }
 
@@ -2182,7 +2189,10 @@ async function getOwnedThread(chatId: number, threadId: string) {
     where: and(eq(agentThreads.id, threadId), eq(agentThreads.chatId, chatId)),
   });
   if (!thread)
-    throw new KapableError("Sub-agent thread not found.", KapableErrorKind.NotFound);
+    throw new KapableError(
+      "Sub-agent thread not found.",
+      KapableErrorKind.NotFound,
+    );
   return thread;
 }
 
@@ -2272,7 +2282,10 @@ async function buildCoordinatedReviewTarget(params: {
         with: { app: true },
       });
       if (!current?.app || current.app.id !== initial.app.id) {
-        throw new KapableError("Chat app not found.", KapableErrorKind.NotFound);
+        throw new KapableError(
+          "Chat app not found.",
+          KapableErrorKind.NotFound,
+        );
       }
       const appPath = getKapableAppPath(current.app.path);
       return {

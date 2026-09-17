@@ -118,7 +118,10 @@ try {
     __dirname,
     "kapable-recorder-client.js",
   );
-  kapableRecorderClientContent = fs.readFileSync(kapableRecorderClientPath, "utf-8");
+  kapableRecorderClientContent = fs.readFileSync(
+    kapableRecorderClientPath,
+    "utf-8",
+  );
   parentPort?.postMessage("[proxy-worker] kapable-recorder-client.js loaded.");
 } catch (error) {
   parentPort?.postMessage(
@@ -127,8 +130,14 @@ try {
 }
 
 try {
-  const kapableAuthBootstrapPath = path.join(__dirname, "kapable-auth-bootstrap.js");
-  kapableAuthBootstrapContent = fs.readFileSync(kapableAuthBootstrapPath, "utf-8");
+  const kapableAuthBootstrapPath = path.join(
+    __dirname,
+    "kapable-auth-bootstrap.js",
+  );
+  kapableAuthBootstrapContent = fs.readFileSync(
+    kapableAuthBootstrapPath,
+    "utf-8",
+  );
   parentPort?.postMessage("[proxy-worker] kapable-auth-bootstrap.js loaded.");
 } catch (error) {
   parentPort?.postMessage(
@@ -145,7 +154,9 @@ try {
     kapableScreenshotClientPath,
     "utf-8",
   );
-  parentPort?.postMessage("[proxy-worker] kapable-screenshot-client.js loaded.");
+  parentPort?.postMessage(
+    "[proxy-worker] kapable-screenshot-client.js loaded.",
+  );
 } catch (error) {
   parentPort?.postMessage(
     `[proxy-worker] Failed to read kapable-screenshot-client.js: ${error.message}`,

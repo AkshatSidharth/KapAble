@@ -192,7 +192,9 @@ describe("InProcessKeychainPasswordReader", () => {
 
     await withPlatform("linux", () => {
       const reader = new InProcessKeychainPasswordReader();
-      expect(reader.readPassword("kapable Safe Storage", "kapable Key")).toBeNull();
+      expect(
+        reader.readPassword("kapable Safe Storage", "kapable Key"),
+      ).toBeNull();
     });
     expect(loadCount).toBe(0);
   });
@@ -258,7 +260,9 @@ describe("InProcessKeychainPasswordReader", () => {
 
     await withPlatform("darwin", () => {
       const reader = new InProcessKeychainPasswordReader();
-      expect(reader.readPassword("kapable Safe Storage", "kapable Key")).toBeNull();
+      expect(
+        reader.readPassword("kapable Safe Storage", "kapable Key"),
+      ).toBeNull();
     });
   });
 
@@ -271,7 +275,9 @@ describe("InProcessKeychainPasswordReader", () => {
 
     await withPlatform("darwin", () => {
       const reader = new InProcessKeychainPasswordReader();
-      expect(reader.readPassword("kapable Safe Storage", "kapable Key")).toBeNull();
+      expect(
+        reader.readPassword("kapable Safe Storage", "kapable Key"),
+      ).toBeNull();
       expect(
         reader.readPassword("Chromium Safe Storage", "Chromium Key"),
       ).toBeNull();
@@ -345,7 +351,8 @@ describe("Keychain unlock recovery retry", () => {
     if (savedRecoveryKillSwitch === undefined) {
       delete process.env.KAPABLE_DISABLE_SAFE_STORAGE_RECOVERY;
     } else {
-      process.env.KAPABLE_DISABLE_SAFE_STORAGE_RECOVERY = savedRecoveryKillSwitch;
+      process.env.KAPABLE_DISABLE_SAFE_STORAGE_RECOVERY =
+        savedRecoveryKillSwitch;
     }
     if (savedPromptKillSwitch === undefined) {
       delete process.env.KAPABLE_DISABLE_SAFE_STORAGE_UNLOCK_PROMPT;
@@ -367,7 +374,9 @@ describe("Keychain unlock recovery retry", () => {
 
     await withPlatform("darwin", () => {
       const reader = new InProcessKeychainPasswordReader();
-      expect(reader.readPassword("kapable Safe Storage", "kapable Key")).toBeNull();
+      expect(
+        reader.readPassword("kapable Safe Storage", "kapable Key"),
+      ).toBeNull();
       expect(recoveryNeedsKeychainUnlock()).toBe(false);
     });
 

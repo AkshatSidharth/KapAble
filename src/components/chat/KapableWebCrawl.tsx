@@ -1,7 +1,11 @@
 import type React from "react";
 import type { ReactNode } from "react";
 import { ScanQrCode } from "lucide-react";
-import { KapableCard, KapableCardHeader, KapableBadge } from "./KapableCardPrimitives";
+import {
+  KapableCard,
+  KapableCardHeader,
+  KapableBadge,
+} from "./KapableCardPrimitives";
 
 interface KapableWebCrawlProps {
   children?: ReactNode;

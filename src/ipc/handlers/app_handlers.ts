@@ -152,7 +152,11 @@ import {
   MAX_FILE_SEARCH_SIZE,
   RIPGREP_EXCLUDED_GLOBS,
 } from "../utils/ripgrep_utils";
-import { KapableError, KapableErrorKind, isKapableError } from "@/errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "@/errors/kapable_error";
 import { detectFrameworkType } from "../utils/framework_utils";
 import { readAppFileForEditor } from "../utils/bounded_text_file";
 import { queryInvalidationBus } from "@/window_infrastructure/main/query_invalidation_bus";
@@ -1657,7 +1661,10 @@ export function registerAppHandlers() {
         if (appPath !== app.path) {
           const validationError = validateAppFolderName(appPath);
           if (validationError) {
-            throw new KapableError(validationError, KapableErrorKind.Validation);
+            throw new KapableError(
+              validationError,
+              KapableErrorKind.Validation,
+            );
           }
         }
 

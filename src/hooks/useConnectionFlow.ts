@@ -80,7 +80,9 @@ function mergeSnapshot(states: FlowSnapshot): void {
 }
 
 function isRevisionConflict(error: unknown): boolean {
-  return error instanceof KapableError && error.kind === KapableErrorKind.Conflict;
+  return (
+    error instanceof KapableError && error.kind === KapableErrorKind.Conflict
+  );
 }
 
 async function refreshSnapshot(): Promise<void> {

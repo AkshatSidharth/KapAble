@@ -114,7 +114,9 @@ export class MainAppRuntimeOutput implements AppRuntimeOutput {
 }
 
 function parseProxyReady(message: string): RunUrl | undefined {
-  const appUrl = message.match(/\[kapable-proxy-server\]started=\[(.*?)\]/)?.[1];
+  const appUrl = message.match(
+    /\[kapable-proxy-server\]started=\[(.*?)\]/,
+  )?.[1];
   const originalUrl = message.match(/original=\[(.*?)\]/)?.[1];
   const mode = message.match(/mode=\[(.*?)\]/)?.[1];
   if (

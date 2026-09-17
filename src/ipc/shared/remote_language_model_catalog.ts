@@ -23,6 +23,7 @@ import {
   OPUS_4_8,
   PROVIDER_TO_ENV_VAR,
 } from "./language_model_constants";
+import { hostedServices } from "@/constants/brand";
 
 const logger = log.scope("remote_language_model_catalog");
 
@@ -30,7 +31,7 @@ const REMOTE_LANGUAGE_MODEL_CATALOG_TIMEOUT_MS = 5_000;
 const DEFAULT_CACHE_TTL_MS = 60 * 60 * 1000;
 const FALLBACK_CACHE_TTL_MS = 30 * 1000;
 
-function getRemoteLanguageModelCatalogUrl() {
+function getRemoteLanguageModelCatalogUrl(): string | undefined {
   if (process.env.KAPABLE_LANGUAGE_MODEL_CATALOG_URL) {
     return process.env.KAPABLE_LANGUAGE_MODEL_CATALOG_URL;
   }
@@ -39,7 +40,13 @@ function getRemoteLanguageModelCatalogUrl() {
     return `http://localhost:${process.env.FAKE_LLM_PORT}/api/language-model-catalog`;
   }
 
-  return "https://api.kapable.sh/v1/language-model-catalog";
+  // KapAble hosts no catalog service. Undefined here makes the fetch
+  // short-circuit to buildFallbackCatalog(), the model list bundled in
+  // language_model_constants.ts.
+  const apiBaseUrl = hostedServices.apiBaseUrl();
+  return apiBaseUrl
+    ? `${apiBaseUrl.replace(/\/+$/, "")}/v1/language-model-catalog`
+    : undefined;
 }
 
 export type { ThemeGenerationModelOption };
@@ -364,6 +371,10 @@ function convertRemoteCatalog(
 async function fetchRemoteCatalog(): Promise<BuiltinLanguageModelCatalog | null> {
   const controller = new AbortController();
   const catalogUrl = getRemoteLanguageModelCatalogUrl();
+  if (!catalogUrl) {
+    // No catalog service configured: callers fall back to the bundled list.
+    return null;
+  }
   const timeoutId = setTimeout(
     () => controller.abort(),
     REMOTE_LANGUAGE_MODEL_CATALOG_TIMEOUT_MS,

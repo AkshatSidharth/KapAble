@@ -268,7 +268,9 @@ describe("chat stream persistence", () => {
     });
     expect(() =>
       persistQueuedIntent(database, intent("large-turn", "different")),
-    ).toThrowError(expect.objectContaining({ kind: KapableErrorKind.Conflict }));
+    ).toThrowError(
+      expect.objectContaining({ kind: KapableErrorKind.Conflict }),
+    );
   });
 
   it("rejects reuse of an intent id with a different payload", () => {
@@ -276,7 +278,9 @@ describe("chat stream persistence", () => {
 
     expect(() =>
       persistQueuedIntent(database, intent("turn-1", "Different")),
-    ).toThrowError(expect.objectContaining({ kind: KapableErrorKind.Conflict }));
+    ).toThrowError(
+      expect.objectContaining({ kind: KapableErrorKind.Conflict }),
+    );
   });
 
   it("rejects replay under a different invocation identity", () => {
@@ -296,7 +300,9 @@ describe("chat stream persistence", () => {
         ...replacement,
         payloadHash: computeChatTurnPayloadHash(replacement),
       }),
-    ).toThrowError(expect.objectContaining({ kind: KapableErrorKind.Conflict }));
+    ).toThrowError(
+      expect.objectContaining({ kind: KapableErrorKind.Conflict }),
+    );
   });
 
   it("updates both the queue projection and the intent dispatched later", async () => {

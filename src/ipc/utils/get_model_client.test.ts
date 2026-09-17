@@ -528,7 +528,9 @@ describe("getModelClient", () => {
         connection: "pro",
       },
     );
-    expect((result.modelClient.model as any).provider).toContain("kapable-engine");
+    expect((result.modelClient.model as any).provider).toContain(
+      "kapable-engine",
+    );
     expect(createCodexSubscriptionModel).not.toHaveBeenCalled();
   });
   afterEach(() => {

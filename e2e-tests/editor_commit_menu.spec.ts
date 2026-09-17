@@ -127,7 +127,11 @@ test("editor commit menu commits multiple staged files at once", async ({
     encoding: "utf-8",
   }).trim();
 
-  const madeWithKapablePath = path.join("src", "components", "made-with-kapable.tsx");
+  const madeWithKapablePath = path.join(
+    "src",
+    "components",
+    "made-with-kapable.tsx",
+  );
   const robotsPath = path.join("public", "robots.txt");
 
   await po.previewPanel.clickTogglePreviewPanel();
@@ -137,7 +141,8 @@ test("editor commit menu commits multiple staged files at once", async ({
   ).toBeHidden({ timeout: Timeout.LONG });
 
   // Edit and save two files. Saving stages (does not commit) each file.
-  const madeWithKapableContent = 'export const MadeWithKapable = "commit-menu";\n';
+  const madeWithKapableContent =
+    'export const MadeWithKapable = "commit-menu";\n';
   const robotsContent = "User-agent: *\nDisallow: /commit-menu\n";
   const madeWithKapableTreePath = madeWithKapablePath.replace(/\\/g, "/");
   const robotsTreePath = robotsPath.replace(/\\/g, "/");

@@ -14,7 +14,9 @@ vi.mock("react-i18next", () => ({
 
 describe("KapableExecuteSql", () => {
   it("shows a schema mutation indicator for DDL", () => {
-    render(<KapableExecuteSql>CREATE TABLE users (id bigint);</KapableExecuteSql>);
+    render(
+      <KapableExecuteSql>CREATE TABLE users (id bigint);</KapableExecuteSql>,
+    );
 
     expect(screen.getByText("Changes database schema")).toBeTruthy();
   });
@@ -38,7 +40,9 @@ describe("KapableExecuteSql", () => {
   });
 
   it("shows a destructive data indicator for deletes", () => {
-    render(<KapableExecuteSql>DELETE FROM users WHERE id = 1;</KapableExecuteSql>);
+    render(
+      <KapableExecuteSql>DELETE FROM users WHERE id = 1;</KapableExecuteSql>,
+    );
 
     expect(screen.getByText("Destructive data change")).toBeTruthy();
   });

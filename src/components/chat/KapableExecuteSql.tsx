@@ -82,7 +82,10 @@ export const KapableExecuteSql: React.FC<KapableExecuteSqlProps> = ({
           <KapableStateIndicator state="pending" pendingLabel="Executing..." />
         )}
         {aborted && (
-          <KapableStateIndicator state="aborted" abortedLabel="Did not finish" />
+          <KapableStateIndicator
+            state="aborted"
+            abortedLabel="Did not finish"
+          />
         )}
         <div className="ml-auto">
           <KapableExpandIcon isExpanded={isContentVisible} />

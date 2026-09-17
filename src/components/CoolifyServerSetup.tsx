@@ -265,9 +265,9 @@ export function CoolifyServerSetup({
           >
             <p className="font-medium">This server is not encrypted</p>
             <p className="text-muted-foreground">
-              {result.insecureReason} KapAble will still work, but its access token
-              crosses your network unencrypted every time it deploys. Adding a
-              domain that points at this server fixes it.
+              {result.insecureReason} KapAble will still work, but its access
+              token crosses your network unencrypted every time it deploys.
+              Adding a domain that points at this server fixes it.
             </p>
             {/* A decision rather than a notice, and only where there is one to
                 make: a token was created, and keeping it is what puts it on
@@ -376,10 +376,10 @@ export function CoolifyServerSetup({
   return (
     <div className="space-y-3" data-testid="coolify-server-setup">
       <p className="text-sm text-muted-foreground">
-        KapAble allows you to self-host an instance of Coolify to deploy your apps.
-        To install it you need a Linux server with root access and about 2GB of
-        memory. Easiest if you have not created the server yet, since the key
-        below can go in at that point.
+        KapAble allows you to self-host an instance of Coolify to deploy your
+        apps. To install it you need a Linux server with root access and about
+        2GB of memory. Easiest if you have not created the server yet, since the
+        key below can go in at that point.
       </p>
 
       {/* First because nothing else can happen until it is done. */}
@@ -480,8 +480,8 @@ export function CoolifyServerSetup({
           </p>
         )}
         <p className="mt-1 text-xs text-muted-foreground">
-          Point it at this server first. Leave blank and KapAble will set up HTTPS
-          using the server&apos;s address.
+          Point it at this server first. Leave blank and KapAble will set up
+          HTTPS using the server&apos;s address.
         </p>
       </div>
 
@@ -617,15 +617,15 @@ export function CoolifyServerSetup({
           className="text-sm text-muted-foreground"
           data-testid="coolify-setup-holds-account"
         >
-          KapAble is holding the admin password for {heldServerUrl}, and it has the
-          only copy. Sign out of Coolify to set up another — that shows the
+          KapAble is holding the admin password for {heldServerUrl}, and it has
+          the only copy. Sign out of Coolify to set up another — that shows the
           password one last time before forgetting it.
         </p>
       )}
       {!inspectionForHost && host.trim() && (
         <p className="text-sm text-muted-foreground">
-          Check the server first. KapAble shows you its fingerprint, and installs
-          only onto the machine that answered.
+          Check the server first. KapAble shows you its fingerprint, and
+          installs only onto the machine that answered.
         </p>
       )}
 

@@ -373,7 +373,10 @@ describe("main-hosted image generation actor", () => {
     });
     await vi.waitFor(() => expect(service.cancel).toHaveBeenCalledOnce());
     generation.reject(
-      new KapableError("Image generation cancelled", KapableErrorKind.UserCancelled),
+      new KapableError(
+        "Image generation cancelled",
+        KapableErrorKind.UserCancelled,
+      ),
     );
     await vi.waitFor(() =>
       expect(actorA.getSnapshot().jobs[0]?.status).toBe("cancelled"),

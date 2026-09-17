@@ -44,7 +44,10 @@ describe("release provenance generator", () => {
       collectReleaseArtifacts(directory).map(
         (artifact: { name: string }) => artifact.name,
       ),
-    ).toEqual(["kapable-1.10.0-beta.1.Setup.exe", "kapable_1.10.0.beta.1_amd64.deb"]);
+    ).toEqual([
+      "kapable-1.10.0-beta.1.Setup.exe",
+      "kapable_1.10.0.beta.1_amd64.deb",
+    ]);
   });
 
   it("hashes and sorts only published release artifact types", () => {

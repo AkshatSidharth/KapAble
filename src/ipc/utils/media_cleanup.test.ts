@@ -240,7 +240,11 @@ describe("cleanupOldMediaFiles", () => {
     fsMocks.stat.mockResolvedValue({ isFile: () => true, mtimeMs: oldMtimeMs });
     fsMocks.unlink.mockResolvedValue(undefined);
     mediaPathMocks.pruneAttachmentManifest.mockRejectedValue(pruneError);
-    const mediaDir = path.join("/home/user/kapable-apps", "my-app", ".kapable/media");
+    const mediaDir = path.join(
+      "/home/user/kapable-apps",
+      "my-app",
+      ".kapable/media",
+    );
 
     await cleanupOldMediaFiles();
 

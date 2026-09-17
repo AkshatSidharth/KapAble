@@ -47,7 +47,9 @@ async function createAppWithGitConfig(
 
 describe("scrubGithubTokenFromRemotes", () => {
   beforeEach(async () => {
-    appsBaseDir = await fs.mkdtemp(path.join(os.tmpdir(), "kapable-token-scrub-"));
+    appsBaseDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "kapable-token-scrub-"),
+    );
     appRows = [];
   });
 

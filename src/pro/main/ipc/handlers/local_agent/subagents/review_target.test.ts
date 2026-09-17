@@ -404,7 +404,9 @@ describe("buildReviewTarget", () => {
 });
 
 async function makeRepo(): Promise<string> {
-  const repo = await fs.mkdtemp(path.join(os.tmpdir(), "kapable-review-target-"));
+  const repo = await fs.mkdtemp(
+    path.join(os.tmpdir(), "kapable-review-target-"),
+  );
   tempDirs.push(repo);
   await git(repo, "init");
   await git(repo, "config", "user.email", "test@example.com");

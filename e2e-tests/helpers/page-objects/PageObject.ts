@@ -565,7 +565,10 @@ export class PageObject {
             /\.kapable\/chats\/\d+\/compaction-[^\s<"]+\.md/g,
             "[[compaction-backup-path]]",
           )
-          .replace(/\[\[kapable-dump-path=([^\]]+)\]\]/g, "[[kapable-dump-path=*]]");
+          .replace(
+            /\[\[kapable-dump-path=([^\]]+)\]\]/g,
+            "[[kapable-dump-path=*]]",
+          );
       }
       return `${normalizedSnapshot.trimEnd()}\n`;
     }, name);
@@ -628,7 +631,10 @@ export class PageObject {
 
     // Read the JSON file
     const dumpContent: string = (fs.readFileSync(dumpFilePath, "utf-8") as any)
-      .replaceAll(/\[\[kapable-dump-path=([^\]]+)\]\]/g, "[[kapable-dump-path=*]]")
+      .replaceAll(
+        /\[\[kapable-dump-path=([^\]]+)\]\]/g,
+        "[[kapable-dump-path=*]]",
+      )
       // Stabilize compaction backup file paths embedded in message text
       // e.g. .kapable/chats/1/compaction-2026-02-05T21-25-24-285Z.md
       .replaceAll(

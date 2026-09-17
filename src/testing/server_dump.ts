@@ -243,7 +243,10 @@ export function extractDumpPaths(text: string): string[] {
 
 function scrubDumpFileContent(raw: string): string {
   return raw
-    .replaceAll(/\[\[kapable-dump-path=([^\]]+)\]\]/g, "[[kapable-dump-path=*]]")
+    .replaceAll(
+      /\[\[kapable-dump-path=([^\]]+)\]\]/g,
+      "[[kapable-dump-path=*]]",
+    )
     .replaceAll(
       /\.kapable[\\/]+chats[\\/]+\d+[\\/]+compaction-[^\s"\\]+\.md/g,
       "[[compaction-backup-path]]",

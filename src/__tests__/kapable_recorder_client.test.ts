@@ -37,7 +37,8 @@ function setup({ allowUntrusted = true }: { allowUntrusted?: boolean } = {}) {
   const parent = {
     postMessage: (msg: any) => {
       messages.push(msg);
-      if (msg && msg.type === "kapable-recorder-action") actions.push(msg.action);
+      if (msg && msg.type === "kapable-recorder-action")
+        actions.push(msg.action);
     },
   };
 

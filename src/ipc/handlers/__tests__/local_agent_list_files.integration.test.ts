@@ -121,9 +121,9 @@ describe("local-agent list_files (integration)", () => {
     // A second list_files card renders for the recursive turn.
     await waitFor(
       () =>
-        expect(screen.getAllByTestId("kapable-list-files").length).toBeGreaterThan(
-          1,
-        ),
+        expect(
+          screen.getAllByTestId("kapable-list-files").length,
+        ).toBeGreaterThan(1),
       { timeout: 20_000 },
     );
 

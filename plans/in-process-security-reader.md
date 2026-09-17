@@ -38,7 +38,7 @@ Identities queried, in order (see `LEGACY_IDENTITIES`):
 
 | service                 | account        |
 | ----------------------- | -------------- |
-| `kapable Safe Storage`     | `kapable Key`     |
+| `kapable Safe Storage`  | `kapable Key`  |
 | `Chromium Safe Storage` | `Chromium Key` |
 
 ### Why the CLI reader prompts and the in-process reader shouldn't

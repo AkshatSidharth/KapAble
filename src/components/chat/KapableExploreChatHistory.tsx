@@ -27,10 +27,9 @@ interface KapableExploreChatHistoryProps {
   };
 }
 
-export const KapableExploreChatHistory: React.FC<KapableExploreChatHistoryProps> = ({
-  children,
-  node,
-}) => {
+export const KapableExploreChatHistory: React.FC<
+  KapableExploreChatHistoryProps
+> = ({ children, node }) => {
   const { t } = useTranslation("chat");
   const state = node?.properties?.state as CustomTagState;
   const inProgress = state === "pending";
@@ -66,7 +65,9 @@ export const KapableExploreChatHistory: React.FC<KapableExploreChatHistoryProps>
       data-testid="kapable-explore-chat-history"
     >
       <KapableCardHeader icon={<History size={15} />} accentColor="purple">
-        <KapableBadge color="purple">{t("exploreChatHistory.badge")}</KapableBadge>
+        <KapableBadge color="purple">
+          {t("exploreChatHistory.badge")}
+        </KapableBadge>
         <span className="font-medium text-sm text-foreground truncate">
           {query ? `"${query}"` : t("exploreChatHistory.title")}
         </span>

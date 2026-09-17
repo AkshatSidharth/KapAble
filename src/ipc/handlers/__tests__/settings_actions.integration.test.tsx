@@ -134,7 +134,9 @@ describe("settings actions (integration)", () => {
     expect(
       within(dialog).getByRole("heading", { name: "API key rejected" }),
     ).toBeTruthy();
-    expect(within(dialog).getByText(/KapAble rejected this API key/)).toBeTruthy();
+    expect(
+      within(dialog).getByText(/KapAble rejected this API key/),
+    ).toBeTruthy();
     fireEvent.click(
       within(dialog).getByRole("button", { name: "Try another API key" }),
     );
@@ -148,7 +150,9 @@ describe("settings actions (integration)", () => {
     await screen.findByText("Current Key (Settings)");
     await waitFor(() => {
       const settings = readSettings();
-      expect(settings.providerSettings.auto?.apiKey?.value).toBe("testkapablekey");
+      expect(settings.providerSettings.auto?.apiKey?.value).toBe(
+        "testkapablekey",
+      );
       expect(settings.enableKapablePro).toBe(true);
     });
   }, 60_000);

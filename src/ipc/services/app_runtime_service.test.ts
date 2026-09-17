@@ -1068,7 +1068,9 @@ describe("executeApp", () => {
   it("surfaces a proxy port-exhaustion error to the renderer", async () => {
     const terminate = vi.fn();
     startProxyMock.mockImplementation(async (_originalUrl, opts) => {
-      opts.onError?.(new KapableError("all ports in use", KapableErrorKind.Conflict));
+      opts.onError?.(
+        new KapableError("all ports in use", KapableErrorKind.Conflict),
+      );
       return { terminate };
     });
     runningApps.set(42, {

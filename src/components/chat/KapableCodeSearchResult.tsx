@@ -13,9 +13,9 @@ interface KapableCodeSearchResultProps {
   children?: React.ReactNode;
 }
 
-export const KapableCodeSearchResult: React.FC<KapableCodeSearchResultProps> = ({
-  children,
-}) => {
+export const KapableCodeSearchResult: React.FC<
+  KapableCodeSearchResultProps
+> = ({ children }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const files = useMemo(() => {

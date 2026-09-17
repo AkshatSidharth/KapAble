@@ -184,7 +184,9 @@ export async function processFullResponseActions(
       assertNotProjectRootPath(appPath, filePath);
     }
     preparedDeletePaths = await Promise.all(
-      kapableDeletePaths.map((filePath) => prepareDeletePath(appPath, filePath)),
+      kapableDeletePaths.map((filePath) =>
+        prepareDeletePath(appPath, filePath),
+      ),
     );
   } catch (error) {
     logger.error("Refusing unsafe delete response:", error);
@@ -233,7 +235,8 @@ export async function processFullResponseActions(
     // Extract all tags
     const kapableWriteTags = getKapableWriteTags(fullResponse);
     const kapableRenameTags = getKapableRenameTags(fullResponse);
-    const kapableAddDependencyPackages = getKapableAddDependencyTags(fullResponse);
+    const kapableAddDependencyPackages =
+      getKapableAddDependencyTags(fullResponse);
     let installedOrUpdatedDependencyPackages: string[] = [];
     const hasDbProvider =
       chatWithApp.app.supabaseProjectId || chatWithApp.app.neonProjectId;

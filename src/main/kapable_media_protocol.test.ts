@@ -267,7 +267,9 @@ describe("kapable-media thumbnail protocol", () => {
     const { handler, createThumbnailFromPath } = makeHandler();
 
     const result = await handler(
-      new Request(`${buildKapableMediaUrl(appPath, "oversized.png")}?thumbnail=1`),
+      new Request(
+        `${buildKapableMediaUrl(appPath, "oversized.png")}?thumbnail=1`,
+      ),
     );
 
     expect(result.status).toBe(413);
@@ -297,7 +299,9 @@ describe("kapable-media thumbnail protocol", () => {
     const { handler, createThumbnailFromPath } = makeHandler();
 
     const result = await handler(
-      new Request(`${buildKapableMediaUrl(appPath, "too-large.png")}?thumbnail=1`),
+      new Request(
+        `${buildKapableMediaUrl(appPath, "too-large.png")}?thumbnail=1`,
+      ),
     );
 
     expect(result.status).toBe(413);
@@ -321,7 +325,9 @@ describe("kapable-media thumbnail protocol", () => {
     await fs.writeFile(path.join(mediaPath, "corrupt.png"), "not an image");
     const corrupt = makeHandler();
     const corruptResult = await corrupt.handler(
-      new Request(`${buildKapableMediaUrl(appPath, "corrupt.png")}?thumbnail=1`),
+      new Request(
+        `${buildKapableMediaUrl(appPath, "corrupt.png")}?thumbnail=1`,
+      ),
     );
     expect(corruptResult.status).toBe(415);
     expect(corrupt.createThumbnailFromPath).not.toHaveBeenCalled();

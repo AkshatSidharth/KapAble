@@ -10,6 +10,14 @@ Casing policy:
 Anything in PROTECTED_LITERALS is an external contract (published npm package
 ids, attributes emitted by a third-party plugin, remote template repos,
 upstream provenance links, legal attribution) and is restored verbatim.
+
+Two further escape hatches exist so this stays safe to re-run after merging
+from upstream:
+
+* Files in SKIP_EXACT/SKIP_PREFIX are never touched. KapAble-authored docs
+  live there because they discuss the fork and name Dyad on purpose.
+* Any line containing the marker `rebrand:keep` is left alone, for deliberate
+  references to upstream inside files that are otherwise swept.
 """
 
 import os
@@ -17,7 +25,9 @@ import re
 import subprocess
 import sys
 
-ROOT = "/home/user/KapAble"
+import pathlib
+
+ROOT = str(pathlib.Path(__file__).resolve().parents[2])
 
 # --- Files never rewritten -------------------------------------------------
 # Lockfiles hold base64 integrity hashes that can legitimately contain the
@@ -29,11 +39,22 @@ SKIP_EXACT = {
     "src/pro/LICENSE",
     "packages/@dyad-sh/react-vite-component-tagger/LICENSE",
     "packages/@dyad-sh/nextjs-webpack-component-tagger/LICENSE",
+    # KapAble-authored, and they describe the fork's relationship to Dyad by
+    # name. Sweeping them turns "a fork of Dyad" into "a fork of KapAble".
+    "README.md",
+    "CONTRIBUTING.md",
+    "docs/README.md",
+    "docs/DEMO.md",
+    "src/constants/brand.ts",
 }
 SKIP_SUFFIX = ("package-lock.json", "pnpm-lock.yaml", "yarn.lock")
 # Vendored copies of packages published to npm under the @dyad-sh scope. Their
 # id and docs describe the *published* artifact, so they are left alone.
-SKIP_PREFIX = ("packages/@dyad-sh/",)
+SKIP_PREFIX = ("packages/@dyad-sh/", "scripts/rebrand/")
+
+# Lines carrying this marker are passed through untouched, so a deliberate
+# mention of upstream survives a re-run.
+KEEP_MARKER = "rebrand:keep"
 
 # --- Literals that must survive the rename ---------------------------------
 PROTECTED_LITERALS = [
@@ -43,7 +64,12 @@ PROTECTED_LITERALS = [
     # read back by the preview component selector / visual editor / recorder.
     "data-dyad-id",
     "data-dyad-name",
-    "data-dyad-",
+    "data-dyad-runtime-id",
+    # ...and the camelCase form the DOM exposes them under. Renaming these
+    # silently breaks "click a component in the preview", because the attribute
+    # on the element still says dyad.
+    "dataset.dyadId",
+    "dataset.dyadName",
     # Remote starter templates cloned at runtime; not ours to rename.
     "dyad-sh/nextjs-template",
     "dyad-sh/react-vite-nitro",
@@ -91,16 +117,24 @@ def restore(text, saved):
 WORD = r"[A-Za-z0-9_]"
 
 
-def rename_text(text):
-    text, saved = protect(text)
-    text = text.replace("DYAD", "KAPABLE")
+def rename_line(line):
+    line, saved = protect(line)
+    line = line.replace("DYAD", "KAPABLE")
     # "Dyad" glued to another word character on either side is an identifier.
-    text = re.sub(rf"(?<={WORD})Dyad", "Kapable", text)
-    text = re.sub(rf"Dyad(?={WORD})", "Kapable", text)
+    line = re.sub(rf"(?<={WORD})Dyad", "Kapable", line)
+    line = re.sub(rf"Dyad(?={WORD})", "Kapable", line)
     # What is left is the standalone product name.
-    text = text.replace("Dyad", "KapAble")
-    text = text.replace("dyad", "kapable")
-    return restore(text, saved)
+    line = line.replace("Dyad", "KapAble")
+    line = line.replace("dyad", "kapable")
+    return restore(line, saved)
+
+
+def rename_text(text):
+    # Line by line, so a `rebrand:keep` marker can exempt a single line.
+    return "\n".join(
+        line if KEEP_MARKER in line else rename_line(line)
+        for line in text.split("\n")
+    )
 
 
 def rename_path_component(name):

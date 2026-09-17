@@ -22,7 +22,10 @@ interface ScriptPayload {
   output?: string;
 }
 
-export const KapableScript: React.FC<KapableScriptProps> = ({ node, children }) => {
+export const KapableScript: React.FC<KapableScriptProps> = ({
+  node,
+  children,
+}) => {
   const description: string = node?.properties?.description || "Ran a script";
   const truncated = node?.properties?.truncated === "true";
   const executionMs: string = node?.properties?.executionMs || "";

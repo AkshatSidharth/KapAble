@@ -132,7 +132,8 @@ export function AppUpgrades({ appId }: { appId: number | null }) {
                         onClick={(e) => {
                           e.stopPropagation();
                           ipc.system.openExternalUrl(
-                            upgrade.manualUpgradeUrl ?? "https://kapable.sh/docs",
+                            upgrade.manualUpgradeUrl ??
+                              "https://github.com/AkshatSidharth/KapAble/blob/main/docs/README.md",
                           );
                         }}
                         className="underline font-medium hover:dark:text-red-200"

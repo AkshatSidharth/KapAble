@@ -1,7 +1,11 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { ExternalLink, FileText, Image } from "lucide-react";
-import { KapableCard, KapableCardHeader, KapableBadge } from "./KapableCardPrimitives";
+import {
+  KapableCard,
+  KapableCardHeader,
+  KapableBadge,
+} from "./KapableCardPrimitives";
 import { ImageLightbox, openFile } from "./ImageLightbox";
 
 export type AttachmentSize = "sm" | "md" | "lg";

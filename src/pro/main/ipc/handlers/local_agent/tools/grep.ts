@@ -385,7 +385,9 @@ export const grepTool: ToolDefinition<z.infer<typeof grepSchema>> = {
     const attrs = buildGrepAttributes(args, matches.length, totalCount);
 
     if (matches.length === 0) {
-      ctx.onXmlComplete(`<kapable-grep ${attrs}>No matches found.</kapable-grep>`);
+      ctx.onXmlComplete(
+        `<kapable-grep ${attrs}>No matches found.</kapable-grep>`,
+      );
       return "No matches found.";
     }
 

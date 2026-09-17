@@ -103,7 +103,9 @@ export function registerTokenCountHandlers() {
       // Count system prompt tokens
       // Migration on read converts "agent" to "build", so no need to check for it here
       const themePrompt = await getThemePromptById(chat.app?.themeId ?? null);
-      const frameworkType = detectFrameworkType(getKapableAppPath(chat.app.path));
+      const frameworkType = detectFrameworkType(
+        getKapableAppPath(chat.app.path),
+      );
       const enableAppBlueprint =
         settings.enableAppBlueprint === true && chat.app.needsAppBlueprint;
       const appBlueprint = getAppBlueprintForChat(chat.id);

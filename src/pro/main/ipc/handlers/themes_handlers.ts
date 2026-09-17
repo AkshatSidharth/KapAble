@@ -343,7 +343,10 @@ export function registerThemesHandlers() {
 
       // Validate name
       if (!trimmedName) {
-        throw new KapableError("Theme name is required", KapableErrorKind.Validation);
+        throw new KapableError(
+          "Theme name is required",
+          KapableErrorKind.Validation,
+        );
       }
       if (trimmedName.length > 100) {
         throw new KapableError(
@@ -526,7 +529,10 @@ export function registerThemesHandlers() {
 
       // Validate base64 data
       if (!data || typeof data !== "string") {
-        throw new KapableError("Invalid image data", KapableErrorKind.Validation);
+        throw new KapableError(
+          "Invalid image data",
+          KapableErrorKind.Validation,
+        );
       }
 
       // Validate and extract extension
@@ -632,7 +638,10 @@ Modern dark theme with purple accents for testing.
       }
 
       if (params.imagePaths.length > 5) {
-        throw new KapableError("Maximum 5 images allowed", KapableErrorKind.External);
+        throw new KapableError(
+          "Maximum 5 images allowed",
+          KapableErrorKind.External,
+        );
       }
 
       // Validate keywords length
@@ -841,7 +850,10 @@ Modern theme extracted from website for testing.
       // Get API key for KapAble Engine
       const apiKey = settings.providerSettings?.auto?.apiKey?.value;
       if (!apiKey) {
-        throw new KapableError("KapAble Pro API key is required", KapableErrorKind.Auth);
+        throw new KapableError(
+          "KapAble Pro API key is required",
+          KapableErrorKind.Auth,
+        );
       }
 
       // Crawl the website

@@ -10,7 +10,10 @@ interface KapableThinkProps {
   children?: React.ReactNode;
 }
 
-export const KapableThink: React.FC<KapableThinkProps> = ({ children, node }) => {
+export const KapableThink: React.FC<KapableThinkProps> = ({
+  children,
+  node,
+}) => {
   const state = node?.properties?.state as CustomTagState;
   const inProgress = state === "pending";
   const [isExpanded, setIsExpanded] = useState(inProgress);

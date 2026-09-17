@@ -1,7 +1,37 @@
+KapAble
+Copyright (c) KapAble contributors.
+
+This product is a derivative work of Dyad (https://github.com/dyad-sh/dyad).
+
 Dyad
 Copyright (c) Dyad contributors.
+Copyright 2025 Dyad Tech, Inc.
+License: Apache-2.0, except for the contents of "src/pro/", which are licensed
+under the Functional Source License, Version 1.1, ALv2 Future License. See
+LICENSE and src/pro/LICENSE.
 
-This product bundles dependencies that carry separate attribution requirements.
+Statement of changes (Apache-2.0 section 4b)
+--------------------------------------------
+KapAble modifies the original Dyad source as follows:
+
+* Renamed the product and its identifiers, user-facing copy, localizations,
+  URL scheme, on-disk paths and response tags from Dyad to KapAble.
+* Removed the bundled product-analytics project key. No analytics are
+  collected unless an operator supplies their own key at build time.
+* Replaced hard-coded hosted-service endpoints with configuration that is
+  unset by default, so features depending on services operated by Dyad Tech,
+  Inc. are disabled rather than directed at those services.
+* Disabled the software update feed by default.
+* Repointed in-application help links to this project's own documentation.
+
+The following upstream identifiers are retained deliberately, because they
+refer to artifacts published and operated by the Dyad project rather than to
+KapAble: the "@dyad-sh" npm package scope, the "data-dyad-*" DOM attributes
+emitted by the Dyad component tagger, and the "dyad-sh" GitHub organization's
+starter template repositories.
+
+Bundled dependencies with separate attribution requirements
+-----------------------------------------------------------
 
 mustardscript
 License: Apache-2.0

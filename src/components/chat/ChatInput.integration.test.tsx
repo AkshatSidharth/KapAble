@@ -58,7 +58,10 @@ describe("chat input during turn admission", () => {
       vi.mocked(preflightSubscriptionTurn).mockImplementation(async (model) => {
         await pending;
         if (rejected) {
-          throw new KapableError("Out of credits", KapableErrorKind.Precondition);
+          throw new KapableError(
+            "Out of credits",
+            KapableErrorKind.Precondition,
+          );
         }
         return { model };
       });

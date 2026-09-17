@@ -6,7 +6,11 @@ import {
   type InvocationRef,
   type InvocationClaim,
 } from "../../state_machines/invocation_ref";
-import { KapableError, KapableErrorKind, isKapableError } from "../../errors/kapable_error";
+import {
+  KapableError,
+  KapableErrorKind,
+  isKapableError,
+} from "../../errors/kapable_error";
 import type { QueryInvalidationScope } from "../../window_infrastructure/types";
 
 // =============================================================================

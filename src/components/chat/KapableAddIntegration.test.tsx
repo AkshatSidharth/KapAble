@@ -82,9 +82,12 @@ function renderCard() {
     return <Provider store={store}>{children}</Provider>;
   }
 
-  return render(<KapableAddIntegration>Connect a database.</KapableAddIntegration>, {
-    wrapper: Wrapper,
-  });
+  return render(
+    <KapableAddIntegration>Connect a database.</KapableAddIntegration>,
+    {
+      wrapper: Wrapper,
+    },
+  );
 }
 
 describe("KapableAddIntegration", () => {

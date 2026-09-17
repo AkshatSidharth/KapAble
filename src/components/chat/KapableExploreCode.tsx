@@ -90,7 +90,10 @@ export const KapableExploreCode: React.FC<KapableExploreCodeProps> = ({
           <KapableStateIndicator state="pending" pendingLabel="Exploring..." />
         )}
         {aborted && (
-          <KapableStateIndicator state="aborted" abortedLabel="Did not finish" />
+          <KapableStateIndicator
+            state="aborted"
+            abortedLabel="Did not finish"
+          />
         )}
         {errored && <KapableStateIndicator state="error" errorLabel="Failed" />}
         <div className="ml-auto">

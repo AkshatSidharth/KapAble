@@ -211,7 +211,9 @@ describe("answers from a run nobody is watching any more", () => {
 
     const stale = controller.start(TARGET);
     controller.cancel();
-    first.reject(new KapableError("Cancelled.", KapableErrorKind.UserCancelled));
+    first.reject(
+      new KapableError("Cancelled.", KapableErrorKind.UserCancelled),
+    );
     await expect(stale.result).rejects.toThrow();
     controller.dismiss();
 

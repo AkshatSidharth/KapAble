@@ -59,7 +59,8 @@ const KAPABLE_ALLOW_BUILDS_DATA_VERSION_KEY =
 const KAPABLE_ALLOW_BUILDS_CHANNEL_KEY = "kapable-default-allow-builds-channel";
 const KAPABLE_ALLOW_BUILDS_BEGIN = "# kapable-default-allow-builds begin";
 const KAPABLE_ALLOW_BUILDS_END = "# kapable-default-allow-builds end";
-const LEGACY_KAPABLE_ALLOW_BUILDS_BEGIN = "# kapable-default-allow-builds=v1 begin";
+const LEGACY_KAPABLE_ALLOW_BUILDS_BEGIN =
+  "# kapable-default-allow-builds=v1 begin";
 const LEGACY_KAPABLE_ALLOW_BUILDS_END = "# kapable-default-allow-builds=v1 end";
 const KAPABLE_AUTO_DENIED_ALLOW_BUILDS_COMMENT = "# kapable-auto-denied";
 const PNPM_IGNORED_BUILDS_ERROR_CODE = "ERR_PNPM_IGNORED_BUILDS";
@@ -217,7 +218,9 @@ function parseDefaultAllowBuilds(
 ): AllowBuildsSource {
   const lines = text.split(/\r?\n/).map((line) => line.trim());
   const metadata = parseAllowBuildsMetadata(lines);
-  if (metadata[KAPABLE_ALLOW_BUILDS_SCHEMA_KEY] !== KAPABLE_ALLOW_BUILDS_SCHEMA) {
+  if (
+    metadata[KAPABLE_ALLOW_BUILDS_SCHEMA_KEY] !== KAPABLE_ALLOW_BUILDS_SCHEMA
+  ) {
     throw new Error(
       `Invalid default pnpm allow-builds list. Expected "${KAPABLE_ALLOW_BUILDS_SCHEMA_KEY}=${KAPABLE_ALLOW_BUILDS_SCHEMA}".`,
     );

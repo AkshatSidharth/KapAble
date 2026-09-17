@@ -21,7 +21,10 @@ export function assertChatModeCompatibleWithModel(
   chatMode: ChatMode,
 ): void {
   if (isFreeProBuildModeCombination(settings.selectedModel, chatMode)) {
-    throw new KapableError(FREE_PRO_BUILD_MODE_ERROR, KapableErrorKind.Precondition);
+    throw new KapableError(
+      FREE_PRO_BUILD_MODE_ERROR,
+      KapableErrorKind.Precondition,
+    );
   }
 }
 

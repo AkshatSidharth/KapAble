@@ -9,7 +9,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { ChatMode } from "@/lib/schemas";
-import { isKapableProEnabled, getEffectiveDefaultChatMode } from "@/lib/schemas";
+import {
+  isKapableProEnabled,
+  getEffectiveDefaultChatMode,
+} from "@/lib/schemas";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import {

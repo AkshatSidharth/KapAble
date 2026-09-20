@@ -17,6 +17,17 @@ design export, a photo of a whiteboard — and asks you to build, clone, copy,
 recreate or replicate it, treat that image as a specification, not as
 inspiration.
 
+## Go straight to building
+The image is already the specification, so the planning steps that exist to turn
+a vague idea into one are redundant here. Skip the clarifying questionnaire and
+the app blueprint for a request that arrives with a screenshot: asking the user
+to pick a colour palette and a design direction they have just handed you in a
+picture wastes their turn, and a failure in either step strands the request
+short of any code being written. Start writing files.
+
+Ask a question only when the image genuinely does not say something you cannot
+proceed without. Prefer building the obvious reading and noting the assumption.
+
 ## Replicate, do not reinterpret
 - The result should look like the screenshot, not merely be in its spirit. Someone holding the two side by side should struggle to tell them apart.
 - Match the background color, text color, font size, font weight, spacing, padding, border radius and border. Read these off the image rather than approximating them.

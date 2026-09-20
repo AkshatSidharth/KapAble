@@ -8,6 +8,8 @@ import { useEffect, useMemo, type ReactNode } from "react";
 import { useAppOutputSubscription } from "@/hooks/useRunApp";
 import { useAtomValue, useSetAtom } from "jotai";
 import { selectedAppIdAtom } from "@/atoms/appAtoms";
+import { hasEnteredWorkspaceAtom } from "@/atoms/landingAtoms";
+import { LandingPage } from "@/components/LandingPage";
 import { useSettings } from "@/hooks/useSettings";
 import { DEFAULT_ZOOM_LEVEL } from "@/lib/schemas";
 import { selectedComponentsPreviewAtom } from "@/atoms/previewAtoms";
@@ -94,6 +96,7 @@ function RootLayoutContent({ children }: { children: ReactNode }) {
   const appRunManager = useAppRunRemoteManager();
   const previewErrors = usePreviewErrorFacade();
   const screenshotManager = useScreenshotManager();
+  const hasEnteredWorkspace = useAtomValue(hasEnteredWorkspaceAtom);
   // Subscribe to app output events once at the root level to avoid duplicates
   useAppOutputSubscription();
   useEffect(
@@ -206,6 +209,12 @@ function RootLayoutContent({ children }: { children: ReactNode }) {
                     {children}
                   </div>
                 </div>
+                {/*
+                 * Rendered last so it paints over the sidebar and content, but
+                 * still inside SidebarProvider and below the title bar's z-11,
+                 * which keeps the window draggable and its controls live.
+                 */}
+                {!hasEnteredWorkspace && <LandingPage />}
                 <Toaster
                   richColors
                   expand

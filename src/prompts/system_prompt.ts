@@ -7,6 +7,7 @@ import {
   constructLocalAgentPrompt,
 } from "./local_agent_prompt";
 import { constructPlanModePrompt } from "./plan_mode_prompt";
+import { UI_REPLICATION_GUIDANCE } from "./ui_replication_prompt";
 import type { AppFrameworkType } from "@/lib/framework_constants";
 import type { AppBlueprintData } from "@/ipc/types/app_blueprint";
 
@@ -572,6 +573,8 @@ ${
 const BUILD_SYSTEM_PROMPT_BASE = `${BUILD_SYSTEM_PREFIX}
 
 [[AI_RULES]]
+
+${UI_REPLICATION_GUIDANCE}
 
 ${BUILD_SYSTEM_POSTFIX}`;
 

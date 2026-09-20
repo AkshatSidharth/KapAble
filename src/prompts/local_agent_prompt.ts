@@ -5,6 +5,7 @@
 
 import type { AppFrameworkType } from "@/lib/framework_constants";
 import type { AppBlueprintData } from "@/ipc/types/app_blueprint";
+import { UI_REPLICATION_GUIDANCE } from "./ui_replication_prompt";
 import {
   resolveLinkedDatabaseProvider,
   type DatabaseProvider,
@@ -1017,6 +1018,10 @@ export function constructLocalAgentPrompt(
     .replace("[[SERVER_LAYER]]", () => serverLayer)
     .replace("[[AI_RULES]]", () => aiRules ?? DEFAULT_AI_RULES);
 
+  // An attached UI screenshot is a spec, not a mood board. Without this the
+  // image still reaches the model, but nothing says to rebuild it faithfully.
+  prompt += "\n\n" + UI_REPLICATION_GUIDANCE;
+
   // Append theme prompt if provided
   if (themePrompt) {
     prompt += "\n\n" + themePrompt;
@@ -1063,6 +1068,8 @@ export function constructBuildAgentPrompt(
   )
     .replace("[[SERVER_LAYER]]", () => serverLayer)
     .replace("[[AI_RULES]]", () => aiRules ?? DEFAULT_AI_RULES);
+
+  prompt += "\n\n" + UI_REPLICATION_GUIDANCE;
 
   if (themePrompt) {
     prompt += "\n\n" + themePrompt;

@@ -6,10 +6,17 @@ import {
   Palette,
   Check,
   Ban,
+  BookOpen,
   Brush,
+  Cloud,
+  LayoutGrid,
   PlusCircle,
   MoreHorizontal,
   ImageIcon,
+  Shapes,
+  Square,
+  Terminal,
+  type LucideIcon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -46,6 +53,38 @@ interface AuxiliaryActionsMenuProps {
   toggleShowTokenBar?: () => void;
   appId?: number;
   onGenerateImage?: () => void;
+}
+
+/**
+ * Icons the built-in themes name in `themesData`.
+ *
+ * Kept as an explicit map rather than a lookup into all of lucide, so that
+ * adding a theme with an icon nobody imported is a type error at the theme
+ * rather than a silently missing glyph in the menu.
+ */
+const THEME_ICONS: Record<string, LucideIcon> = {
+  palette: Palette,
+  "book-open": BookOpen,
+  square: Square,
+  cloud: Cloud,
+  "layout-grid": LayoutGrid,
+  shapes: Shapes,
+  terminal: Terminal,
+};
+
+function ThemeIcon({
+  name,
+  size,
+  className,
+}: {
+  name: string;
+  size: number;
+  className?: string;
+}) {
+  // Custom themes and any future built-in fall back to the generic mark
+  // instead of leaving the row's label hanging without one.
+  const Icon = THEME_ICONS[name] ?? Palette;
+  return <Icon size={size} className={className} />;
 }
 
 export function AuxiliaryActionsMenu({
@@ -190,12 +229,11 @@ export function AuxiliaryActionsMenu({
                     title={theme.description}
                   >
                     <div className="flex items-center w-full">
-                      {theme.icon === "palette" && (
-                        <Palette
-                          size={16}
-                          className="mr-2 text-muted-foreground"
-                        />
-                      )}
+                      <ThemeIcon
+                        name={theme.icon}
+                        size={16}
+                        className="mr-2 text-muted-foreground"
+                      />
                       <span className="flex-1">{theme.name}</span>
                       {isSelected && (
                         <Check size={16} className="text-primary ml-2" />

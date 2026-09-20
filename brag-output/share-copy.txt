@@ -1,0 +1,3 @@
+Introducing KapAble: a local, open-source AI app builder. Describe an app, and it writes real code to a folder you own — then quit KapAble and `npm run dev` still works.
+
+Bring your own key. No analytics. Apache-2.0.

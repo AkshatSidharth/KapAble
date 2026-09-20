@@ -1,0 +1,24 @@
+<svg
+  width="200"
+  height="200"
+  viewBox="0 0 200 200"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label="KapAble"
+>
+  <title>KapAble</title>
+  <!--
+    The KapAble mark: a white angular glyph knocked out of a brand-red disc.
+
+    Proportions are driven by the ~20px title bar, which is where the mark is
+    mostly seen. At that size one SVG unit is a tenth of a pixel, so the two
+    wedges are deliberately heavy and the gap between them is ~24 units (~2.4px
+    at 20px) — thinner than that and the glyph rasterises into a solid blob.
+  -->
+  <circle cx="100" cy="100" r="96" fill="#E11D2E" />
+  <g fill="#FFFFFF">
+    <path d="M46 97 L150 34 L150 88 Z" />
+    <path d="M46 103 L150 112 L150 166 Z" />
+  </g>
+</svg>

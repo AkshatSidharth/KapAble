@@ -1,0 +1,107 @@
+# Hyperframes Composition Brief: KapAble
+
+## Objective
+Create a short launch-style brag video for KapAble — a local, open-source AI app builder.
+
+## Output
+- Composition directory: `brag-output/composition/`
+- Rendered video: `brag-output/brag.mp4`
+- Format: landscape — 1920x1080
+- Duration: 21 seconds
+
+## Source Material
+- Project root: `/home/user/KapAble`
+- Primary files read: `README.md`, `package.json`, `docs/DEMO.md`,
+  `src/styles/globals.css`, `src/constants/brand.ts`, `assets/logo.svg`
+- Product name: KapAble
+- Tagline / strongest claim: "A local, open-source AI app builder" — and the
+  sharper one from `docs/DEMO.md`: *"If I quit KapAble right now, the folder is
+  still there and `npm run dev` still works."*
+- Key UI or visual moment to recreate: the KapAble app shell — dark navy left
+  rail (`#0F172A`) carrying the red disc mark, light canvas (`#F1F5F9`) — with
+  the chat input, a written file tree, and the live preview of a generated
+  habit tracker.
+- Copy that must appear verbatim:
+  - `A habit tracker with streaks.`
+  - `Show the streak as a big number with a flame.`
+  - `Quit KapAble.`
+  - `The folder is still there.`
+  - `npm run dev still works.`
+  - `A local, open-source AI app builder`
+
+## Creative Direction
+- Tone preset: `polished`
+- Creative direction: quiet premium developer-tool film — the product speaks, the edit doesn't
+- Interpretation: four scenes, long holds, 0.6s crossfades. Purposeful motion
+  over energetic motion; mixed-case medium-weight type. The restraint is the
+  argument — a local-first tool that shouts would undercut itself.
+- Angle: Every competitor in this category is a cloud service. The brag is not
+  "AI builds your app" — that is table stakes. The brag is **where the code
+  lands**. Show the app being built, then point at the folder on disk: quit the
+  tool and `npm run dev` still works.
+- Hook: a cursor types `A habit tracker with streaks.` into the KapAble chat input.
+- Outro / punchline: Quit KapAble. / The folder is still there. / `npm run dev` still works.
+- Avoid:
+  - Generic SaaS language
+  - Abstract filler visuals
+  - Unrelated visual redesign
+
+## Visual Identity
+- Background: `#F1F5F9` (canvas), `#0F172A` (app rail / chrome)
+- Text: `#0F172A`, muted `#64748B`
+- Accent: `#E11D2E` (brand primary), `#FF6B80` (secondary — fills only, never light-mode text)
+- Display font: Geist (SemiBold/Medium) — real TTFs vendored to `assets/fonts/`
+- Body font: Geist; Geist Mono for file paths and the `npm run dev` line
+- Visual references from the project: the mark from `assets/logo.svg` (white
+  angular glyph knocked out of a brand-red disc), the navy-rail-and-light-canvas
+  chrome, the demo script's habit tracker
+
+## Storyboard
+Use the storyboard in `brag-output/brag-plan.md` as the creative contract.
+
+Scene summary:
+1. Type the idea — 4.1s — KapAble chrome; `A habit tracker with streaks.` types into the chat input; send button lights brand red.
+2. It writes real files — 5.2s — four real file paths arrive one by one in a file tree; the live preview boots beside them showing a working habit tracker.
+3. Point at the thing on screen — 5.4s — cursor clicks a habit card in the preview, red selection ring snaps on, one instruction line, card re-renders to a big streak numeral counting to 12 with a flame.
+4. Where the code lives — 6.3s — three lines one at a time, then the mark, the name, the tagline, silence.
+
+## Audio
+- Audio role: warm bed with sparse professional accents
+- Audio arc: bed enters under the typed prompt, carries motion-matched ticks
+  through the build and the click-to-edit, then fades away so the final three
+  lines and the mark land in near-silence.
+- Music: `happy-beats-business-moves-vol-10-by-ende-dot-app.mp3` (60s, 109.96 BPM)
+- Music treatment: bed at `0.22` gain via a `data-automation` volume lane —
+  0→0.4s fade-in, hold, 19.5→21.0s fade-out to 0.
+- Music cue guidance: bundled preset read
+  (`assets/music/cues/…vol-10….music-cues.md`). Strong cue **18.55s** (strength
+  0.98) locks the mark reveal. Beat grid for sequential reveals: file rows on
+  4.64 / 5.19 / 5.74 / 6.28; outro lines on 15.28 / 16.38 / 17.47 (every other
+  beat, ~1.1s apart, above the readable floor).
+- Audio-reactive treatment: subtle. `audio-data.json` extracted at 30fps / 16
+  bands. Bass (`bands[0]`) drives the outro mark's scale within 3-4% and the
+  softness of its red glow. Nothing else responds. No waveform bars, no pulsing UI.
+- Audio-coupled moments:
+  - Scene 1 typed prompt — thinned key ticks under the typing, one soft click as send activates
+  - Scene 2 file rows — one dry tick per row, motion-matched, on the beat grid
+  - Scene 3 selection ring — a single soft UI click on the snap; faint ticks under the count-up
+  - Scene 4 mark — one dry warm accent as it settles, beat-locked to 18.55s
+- SFX selection guidance: low high-frequency-risk files only, per
+  `sfx-analysis.md`. Ticks match motion exactly; nothing fires that is not
+  carrying meaning. No whoosh per transition, no riser into the outro, no
+  stinger stacking on the logo.
+- SFX analysis guidance: `/home/user/latent-spaces/brag/skills/brag/assets/sfx/sfx-analysis.md`
+  — selected `keypress-002/003/005.wav`, `ui/click2.ogg`,
+  `interface/click_003.ogg`, `interface/click_005.ogg`,
+  `impact/impactSoft_medium_001.ogg` (all low HF risk, warm/balanced).
+- Exact SFX choice: chosen against the implemented animation, timestamps matched to motion.
+- Audio files: copied into `composition/assets/music/` and `composition/assets/sfx/`.
+
+## Hyperframes Instructions
+Requirements:
+- Show at least one real UI, copy, or visual element from the source project. ✔ app chrome, mark, demo copy
+- Keep all text readable in the final render. ✔ reading-time floors honoured
+- Keep the video within 15-25 seconds. ✔ 21s
+- Include the planned music/SFX layer. ✔
+- Treat music cue metadata as optional timing hints; 1 strong-cue lock (18.55s).
+- Run `hyperframes check` before render — brag's single gate.

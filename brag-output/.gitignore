@@ -1,0 +1,15 @@
+# Hyperframes project dependencies — reinstall with `npm install` in composition/
+composition/node_modules/
+
+# Scratch frames from `hyperframes snapshot`
+composition/snapshots/
+
+# Full 16-band extraction; composition/audio-data.js carries the bass band it uses
+composition/audio-data.json
+
+# Bundled music track from the /brag skill. Its README says the exact license
+# terms must be verified and documented before redistribution, so neither the
+# track nor the render that embeds it is committed here. Drop the mp3 back into
+# composition/assets/music/ and re-run `npx hyperframes render` to rebuild.
+composition/assets/music/*.mp3
+brag.mp4

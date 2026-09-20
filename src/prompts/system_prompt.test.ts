@@ -37,3 +37,31 @@ describe("build system prompt", () => {
     );
   });
 });
+
+describe("server-side code in Build mode", () => {
+  const REFUSAL = "I can't set up server-side code in Build mode";
+
+  it("refuses for a plain Vite app, which has no server layer to write into", () => {
+    const prompt = getSystemPromptForChatMode({
+      chatMode: "build",
+      enableTurboEditsV2: false,
+      frameworkType: "vite",
+    });
+
+    expect(prompt).toContain(REFUSAL);
+  });
+
+  it("does not refuse for a vite-nitro app, which the scaffold now produces", () => {
+    // Apps created from scaffold/ ship a Nitro server layer, so there is
+    // nothing for Build mode to set up and nothing to send the user to Agent
+    // mode for — it can write server/routes/api files directly. Without this,
+    // every backend request in the default chat mode dead-ends in the refusal.
+    const prompt = getSystemPromptForChatMode({
+      chatMode: "build",
+      enableTurboEditsV2: false,
+      frameworkType: "vite-nitro",
+    });
+
+    expect(prompt).not.toContain(REFUSAL);
+  });
+});

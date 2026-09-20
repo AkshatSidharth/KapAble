@@ -8,6 +8,8 @@ import {
   MAX_IMAGE_DIMENSION,
 } from "./image_utils";
 import { KapableError, KapableErrorKind } from "@/errors/kapable_error";
+import { isKapableEngineConfigured } from "@/ipc/utils/kapable_engine_url";
+import { capturePageLocally } from "@/ipc/utils/local_page_capture";
 
 const logger = log.scope("web_crawl");
 
@@ -41,6 +43,13 @@ const CLONE_INSTRUCTIONS_WITH_SCREENSHOT = `
 Replicate the website from the provided screenshot image and markdown.
 
 **Use the screenshot as your primary visual reference** to understand the layout, colors, typography, and overall design of the website. The screenshot shows exactly how the page should look.
+
+**Match the design precisely**
+- The result should look *exactly* like the screenshot, not merely similar to it.
+- Pay close attention to background color, text color, font size, font weight, font family, padding, margin, border radius, and border — match these, do not approximate them.
+- Use the exact text from the page. The markdown snapshot below carries the copy verbatim; read wording from there rather than transcribing it off the pixels.
+- Reproduce the spacing rhythm and alignment. Sloppy vertical rhythm is the most common way a clone reads as "close but wrong".
+- If the page has a theme selected for this app, the page being cloned wins on layout and structure; keep the clone faithful rather than restyling it.
 
 **IMPORTANT: Image Handling**
 - Do NOT use or reference real external image URLs.
@@ -88,6 +97,13 @@ async function callWebCrawl(
   url: string,
   ctx: Pick<AgentContext, "kapableRequestId" | "abortSignal">,
 ): Promise<z.infer<typeof webCrawlResponseSchema>> {
+  // Upstream crawls through a hosted service. This fork runs none, and without
+  // a fallback the whole clone-a-site capability was simply unreachable — so
+  // capture the page with the browser KapAble is already built on instead.
+  if (!isKapableEngineConfigured()) {
+    return capturePageLocally(url, { signal: ctx.abortSignal });
+  }
+
   const response = await engineFetch(ctx, "/tools/web-crawl", {
     method: "POST",
     body: JSON.stringify({ url }),
@@ -111,8 +127,10 @@ export const webCrawlTool: ToolDefinition<z.infer<typeof webCrawlSchema>> = {
   defaultConsent: "ask",
   usesEngineEndpoint: true,
 
-  // Requires KapAble Pro engine API
-  isEnabled: (ctx) => ctx.isKapablePro,
+  // The hosted crawl endpoint is Pro-only, but the local capture that replaces
+  // it when no engine is configured needs nothing — so gate on Pro only when
+  // the engine is what would actually serve the request.
+  isEnabled: (ctx) => ctx.isKapablePro || !isKapableEngineConfigured(),
 
   getConsentPreview: (args) => `Crawl URL: "${args.url}"`,
 

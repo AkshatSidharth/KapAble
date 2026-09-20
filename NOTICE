@@ -40,3 +40,18 @@ Repository: https://github.com/mustardscript/mustardscript
 Playwright
 License: Apache-2.0
 Repository: https://github.com/microsoft/playwright
+
+Derived prompt text with separate attribution requirements
+----------------------------------------------------------
+
+screenshot-to-code
+License: MIT
+Copyright (c) 2023 Abi Raja
+Repository: https://github.com/abi/screenshot-to-code
+
+The "Match the design precisely" guidance in the web_crawl tool's clone
+instructions (src/pro/main/ipc/handlers/local_agent/tools/web_crawl.ts) is
+adapted from that project's screenshot replication prompts. No source code
+from screenshot-to-code is bundled; the wording was ported and rewritten for
+KapAble's own agent, which generates into an existing app rather than into a
+standalone HTML document.

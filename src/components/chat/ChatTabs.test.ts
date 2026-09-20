@@ -25,6 +25,7 @@ import {
   matchesPreNavigationPresentationCapture,
   getFallbackChatIdAfterClose,
   groupChatIdsByApp,
+  getChatTabLabels,
   partitionChatsByVisibleCount,
   reorderVisibleChatIds,
   restoreLocalStorageSnapshot,
@@ -718,5 +719,41 @@ describe("groupChatIdsByApp", () => {
     const result = groupChatIdsByApp([5, 1, 3, 2, 4], toMap(chats));
     // app2 group comes first now (its chat 5 is seen first), new chat leads it.
     expect(result).toEqual([5, 2, 4, 1, 3]);
+  });
+});
+
+describe("getChatTabLabels", () => {
+  const RAILGO = { title: "Railway ticket booking website", appName: "RailGo" };
+
+  it("leads with the chat title, which is what separates two tabs", () => {
+    // Leading with the app name gave every tab in an app the same bold label.
+    expect(getChatTabLabels({ ...RAILGO, hasMultipleApps: true }).primary).toBe(
+      "Railway ticket booking website",
+    );
+    expect(
+      getChatTabLabels({ ...RAILGO, hasMultipleApps: false }).primary,
+    ).toBe("Railway ticket booking website");
+  });
+
+  it("omits the app name when every open tab belongs to one app", () => {
+    // It would repeat the tab's own avatar and the title bar's app chip.
+    expect(
+      getChatTabLabels({ ...RAILGO, hasMultipleApps: false }).secondary,
+    ).toBeNull();
+  });
+
+  it("keeps the app name when tabs span more than one app", () => {
+    // There it is the only thing saying which app a tab belongs to.
+    expect(
+      getChatTabLabels({ ...RAILGO, hasMultipleApps: true }).secondary,
+    ).toBe("RailGo");
+  });
+
+  it("never returns the app name as the primary label", () => {
+    for (const hasMultipleApps of [true, false]) {
+      expect(getChatTabLabels({ ...RAILGO, hasMultipleApps }).primary).not.toBe(
+        "RailGo",
+      );
+    }
   });
 });

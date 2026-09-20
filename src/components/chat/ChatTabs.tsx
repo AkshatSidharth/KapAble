@@ -439,6 +439,34 @@ export function groupChatIdsByApp(
   return Array.from(groups.values()).flat();
 }
 
+/**
+ * What a chat tab writes on its two lines.
+ *
+ * The chat title leads, because it is the only thing that separates two tabs
+ * of the same app. Leading with the app name — which is what this used to do —
+ * gave every tab in an app the same bold label, and demoted the part that
+ * tells them apart to the small muted row underneath.
+ *
+ * The app name is worth a second line only when the open tabs actually span
+ * more than one app. Within a single app it already appears on the tab's own
+ * avatar and on the title bar's app chip, and it costs the title width it
+ * needs to stay readable.
+ */
+export function getChatTabLabels({
+  title,
+  appName,
+  hasMultipleApps,
+}: {
+  title: string;
+  appName: string;
+  hasMultipleApps: boolean;
+}): { primary: string; secondary: string | null } {
+  return {
+    primary: title,
+    secondary: hasMultipleApps ? appName : null,
+  };
+}
+
 export function getFallbackChatIdAfterClose(
   tabs: ChatSummary[],
   closedChatId: number,
@@ -1536,6 +1564,11 @@ export function ChatTabs({ selectedChatId }: ChatTabsProps) {
             const title = chat.title?.trim() || t("newChat");
             const app = appById.get(chat.appId);
             const appName = app?.name ?? `App ${chat.appId}`;
+            const labels = getChatTabLabels({
+              title,
+              appName,
+              hasMultipleApps,
+            });
             const titleExcerpt = getChatTitleExcerpt(title);
             const isDragging = draggingChatId === chat.id;
 
@@ -1697,24 +1730,27 @@ export function ChatTabs({ selectedChatId }: ChatTabsProps) {
                         <div className="flex min-w-0 flex-col justify-center text-xs">
                           <span
                             className={cn(
-                              "truncate leading-3",
+                              "truncate",
+                              labels.secondary ? "leading-3" : "leading-4",
                               isActive
                                 ? "font-semibold text-foreground"
                                 : "font-medium text-foreground/60",
                             )}
                           >
-                            {appName}
+                            {labels.primary}
                           </span>
-                          <span
-                            className={cn(
-                              "truncate text-[11px] leading-3.5",
-                              isActive
-                                ? "text-muted-foreground"
-                                : "text-muted-foreground/70",
-                            )}
-                          >
-                            {title}
-                          </span>
+                          {labels.secondary && (
+                            <span
+                              className={cn(
+                                "truncate text-[11px] leading-3.5",
+                                isActive
+                                  ? "text-muted-foreground"
+                                  : "text-muted-foreground/70",
+                              )}
+                            >
+                              {labels.secondary}
+                            </span>
+                          )}
                         </div>
                       </button>
                       <button
@@ -1740,12 +1776,17 @@ export function ChatTabs({ selectedChatId }: ChatTabsProps) {
                       sideOffset={6}
                       className="max-w-80 !rounded-lg !border !border-border !bg-popover !px-3.5 !py-2.5 !text-popover-foreground !shadow-lg [&>:last-child]:!hidden"
                     >
+                      {/*
+                       * The tooltip exists to show the full title the tab had
+                       * to truncate, so that leads here too; the app name is
+                       * the context underneath it.
+                       */}
                       <div className="min-w-0">
-                        <div className="truncate text-[11px] leading-4 font-semibold">
-                          {appName}
-                        </div>
-                        <div className="mt-0.5 text-[11px] leading-4 break-words opacity-70">
+                        <div className="text-[11px] leading-4 font-semibold break-words">
                           {titleExcerpt}
+                        </div>
+                        <div className="mt-0.5 truncate text-[11px] leading-4 opacity-70">
+                          {appName}
                         </div>
                       </div>
                     </TooltipContent>
@@ -1829,6 +1870,11 @@ export function ChatTabs({ selectedChatId }: ChatTabsProps) {
                 const title = chat.title?.trim() || t("newChat");
                 const appName =
                   appById.get(chat.appId)?.name ?? `App ${chat.appId}`;
+                const labels = getChatTabLabels({
+                  title,
+                  appName,
+                  hasMultipleApps,
+                });
                 return (
                   <DropdownMenuItem
                     key={chat.id}
@@ -1851,10 +1897,14 @@ export function ChatTabs({ selectedChatId }: ChatTabsProps) {
                       notified={notifiedChatIds.has(chat.id)}
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-xs leading-3.5 font-bold">
-                        {appName}
+                      <div className="truncate text-xs leading-4 font-bold">
+                        {labels.primary}
                       </div>
-                      <div className="truncate text-xs leading-4">{title}</div>
+                      {labels.secondary && (
+                        <div className="truncate text-xs leading-3.5 opacity-70">
+                          {labels.secondary}
+                        </div>
+                      )}
                     </div>
                     <button
                       type="button"

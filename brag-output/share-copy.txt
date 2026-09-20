@@ -1,3 +1,3 @@
-Kapture didn't buy an AI app builder. Kapture built one.
+Kapture didn't buy an AI app builder. Kapture built one — and wired it into Kapture CRM.
 
-KapAble turns a sentence into a working internal tool — here it stands up a support triage board, then rewrites a ticket card because someone clicked it and asked.
+Describe the dashboard you want. KapAble reads the CRM's own fields, builds it in place, and rebuilds it when you click a widget and describe the change.

@@ -1,7 +1,7 @@
 # Hyperframes Composition Brief: KapAble
 
 ## Objective
-Create a short launch-style brag video for KapAble — a local, open-source AI app builder.
+Create a short launch-style brag video for KapAble — Kapture CRM's in-house AI app builder.
 
 ## Output
 - Composition directory: `brag-output/composition/`
@@ -14,33 +14,36 @@ Create a short launch-style brag video for KapAble — a local, open-source AI a
 - Primary files read: `README.md`, `package.json`, `docs/DEMO.md`,
   `src/styles/globals.css`, `src/constants/brand.ts`, `assets/logo.svg`
 - Product name: KapAble
-- Tagline / strongest claim: "A local, open-source AI app builder" — and the
-  sharper one from `docs/DEMO.md`: *"If I quit KapAble right now, the folder is
-  still there and `npm run dev` still works."*
+- Positioning (from the user, not the repo): KapAble is **Kapture CRM's in-house
+  AI app builder**. The repo README still carries the upstream local-first
+  framing; the video follows the in-house one.
+- Tagline / strongest claim: "Kapture's in-house AI app builder" — the brag is
+  ownership: everyone in this market rents a builder, Kapture built its own.
 - Key UI or visual moment to recreate: the KapAble app shell — dark navy left
-  rail (`#0F172A`) carrying the red disc mark, light canvas (`#F1F5F9`) — with
-  the chat input, a written file tree, and the live preview of a generated
-  habit tracker.
+  rail (`#0F172A`) carrying the red disc mark, light canvas (`#F1F5F9`), title
+  bar marked *Kapture CRM · internal tools* — with the chat input, a written
+  file tree, and the live preview of a generated support triage board.
 - Copy that must appear verbatim:
-  - `A habit tracker with streaks.`
-  - `Show the streak as a big number with a flame.`
-  - `Quit KapAble.`
-  - `The folder is still there.`
-  - `npm run dev still works.`
-  - `A local, open-source AI app builder`
+  - `A triage board for the support queue.`
+  - `Show the SLA as a big countdown.`
+  - `Kapture didn't buy an app builder.`
+  - `Kapture built one.`
+  - `Kapture CRM · internal tools`
+  - `Kapture's in-house AI app builder`
 
 ## Creative Direction
 - Tone preset: `polished`
-- Creative direction: quiet premium developer-tool film — the product speaks, the edit doesn't
+- Creative direction: quiet premium in-house-tooling film — the product speaks, the edit doesn't
 - Interpretation: four scenes, long holds, 0.6s crossfades. Purposeful motion
   over energetic motion; mixed-case medium-weight type. The restraint is the
   argument — a local-first tool that shouts would undercut itself.
-- Angle: Every competitor in this category is a cloud service. The brag is not
-  "AI builds your app" — that is table stakes. The brag is **where the code
-  lands**. Show the app being built, then point at the folder on disk: quit the
-  tool and `npm run dev` still works.
-- Hook: a cursor types `A habit tracker with streaks.` into the KapAble chat input.
-- Outro / punchline: Quit KapAble. / The folder is still there. / `npm run dev` still works.
+- Angle: The brag is not "AI builds your app" — that is table stakes. The brag
+  is **ownership**. Everyone in this market rents a builder from someone else;
+  Kapture went and built its own, and it builds Kapture-shaped software. Show
+  that builder doing real CRM work, then land the flex plainly.
+- Hook: a cursor types `A triage board for the support queue.` into the KapAble
+  chat input, inside chrome marked *Kapture CRM · internal tools*.
+- Outro / punchline: Kapture didn't buy an app builder. / Kapture built one.
 - Avoid:
   - Generic SaaS language
   - Abstract filler visuals
@@ -54,16 +57,17 @@ Create a short launch-style brag video for KapAble — a local, open-source AI a
 - Body font: Geist; Geist Mono for file paths and the `npm run dev` line
 - Visual references from the project: the mark from `assets/logo.svg` (white
   angular glyph knocked out of a brand-red disc), the navy-rail-and-light-canvas
-  chrome, the demo script's habit tracker
+  chrome, and a support queue in Kapture's own domain — ticket IDs, priority
+  dots, SLA timers
 
 ## Storyboard
 Use the storyboard in `brag-output/brag-plan.md` as the creative contract.
 
 Scene summary:
-1. Type the idea — 4.1s — KapAble chrome; `A habit tracker with streaks.` types into the chat input; send button lights brand red.
-2. It writes real files — 5.2s — four real file paths arrive one by one in a file tree; the live preview boots beside them showing a working habit tracker.
-3. Point at the thing on screen — 5.4s — cursor clicks a habit card in the preview, red selection ring snaps on, one instruction line, card re-renders to a big streak numeral counting to 12 with a flame.
-4. Where the code lives — 6.3s — three lines one at a time, then the mark, the name, the tagline, silence.
+1. Type the idea — 4.1s — KapAble chrome marked *Kapture CRM · internal tools*; `A triage board for the support queue.` types into the chat input; send button lights brand red.
+2. It writes real files — 5.2s — `src/TriageBoard.tsx`, `src/TicketCard.tsx` and two more arrive one by one; the live preview boots beside them showing a working support queue with ticket IDs, priorities and SLA pills.
+3. Point at the thing on screen — 5.4s — cursor clicks a ticket row, red selection ring snaps on, `src/TicketCard.tsx` tag appears, one instruction line, the row re-renders to a big red SLA countdown ticking 2:14 → 2:10.
+4. Not bought. Built. — 6.3s — two lines one at a time, then the mark, the name, the tagline, silence.
 
 ## Audio
 - Audio role: warm bed with sparse professional accents
@@ -77,14 +81,14 @@ Scene summary:
   (`assets/music/cues/…vol-10….music-cues.md`). Strong cue **18.55s** (strength
   0.98) locks the mark reveal. Beat grid for sequential reveals: file rows on
   4.64 / 5.19 / 5.74 / 6.28; outro lines on 15.28 / 16.38 / 17.47 (every other
-  beat, ~1.1s apart, above the readable floor).
+  beat). Outro lines at 15.28 / 16.93, every third beat, stacking on screen.
 - Audio-reactive treatment: subtle. `audio-data.json` extracted at 30fps / 16
   bands. Bass (`bands[0]`) drives the outro mark's scale within 3-4% and the
   softness of its red glow. Nothing else responds. No waveform bars, no pulsing UI.
 - Audio-coupled moments:
   - Scene 1 typed prompt — thinned key ticks under the typing, one soft click as send activates
   - Scene 2 file rows — one dry tick per row, motion-matched, on the beat grid
-  - Scene 3 selection ring — a single soft UI click on the snap; faint ticks under the count-up
+  - Scene 3 selection ring — a single soft UI click on the snap; faint ticks under the SLA countdown
   - Scene 4 mark — one dry warm accent as it settles, beat-locked to 18.55s
 - SFX selection guidance: low high-frequency-risk files only, per
   `sfx-analysis.md`. Ticks match motion exactly; nothing fires that is not
@@ -99,7 +103,7 @@ Scene summary:
 
 ## Hyperframes Instructions
 Requirements:
-- Show at least one real UI, copy, or visual element from the source project. ✔ app chrome, mark, demo copy
+- Show at least one real UI, copy, or visual element from the source project. ✔ app chrome, mark, Kapture's own ticket/SLA domain
 - Keep all text readable in the final render. ✔ reading-time floors honoured
 - Keep the video within 15-25 seconds. ✔ 21s
 - Include the planned music/SFX layer. ✔

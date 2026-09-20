@@ -41,9 +41,27 @@ server sends whatever it has.
 Session cookies expire. If tools start failing with an auth error, refresh
 them from a logged-in browser session and update the Env values.
 
+## Use it: Agent mode only
+
+This is the step that looks like a broken install. MCP tools are registered by
+the local-agent loop and gated in `local_agent_handler.ts`:
+
+```js
+const mcpInSandboxEnabled =
+  !buildMode && !readOnly && !planModeOnly &&
+  shouldIncludeTool(executeSandboxScriptTool, ctx, buildOptions);
+```
+
+So the plugin can be connected, enabled and healthy, and still contribute
+nothing in **Build**, **Ask** or **Plan** mode — those get no MCP tools at all.
+Switch the chat to **Agent** mode before expecting a tool call.
+
+The first call also asks for consent. Approve it, or choose always-approve for
+read-only tools; writes are worth leaving on ask.
+
 ## Verify
 
-Ask in a new chat:
+Switch to Agent mode, then ask in a new chat:
 
 > list my Kapture queues
 
